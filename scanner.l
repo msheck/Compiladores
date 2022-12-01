@@ -25,7 +25,7 @@ sig 			\+|\-
 ident 			{let}+
 lit_i 			{sig}?{dig}+
 lit_f_regular 		({lit_i}\.{dig}+)
-lit_f_scientific 	({lit_f_regular}|{lit_i})(E|e){lit_i}
+lit_f_scientific 	{lit_f_regular}(E|e){lit_i}
 lit_f 			{lit_f_regular}|{lit_f_scientific}
 lit_c 			\'.\'|\'\'
 
