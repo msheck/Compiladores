@@ -1,25 +1,37 @@
+/*
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
+
+Desenvolvido pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+*/
+
 %{
 #include "tokens.h"
-int lineNumber = 1;
 %}
 
-spec_char [\,\;\:\(\)\{\}\+\-\*\/\%\^\<\>\=\!]
+%option noyywrap
 
-let [a-zA-Z]
-dig [0-9]
-sig \+|\-
+%option yylineno
 
-ident {let}+
-lit_i {sig}?{dig}+
-lit_f_regular ({lit_i}\.{dig}+)
-lit_f_scientific {lit_f_regular}E{lit_i}
-lit_f {lit_f_regular}|{lit_f_scientific}
-lit_b (false)|(true)
-lit_c \'.\'|\'\'
+spec_char 		[\,\;\:\(\)\{\}\+\-\*\/\%\^\<\>\=\!]
+
+let 			[a-zA-Z]
+dig 			[0-9]
+sig 			\+|\-
+
+ident 			{let}+
+lit_i 			{sig}?{dig}+
+lit_f_regular 		({lit_i}\.{dig}+)
+lit_f_scientific 	({lit_f_regular}|{lit_i})(E|e){lit_i}
+lit_f 			{lit_f_regular}|{lit_f_scientific}
+lit_c 			\'.\'|\'\'
 
 %x B_COMM
-line_comm \/\/.*
-ignore [" ""\r"]|{line_comm}
+line_comm 		\/\/.*
+ignore 			["\t"" ""\r"]|{line_comm}
 
 %%
 
@@ -44,26 +56,23 @@ for          { return TK_PR_FOR; }
 "||"         { return TK_OC_OR; }
 {lit_i}      { return TK_LIT_INT; }
 {lit_f}      { return TK_LIT_FLOAT; }
-{lit_b}      { return TK_LIT_TRUE; }
+true         { return TK_LIT_TRUE; }
+false        { return TK_LIT_FALSE; }
 {lit_c}      { return TK_LIT_CHAR; }
 {ident}      { return TK_IDENTIFICADOR; }
 
 "/*"         { BEGIN(B_COMM); }
 <B_COMM>"*/" { BEGIN(INITIAL); }
-<B_COMM>\n   { ++lineNumber; }
+<B_COMM>\n   { }
 <B_COMM>.    { }
 {ignore}     { }
 
-"\n"         { ++lineNumber; }
+"\n"         { }
 
 .            { return TK_ERRO; }
 
 
 %%
-int yywrap() {
-    return 1;
-}
-
 int get_line_number() {
-    return lineNumber;
+    return yylineno;
 }
