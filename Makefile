@@ -3,7 +3,7 @@ etapa1: lex.yy.c
 
 
 lex.yy.c: scanner.l
-	lex scanner.l
+	flex scanner.l
 
 clean:
 	rm -rf etapa1 lex.yy.c
