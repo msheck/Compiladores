@@ -1,9 +1,0 @@
-int a = 123
-int b = a
-// sdadasd fsjughfdiughdfog dfpj gkpodfg jhh
-/* asidjnausiohgfusdfhjgdpfjgopdfg
-dskijnffiodgjhiopjgh
-dsfiojsdgoihdfg
-gdfohopfghj dgfojh pfogjh ogk 
-/*
-bool a = false
