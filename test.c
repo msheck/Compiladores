@@ -147,9 +147,9 @@ int main (int argc, char **argv) {
     test_result = test_result && test_token("abcd_ABCD", TK_IDENTIFICADOR, false); // Invalid
     
     if (!test_result)
-        printf("\n\033[0;31mTESTS FAILED!\033[0m");
+        printf("\n\n\t\033[0;31mSOME TESTS FAILED!\033[0m\n");
     else
-        printf("\n\033[0;32mTESTS SUCCESSFUL!\033[0m");
+        printf("\n\n\t\033[0;32mALL TESTS PASSED!\033[0m\n");
     
     yylex_destroy();
     printf("\n");
@@ -165,10 +165,10 @@ int test_line_numbers(char* string, int expected_line_number) {
 
     printf("\nLine number is %d, expected is %d. ", line_number, expected_line_number);
     if (expected_line_number != line_number){
-        printf("\033[0;31mFAILURE!\033[0m");
+        printf("\033[0;31mFAILED!\033[0m");
         return false;
     }
-    printf("\033[0;32mSUCCESS!\033[0m");
+    printf("\033[0;32mPASSED!\033[0m");
     return true;
 }
 
@@ -179,10 +179,10 @@ int test_token(char* string, int expected_token, bool assertion) {
     if (yylex() != 0){
         printf("\nTesting %s. More than one token present. ", string);
         if (!assertion) {
-            printf("Failure expected. \033[0;32mSUCCESS!\033[0m");
+            printf("Failure expected. \033[0;32mPASSED!\033[0m");
             return true;
         } else {
-            printf("\033[0;31mFAILURE!\033[0m");
+            printf("\033[0;31mFAILED!\033[0m");
             return false;
         }
     }
@@ -193,18 +193,18 @@ int test_token(char* string, int expected_token, bool assertion) {
 
     if (expected_token == tk) {
         if (assertion) {
-            printf("\033[0;32mSUCCESS!\033[0m");
+            printf("\033[0;32mPASSED!\033[0m");
             return true;
         } else {
-            printf("Success not expexted. \033[0;31mFAILURE!\033[0m");
+            printf("Success not expexted. \033[0;31mFAILED!\033[0m");
             return false;
         }
     } else {
         if (!assertion) {
-            printf("Failure expected. \033[0;32mSUCCESS!\033[0m");
+            printf("Failure expected. \033[0;32mPASSED!\033[0m");
             return true;
         } else {
-            printf("\033[0;31mFAILURE!\033[0m");
+            printf("\033[0;31mFAILED!\033[0m");
             return false;
         }
     }
