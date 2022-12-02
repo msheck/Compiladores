@@ -1,13 +1,15 @@
-.PHONY: compile_test test clean flex etapa1
+etapa = etapa1
 
-etapa1: flex
-	gcc lex.yy.c main.c -o etapa1
+.PHONY: compile_test test clean flex $(etapa)
+
+$(etapa): flex
+	gcc lex.yy.c main.c -o $(etapa).exe
 
 flex: scanner.l
 	flex scanner.l
 
 clean:
-	rm -rf etapa1 lex.yy.c test.o
+	rm -rf $(etapa).exe lex.yy.c test.o
 
 test: flex compile_test
 	./test.o
