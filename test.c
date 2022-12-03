@@ -38,6 +38,30 @@ int main (int argc, char **argv) {
     // Line numbers
     test_result = test_result && test_line_numbers("a\nb\nc\nd\ne", 5);
     test_result = test_result && test_line_numbers("a\n", 1);
+
+    // Special Characters
+    test_result = test_result && test_token(",", ',', true);
+    test_result = test_result && test_token(";", ';', true);
+    test_result = test_result && test_token(":", ':', true);
+    test_result = test_result && test_token("(", '(', true);
+    test_result = test_result && test_token(")", ')', true);
+    test_result = test_result && test_token("{", '{', true);
+    test_result = test_result && test_token("}", '}', true);
+    test_result = test_result && test_token("+", '+', true);
+    test_result = test_result && test_token("-", '-', true);
+    test_result = test_result && test_token("*", '*', true);
+    test_result = test_result && test_token("/", '/', true);
+    test_result = test_result && test_token("\%", '\%', true);
+    test_result = test_result && test_token("^", '^', true);
+    test_result = test_result && test_token("<", '<', true);
+    test_result = test_result && test_token(">", '>', true);
+    test_result = test_result && test_token("=", '=', true);
+    test_result = test_result && test_token("!", '!', true);
+    test_result = test_result && test_token("~", '~', false); // Invalid
+    test_result = test_result && test_token("f", 'f', false); // Invalid
+    test_result = test_result && test_token("?", '?', false); // Invalid
+    test_result = test_result && test_token("&", '&', false); // Invalid
+    test_result = test_result && test_token("|", '|', false); // Invalid
     
     // TK_PR_INT
     test_result = test_result && test_token("int", TK_PR_INT, true);
