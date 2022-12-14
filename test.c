@@ -37,6 +37,7 @@ int main (int argc, char **argv) {
 
     // Line numbers
     test_result = test_result && test_line_numbers("a\nb\nc\nd\ne", 5);
+    test_result = test_result && test_line_numbers("a\nb\nc /*this\nis\na\nmultiline\ncomment!*/ \nd\ne", 8);
     test_result = test_result && test_line_numbers("a\n", 1);
 
     // Special Characters
@@ -169,6 +170,11 @@ int main (int argc, char **argv) {
     test_result = test_result && test_token("ABCD", TK_IDENTIFICADOR, true);
     test_result = test_result && test_token("abcdABCD", TK_IDENTIFICADOR, true);
     test_result = test_result && test_token("abcd_ABCD", TK_IDENTIFICADOR, false); // Invalid
+
+    // COMMENTS
+    test_result = test_result && test_token("1234//.5678", TK_LIT_INT, true);
+    test_result = test_result && test_token("/*abcd\nefgh*/5.5678", TK_LIT_FLOAT, true);
+    test_result = test_result && test_token("/*abcd/*\nefgh*/5.5678", TK_LIT_FLOAT, true);
     
     if (!test_result)
         printf("\n\n\t\033[0;31mSOME TESTS FAILED!\033[0m\n");
