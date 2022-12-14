@@ -9,7 +9,7 @@ flex: scanner.l
 	flex scanner.l
 
 clean:
-	rmdir entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz
+	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz
 
 test: flex compile_test
 	./test.o
