@@ -31,7 +31,7 @@ lit_c 				\'.\'|\'\'
 
 %x B_COMM	
 line_comm 			\/\/.*
-espaco				["\t"" ""\r"]
+espaco				[\t\r ]
 ignore 				{espaco}|{line_comm}
 
 %%
