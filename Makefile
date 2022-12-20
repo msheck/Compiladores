@@ -18,7 +18,7 @@ compile_test:
 	gcc lex.yy.c test.c -o test.o
 
 zip: clean
-	tar cvzf etapa$(etapa).tgz .
+	tar --exclude-vcs-ignores --exclude='.git*' -cvzf etapa$(etapa).tgz .
 
 unzip:
 	mkdir entrega | tar xf etapa$(etapa).tgz --directory entrega
