@@ -1,15 +1,24 @@
-etapa = 1
+etapa = 2
 
 .PHONY: zip unzip compile_test test clean flex etapa$(etapa)
 
-$(etapa): flex
-	gcc lex.yy.c main.c -o etapa$(etapa)
+$(etapa): flex bison
+	gcc lex.yy.c parser.tab.c main.c -o etapa$(etapa)
+
+debug: flex bison_debug
+	gcc lex.yy.c parser.tab.c main.c -o etapa$(etapa)
 
 flex: scanner.l
 	flex scanner.l
 
+bison: parser.y
+	bison parser.y
+
+bison_debug:
+	bison -d parser.y
+
 clean:
-	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.*
+	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output
 
 test: flex compile_test
 	./test.o
