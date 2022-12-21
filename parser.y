@@ -35,7 +35,7 @@ programa:           programa funcao
                     | programa var_glob
                     | ;
 
--- VARIAVEIS
+// VARIAVEIS
 
 tipo_var:           TK_PR_INT
                     | TK_PR_FLOAT
@@ -65,7 +65,7 @@ var_loc:            tipo_var list_ident ';'
 var_glob:           tipo_var list_ident ';'
                     | var_multidim ';';
 
--- BLOCO COMANDOS
+// BLOCO COMANDOS
 
 list_lits:          list_lits lits
                     | lits;
@@ -83,7 +83,7 @@ comando_simples:    var_loc
                     | atrib ';'
                     | chamada_func ';'
                     | TK_PR_RETURN ';';
-                    -- FALTA CONTROLE DE FLUXO
+                    // FALTA CONTROLE DE FLUXO
 
 comando:            comando_simples
                     | ;
@@ -93,7 +93,7 @@ bloc_com:           '{' bloc_com_ou_nulo comando '}';
 bloc_com_ou_nulo:   bloc_com
                     | ;
 
--- FUNCOES
+// FUNCOES
 
 parametros:         parametros ',' var_loc
                     | var_loc
