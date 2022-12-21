@@ -12,10 +12,10 @@ flex: scanner.l
 	flex scanner.l
 
 bison: parser.y
-	bison parser.y
+	bison -d parser.y
 
 bison_debug:
-	bison -d parser.y
+	bison -d -v parser.y
 
 clean:
 	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output
