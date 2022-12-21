@@ -67,7 +67,7 @@ var_glob:           tipo_var list_ident ';'
 
 // BLOCO COMANDOS
 
-list_lits:          list_lits lits
+list_lits:          list_lits '^' lits
                     | lits;
 
 atrib:              TK_IDENTIFICADOR '=' lits
@@ -77,13 +77,12 @@ list_args:          list_args ',' lits
                     | lits
                     | ;
 
-chamada_func:       TK_IDENTIFICADOR '(' list_args ')' ';';
-
 comando_simples:    var_loc
                     | atrib ';'
                     | chamada_func ';'
-                    | TK_PR_RETURN ';';
-                    // FALTA CONTROLE DE FLUXO
+                    | TK_PR_RETURN ';'
+                    | if_then_else
+                    | while;
 
 comando:            comando_simples
                     | ;
@@ -92,6 +91,53 @@ bloc_com:           '{' bloc_com_ou_nulo comando '}';
 
 bloc_com_ou_nulo:   bloc_com
                     | ;
+
+chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
+
+// EXPRESSOES
+
+/*list_expr:          list_expr "^" expr
+                    | expr;
+
+expr_ident:         TK_IDENTIFICADOR
+                    | TK_IDENTIFICADOR ':' list_expr;
+
+expr_operando:      expr_ident
+                    | lits
+                    | chamada_func;
+
+expr_op_prefix:     '-'
+                    | '!';
+
+expr_op_bin:        '+'
+                    | '-'
+                    | '*'
+                    | '/'
+                    | '%'
+                    | TK_OC_AND
+                    | TK_OC_EQ
+                    | TK_OC_GE
+                    | TK_OC_LE
+                    | TK_OC_NE
+                    | TK_OC_OR;
+
+expr_bin:           expr expr_op_bin expr;
+
+expr_prefix:        expr_op_prefix expr;*/
+
+expr:               ;/*expr_operando
+                    | expr_bin
+                    | expr_prefix;*/
+                    // FALTA RECURSAO E PRECEDENCIA
+
+// CONTROLE DE FLUXO
+
+if_then:            TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com;
+
+if_then_else:       if_then
+                    | if_then TK_PR_ELSE bloc_com;
+
+while:              TK_PR_WHILE '(' expr ')' bloc_com;
 
 // FUNCOES
 
