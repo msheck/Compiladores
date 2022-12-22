@@ -9,7 +9,7 @@ Desenvolvido pelos alunos:
 */
 
 %{
-#include "tokens.h"
+#include "parser.tab.h"
 %}
 
 %option noyywrap
@@ -24,8 +24,8 @@ sig 				\+|\-
 
 ident 				{let}+
 lit_i 				{sig}?{dig}+
-lit_f_regular 		({lit_i}\.{dig}+)
-lit_f_scientific 	{lit_f_regular}(E|e){lit_i}
+lit_f_regular 			({lit_i}\.{dig}+)
+lit_f_scientific 		{lit_f_regular}(E|e){lit_i}
 lit_f 				{lit_f_regular}|{lit_f_scientific}
 lit_c 				\'.\'|\'\'
 
@@ -77,5 +77,5 @@ int get_line_number() {
     return yylineno;
 }
 void yyerror (char const *s) {
-   fprintf (stderr, "%s\n", s);
+   fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
 }

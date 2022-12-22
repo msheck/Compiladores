@@ -1,7 +1,11 @@
 %{
 int yylex(void);
-void yyerror (char const *s);
+void yyerror (char const *error_message);
+
+#include <stdio.h>
 %}
+
+%define parse.error verbose
 
 %token TK_PR_INT
 %token TK_PR_FLOAT
@@ -28,6 +32,8 @@ void yyerror (char const *s);
 %token TK_LIT_CHAR
 %token TK_IDENTIFICADOR
 %token TK_ERRO
+
+%start programa
 
 %%
 
@@ -87,10 +93,10 @@ comando_simples:    var_loc
 comando:            comando_simples
                     | ;
 
-bloc_com:           '{' bloc_com_ou_nulo comando '}';
+bloc_com_ou_nulo:   bloc_com_ou_nulo comando
+		    | comando;
 
-bloc_com_ou_nulo:   bloc_com
-                    | ;
+bloc_com:           '{' bloc_com_ou_nulo '}';
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
@@ -125,9 +131,9 @@ expr_bin:           expr expr_op_bin expr;
 
 expr_prefix:        expr_op_prefix expr;*/
 
-expr:               ;/*expr_operando
+expr:               /*expr_operando
                     | expr_bin
-                    | expr_prefix;*/
+                    | expr_prefix*/;
                     // FALTA RECURSAO E PRECEDENCIA
 
 // CONTROLE DE FLUXO
