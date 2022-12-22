@@ -76,6 +76,6 @@ false        		{ return TK_LIT_FALSE; }
 int get_line_number() {
     return yylineno;
 }
-void yyerror (char const *s) {
+void yyerror (char const *error_message) {
    fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
 }
