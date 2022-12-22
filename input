@@ -1,0 +1,44 @@
+// DEC VAR GLOBAL
+int aa;
+int az:13^5;
+int aa, ab, ac;
+float bb;
+float bz:13^5;
+float bb, bc, bd;
+char cc;
+char cz:13^5;
+char cc, cd, ce;
+bool dd;
+bool cz:13^5;
+bool dd, de, df;
+
+// FUNCOES
+int fA (){
+}
+
+float fB(){
+}
+
+char fC(){
+}
+
+bool fD(){
+}
+
+// BLOCOS DE COMANDOS
+int commBlock ()
+{
+	// DEC VAR LOCAL
+	int aa;
+	int a;
+	int aa, ab, ac;
+	float bb;
+	float bz:13^5;
+	float bb, bc, bd;
+	char cc;
+	char cz:13^5;
+	char cc, cd, ce;
+	bool dd;
+	bool cz:13^5;
+	bool dd, de, df;
+}
