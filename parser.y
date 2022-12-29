@@ -42,6 +42,7 @@ programa:           programa var_glob
                     | var_glob
                     | funcao;
 
+
 // VARIAVEIS
 
 tipo_var:           TK_PR_INT
@@ -77,6 +78,7 @@ var_loc:            var_basic
                     | var_poly
                     | var_inicializada;
 
+
 // BLOCO COMANDOS
 
 list_lits:          list_lits '^' lits
@@ -104,8 +106,9 @@ bloc_com:           '{' comandos '}'
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
+
 // EXPRESSOES
-/*
+
 list_expr:          list_expr "^" expr
                     | expr;
 
@@ -139,19 +142,20 @@ expr_unit:          expr_bin
                     | expr_prefix;
 
 expr:               '(' expr ')'
-                    | expr_op_prefix expr
-                    | expr expr_op_bin expr
-                    expr_unit;
-*/
+                    // | expr_op_prefix expr
+                    // | expr expr_op_bin expr
+                    | expr_unit;
+
 
 // CONTROLE DE FLUXO
 
-if_then:            TK_PR_IF '('  ')' TK_PR_THEN bloc_com; //TODO add expr
+if_then:            TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com;
 
 if_then_else:       if_then
                     | if_then TK_PR_ELSE bloc_com;
 
-while:              TK_PR_WHILE '('  ')' bloc_com; //TODO add expr
+while:              TK_PR_WHILE '(' expr ')' bloc_com;
+
 
 // FUNCOES
 

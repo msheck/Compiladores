@@ -38,4 +38,16 @@ int commBlock ()
 	char cc, cd, ce;
 	bool dd;
 	bool dd, de, df;
+
+	if (bb == aa) then
+	{
+
+	}
+	else
+	{
+		while ((bb >= aa))
+		{
+
+		}
+	}
 }
