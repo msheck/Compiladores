@@ -1,15 +1,15 @@
 // DEC VAR GLOBAL
 int aa;
-int az:13^5;
+int az[13^5];
 int aa, ab, ac;
 float bb;
-float bz:13^5;
+float bz[13^5];
 float bb, bc, bd;
 char cc;
-char cz:13^5;
+char cz[13^5];
 char cc, cd, ce;
 bool dd;
-bool cz:13^5;
+bool cz[13^5];
 bool dd, de, df;
 
 // FUNCOES
@@ -33,12 +33,9 @@ int commBlock ()
 	int a;
 	int aa, ab, ac;
 	float bb;
-	float bz:13^5;
 	float bb, bc, bd;
 	char cc;
-	char cz:13^5;
 	char cc, cd, ce;
 	bool dd;
-	bool cz:13^5;
 	bool dd, de, df;
 }

@@ -37,9 +37,10 @@ void yyerror (char const *error_message);
 
 %%
 
-programa:           programa funcao
-                    | programa var_glob
-                    | ;
+programa:           programa var_glob
+                    | programa funcao
+                    | var_glob
+                    | funcao;
 
 // VARIAVEIS
 
@@ -48,26 +49,32 @@ tipo_var:           TK_PR_INT
                     | TK_PR_CHAR
                     | TK_PR_BOOL;
 
+var_basic:          tipo_var TK_IDENTIFICADOR;
+
+list_ident:         list_ident ',' TK_IDENTIFICADOR
+                    | TK_IDENTIFICADOR;
+
+var_poly:           var_basic ',' list_ident;
+
+list_dimensoes:     list_dimensoes '^' TK_LIT_INT
+                    | TK_LIT_INT;
+
+var_multidim:       var_basic '[' list_dimensoes ']';
+
+var_glob:           var_basic ';'
+                    | var_poly ';'
+                    | var_multidim ';';
+
 lits:               TK_LIT_FALSE
                     | TK_LIT_TRUE
                     | TK_LIT_INT
                     | TK_LIT_FLOAT
                     | TK_LIT_CHAR;
 
-list_ident:         list_ident ',' TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR;
+var_inicializada:   var_basic '<''=' lits;
 
-list_dimensoes:     list_dimensoes '^' TK_LIT_INT
-                    | TK_LIT_INT;
-
-var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']';
-
-var_glob:           tipo_var list_ident ';'
-                    | var_multidim ';';
-
-var_inicializada:   tipo_var TK_IDENTIFICADOR '<''=' lits;
-
-var_loc:            tipo_var list_ident
+var_loc:            var_basic
+                    | var_poly
                     | var_inicializada;
 
 // BLOCO COMANDOS
@@ -89,13 +96,11 @@ comando_simples:    var_loc ';'
                     | if_then_else
                     | while;
 
-comando:            comando_simples
-                    | ;
+comandos:           comandos comando_simples
+		            | comando_simples;
 
-bloc_com_ou_nulo:   bloc_com_ou_nulo comando
-		            | comando;
-
-bloc_com:           '{' bloc_com_ou_nulo '}';
+bloc_com:           '{' comandos '}'
+                    | '{' '}';
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
@@ -150,8 +155,8 @@ while:              TK_PR_WHILE '('  ')' bloc_com; //TODO add expr
 
 // FUNCOES
 
-parametros:         parametros ',' var_loc
-                    | var_loc
+parametros:         parametros ',' var_basic
+                    | var_basic
                     | ;
 
 funcao:             tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com;
