@@ -57,34 +57,33 @@ lits:               TK_LIT_FALSE
 list_ident:         list_ident ',' TK_IDENTIFICADOR
                     | TK_IDENTIFICADOR;
 
-var_atrib:          tipo_var TK_IDENTIFICADOR '<''=' lits;
-
 list_dimensoes:     list_dimensoes '^' TK_LIT_INT
                     | TK_LIT_INT;
 
-var_multidim:       tipo_var TK_IDENTIFICADOR ':' list_dimensoes;
-
-var_loc:            tipo_var list_ident ';'
-                    | var_atrib ';'
-                    | var_multidim ';';
+var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']';
 
 var_glob:           tipo_var list_ident ';'
                     | var_multidim ';';
+
+var_inicializada:   tipo_var TK_IDENTIFICADOR '<''=' lits;
+
+var_loc:            tipo_var list_ident
+                    | var_inicializada;
 
 // BLOCO COMANDOS
 
 list_lits:          list_lits '^' lits
                     | lits;
 
-atrib:              TK_IDENTIFICADOR '=' lits
-                    | var_multidim ':' list_lits;
+atribuicao:         TK_IDENTIFICADOR '=' lits
+                    | var_multidim '=' '[' list_lits ']';
 
 list_args:          list_args ',' lits
                     | lits
                     | ;
 
-comando_simples:    var_loc
-                    | atrib ';'
+comando_simples:    var_loc ';'
+                    | atribuicao ';'
                     | chamada_func ';'
                     | TK_PR_RETURN ';'
                     | if_then_else
@@ -94,19 +93,19 @@ comando:            comando_simples
                     | ;
 
 bloc_com_ou_nulo:   bloc_com_ou_nulo comando
-		    | comando;
+		            | comando;
 
 bloc_com:           '{' bloc_com_ou_nulo '}';
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
 // EXPRESSOES
-
-/*list_expr:          list_expr "^" expr
+/*
+list_expr:          list_expr "^" expr
                     | expr;
 
 expr_ident:         TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR ':' list_expr;
+                    | TK_IDENTIFICADOR '[' list_expr ']';
 
 expr_operando:      expr_ident
                     | lits
@@ -115,35 +114,39 @@ expr_operando:      expr_ident
 expr_op_prefix:     '-'
                     | '!';
 
-expr_op_bin:        '+'
-                    | '-'
-                    | '*'
+expr_op_bin:        '*'
                     | '/'
                     | '%'
-                    | TK_OC_AND
-                    | TK_OC_EQ
-                    | TK_OC_GE
+                    | '+'
+                    | '-'
                     | TK_OC_LE
+                    | TK_OC_GE
+                    | TK_OC_EQ
                     | TK_OC_NE
+                    | TK_OC_AND
                     | TK_OC_OR;
 
-expr_bin:           expr expr_op_bin expr;
+expr_bin:           expr_operando expr_op_bin expr_operando;
 
-expr_prefix:        expr_op_prefix expr;*/
+expr_prefix:        expr_op_prefix expr_operando;
 
-expr:               /*expr_operando
-                    | expr_bin
-                    | expr_prefix*/;
-                    // FALTA RECURSAO E PRECEDENCIA
+expr_unit:          expr_bin
+                    | expr_prefix;
+
+expr:               '(' expr ')'
+                    | expr_op_prefix expr
+                    | expr expr_op_bin expr
+                    expr_unit;
+*/
 
 // CONTROLE DE FLUXO
 
-if_then:            TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com;
+if_then:            TK_PR_IF '('  ')' TK_PR_THEN bloc_com; //TODO add expr
 
 if_then_else:       if_then
                     | if_then TK_PR_ELSE bloc_com;
 
-while:              TK_PR_WHILE '(' expr ')' bloc_com;
+while:              TK_PR_WHILE '('  ')' bloc_com; //TODO add expr
 
 // FUNCOES
 
