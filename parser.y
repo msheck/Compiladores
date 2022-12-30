@@ -127,6 +127,8 @@ expr_op_bin:        '*'
                     | '%'
                     | '+'
                     | '-'
+                    | '<'
+                    | '>'
                     | TK_OC_LE
                     | TK_OC_GE
                     | TK_OC_EQ
@@ -141,9 +143,10 @@ expr_prefix:        expr_op_prefix expr_operando;
 expr_unit:          expr_bin
                     | expr_prefix;
 
+//TODO: solve 39 conflicts
 expr:               '(' expr ')'
-                    // | expr_op_prefix expr
-                    // | expr expr_op_bin expr
+                    | expr_op_prefix expr
+                    | expr expr_op_bin expr
                     | expr_unit;
 
 
