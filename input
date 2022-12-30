@@ -47,7 +47,10 @@ int commBlock ()
 	{
 		while ((bb >= aa) || bb < aa)
 		{
+			if (cc[!fD() == true ^ fA() > 1 ^ fC() != a] == true) then
+			{
 
+			}
 		}
 	}
 }
