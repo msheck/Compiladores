@@ -20,12 +20,6 @@ bison_debug:
 clean:
 	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output
 
-test: flex compile_test
-	./test.o
-
-compile_test:
-	gcc lex.yy.c test.c -o test.o
-
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' -cvzf etapa$(etapa).tgz .
 
