@@ -65,5 +65,5 @@ int commBlock ()
 	if(a^a) then{}
 	if(abx()^abx()) then{}
 	if(abx(aaa)) then{}
-	if((banana[!fff()^ffr(abc)] + frr(32)) > 100) then {}
+	if((banana[!fff()^ffr(abc)*foo(a, b, d, a+x+50*37^4)] + frr(32)) > 100) then {}
 }

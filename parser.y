@@ -91,8 +91,7 @@ list_lits:          list_lits '^' lits
 atribuicao:         TK_IDENTIFICADOR '=' lits
                     | var_multidim '=' '[' list_lits ']';
 
-arg:                lits
-                    | expr
+arg:                expr
                     | ;
 
 list_args:          list_args ',' arg
