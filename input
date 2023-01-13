@@ -41,10 +41,14 @@ int commBlock ()
 
 	if (bb == aa) then
 	{
-
+		if(!!bb) then {}
 	}
 	else
 	{
+		if (!(a+bc)) then{}
+		if (b(!c)) then{}
+		if ((a+d)+b+c) then{}
+		
 		while ((bb >= aa) || bb < aa)
 		{
 			if (cc[!fD() == true ^ fA() > 1 ^ fC() != a] == true) then

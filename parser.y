@@ -109,7 +109,7 @@ chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
 // EXPRESSOES
 
-list_expr:          list_expr "^" expr
+list_expr:          list_expr '^' expr
                     | expr;
 
 expr_ident:         TK_IDENTIFICADOR
@@ -141,12 +141,14 @@ expr_bin:           expr_operando expr_op_bin expr_operando;
 expr_prefix:        expr_op_prefix expr_operando;
 
 expr_unit:          expr_bin
-                    | expr_prefix;
+                    | expr_prefix
+                    | expr_op_prefix expr_prefix;
 
-//TODO: solve 39 conflicts
+expr_end:           expr
+                    | expr_operando;
+
 expr:               '(' expr ')'
-                    | expr_op_prefix expr
-                    | expr expr_op_bin expr
+                    | expr_unit expr_op_bin expr_end
                     | expr_unit;
 
 
