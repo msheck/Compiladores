@@ -35,6 +35,10 @@ void yyerror (char const *error_message);
 
 %start programa
 
+%left '%' '|' '&' '^' '>' '<' TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND
+%left '+' '-' '!'
+%left '*' '/'
+
 %%
 
 programa:           programa var_glob
@@ -135,16 +139,13 @@ op_un:
 // R46
 
 expr:
-      expr_
-	| expr op_bin expr_;
+      expr_end
+	| expr op_bin expr_end;
 
-expr_:
+expr_end:
 	  '(' expr ')'
-    | op_pre expr
-    | expr_unit;
-
-expr_unit:
-	  TK_IDENTIFICADOR
+    | op_pre expr_end
+	| TK_IDENTIFICADOR
 	| TK_IDENTIFICADOR '[' expr ']'
 	| lits
 	| chamada_func;

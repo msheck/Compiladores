@@ -54,7 +54,12 @@ int commBlock ()
 		}
 	}
 
-	if (!(a+b*c)) then{}
+	if (!!(a+b*c)) then{}
 	if (b*(!c)) then{}
 	if ((a+d)+b+c) then{}
+	if((!!!--((----a)))>(!!!!(a))) then{}
+	if(a^a) then{}
+	if(abx()^abx()) then{}
+	if(abx(aaa)) then{}
+	if((banana[!fff()^ffr(abc)] + frr(32)) > 100) then {}
 }
