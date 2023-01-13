@@ -35,6 +35,10 @@ void yyerror (char const *error_message);
 
 %start programa
 
+%left '%' '|' '&' '^' '>' '<' TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND
+%left '+' '-' '!'
+%left '*' '/'
+
 %%
 
 programa:           programa var_glob
@@ -112,53 +116,24 @@ chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
 // EXPRESSOES
 
-list_expr:          list_expr '^' expr
-                    | expr;
+expr:
+      expr_end
+	| expr op_bin expr_end;
 
-expr_ident:         TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR '[' list_expr ']';
+expr_end:
+	  '(' expr ')'
+    | op_pre expr_end
+	| TK_IDENTIFICADOR
+	| TK_IDENTIFICADOR '[' expr ']'
+	| lits
+	| chamada_func;
 
-expr_operando:      expr_ident
-                    | lits
-                    | chamada_func;
+op_bin:
+	  '+' | '-' | '*' | '/' | '%' | '|' | '&' | '^' | '>' | '<' | TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | TK_OC_AND
+	| TK_OC_OR;
 
-expr_op_prefix:     '-'
-                    | '!';
-
-expr_op_bin:        '*'
-                    | '/'
-                    | '%'
-                    | '+'
-                    | '-'
-                    | '<'
-                    | '>'
-                    | TK_OC_LE
-                    | TK_OC_GE
-                    | TK_OC_EQ
-                    | TK_OC_NE
-                    | TK_OC_AND
-                    | TK_OC_OR;
-
-expr_bin:           expr_operando expr_op_bin expr_operando;
-
-expr_prefix:        expr_op_prefix expr_operando;
-
-expr_unit:          expr_bin
-                    | expr_prefix
-                    | expr_op_prefix expr_prefix;
-
-expr_end:           expr
-                    | expr_operando;
-
-pre_bracket:        expr_op_prefix
-                    | ;
-
-post_bracket:       expr_op_bin expr_end
-                    | ;
-
-expr:               pre_bracket '(' expr ')' post_bracket
-                    | expr_unit expr_op_bin expr_end
-                    | expr_unit;
+op_pre:
+	  '-' | '!';
 
 
 // CONTROLE DE FLUXO
