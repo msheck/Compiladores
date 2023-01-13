@@ -115,24 +115,35 @@ chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
 // EXPRESSOES
 
-expr:
-      expr_end
-	| expr op_bin expr_end;
+list_expr:          list_expr '^' expr
+                    | expr;
 
-expr_end:
-	  '(' expr ')'
-    | op_pre expr_end
-	| TK_IDENTIFICADOR
-	| TK_IDENTIFICADOR '[' expr ']'
-	| lits
-	| chamada_func;
+expr:               expr_end
+	                | expr op_bin expr_end;
 
-op_bin:
-	  '+' | '-' | '*' | '/' | '%' | '|' | '&' | '^' | '>' | '<' | TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | TK_OC_AND
-	| TK_OC_OR;
+expr_end:           '(' expr ')'
+                    | op_pre expr_end
+	                | TK_IDENTIFICADOR
+	                | TK_IDENTIFICADOR '[' list_expr ']'
+	                | lits
+	                | chamada_func;
 
-op_pre:
-	  '-' | '!';
+op_bin:             '*'
+                    | '/'
+                    | '%'
+                    | '+'
+                    | '-'
+                    | '<'
+                    | '>'
+                    | TK_OC_LE
+                    | TK_OC_GE
+                    | TK_OC_EQ
+                    | TK_OC_NE
+                    | TK_OC_AND
+                    | TK_OC_OR;
+
+op_pre:             '-' 
+                    | '!';
 
 
 // CONTROLE DE FLUXO
