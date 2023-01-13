@@ -87,9 +87,12 @@ list_lits:          list_lits '^' lits
 atribuicao:         TK_IDENTIFICADOR '=' lits
                     | var_multidim '=' '[' list_lits ']';
 
-list_args:          list_args ',' lits
-                    | lits
+arg:                lits
+                    | expr
                     | ;
+
+list_args:          list_args ',' arg
+                    | arg;
 
 comando_simples:    var_loc ';'
                     | atribuicao ';'
@@ -140,18 +143,20 @@ expr_bin:           expr_operando expr_op_bin expr_operando;
 
 expr_prefix:        expr_op_prefix expr_operando;
 
-expr_unit:          '(' expr_unit ')'
-                    | expr_bin
+expr_unit:          expr_bin
                     | expr_prefix
                     | expr_op_prefix expr_prefix;
 
 expr_end:           expr
                     | expr_operando;
 
+pre_bracket:        expr_op_prefix
+                    | ;
+
 post_bracket:       expr_op_bin expr_end
                     | ;
 
-expr:               '(' expr ')' post_bracket
+expr:               pre_bracket '(' expr ')' post_bracket
                     | expr_unit expr_op_bin expr_end
                     | expr_unit;
 
