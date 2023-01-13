@@ -53,4 +53,8 @@ int commBlock ()
 			}
 		}
 	}
+
+	if (!(a+b*c)) then{}
+	if (b*(!c)) then{}
+	if ((a+d)+b+c) then{}
 }

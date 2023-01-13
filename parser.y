@@ -109,45 +109,52 @@ chamada_func:       TK_IDENTIFICADOR '(' list_args ')';
 
 // EXPRESSOES
 
-list_expr:          list_expr "^" expr
-                    | expr;
+// ESSA PORRA FUNCIONA
+/*expr:
+	  expr op_bin op_un_rec exprs
+    | '(' expr ')'
+	| expr op_bin exprs
+	| exprs
+	| op_un_rec exprs;
+exprs:
+	  TK_IDENTIFICADOR
+	| TK_IDENTIFICADOR '[' expr ']'
+	| lits
+	| chamada_func;
 
-expr_ident:         TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR '[' list_expr ']';
+op_bin:
+	  '+' | '-' | '*' | '/' | '%' | '|' | '&' | '^' | '>' | '<' | TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | TK_OC_AND
+	| TK_OC_OR;
 
-expr_operando:      expr_ident
-                    | lits
-                    | chamada_func;
+op_un_rec:
+	  op_un_rec op_un
+	| op_un;
+op_un:
+	  '+' | '-' | '!' | '&' | '*' | '?' | '#';*/
 
-expr_op_prefix:     '-'
-                    | '!';
+// R46
 
-expr_op_bin:        '*'
-                    | '/'
-                    | '%'
-                    | '+'
-                    | '-'
-                    | '<'
-                    | '>'
-                    | TK_OC_LE
-                    | TK_OC_GE
-                    | TK_OC_EQ
-                    | TK_OC_NE
-                    | TK_OC_AND
-                    | TK_OC_OR;
+expr:
+      expr_
+	| expr op_bin expr_;
 
-expr_bin:           expr_operando expr_op_bin expr_operando;
+expr_:
+	  '(' expr ')'
+    | op_pre expr
+    | expr_unit;
 
-expr_prefix:        expr_op_prefix expr_operando;
+expr_unit:
+	  TK_IDENTIFICADOR
+	| TK_IDENTIFICADOR '[' expr ']'
+	| lits
+	| chamada_func;
 
-expr_unit:          expr_bin
-                    | expr_prefix;
+op_bin:
+	  '+' | '-' | '*' | '/' | '%' | '|' | '&' | '^' | '>' | '<' | TK_OC_LE | TK_OC_GE | TK_OC_EQ | TK_OC_NE | TK_OC_AND
+	| TK_OC_OR;
 
-//TODO: solve 39 conflicts
-expr:               '(' expr ')'
-                    | expr_op_prefix expr
-                    | expr expr_op_bin expr
-                    | expr_unit;
+op_pre:
+	  '-' | '!';
 
 
 // CONTROLE DE FLUXO
