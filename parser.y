@@ -140,14 +140,18 @@ expr_bin:           expr_operando expr_op_bin expr_operando;
 
 expr_prefix:        expr_op_prefix expr_operando;
 
-expr_unit:          expr_bin
+expr_unit:          '(' expr_unit ')'
+                    | expr_bin
                     | expr_prefix
                     | expr_op_prefix expr_prefix;
 
 expr_end:           expr
                     | expr_operando;
 
-expr:               '(' expr ')'
+post_bracket:       expr_op_bin expr_end
+                    | ;
+
+expr:               '(' expr ')' post_bracket
                     | expr_unit expr_op_bin expr_end
                     | expr_unit;
 
