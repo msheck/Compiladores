@@ -72,9 +72,11 @@ false        		{ return TK_LIT_FALSE; }
 .            		{ return TK_ERRO; }
 
 %%
+int error_message_enabled = 1;
 int get_line_number() {
-    return yylineno;
+	return yylineno;
 }
 void yyerror (char const *error_message) {
-   fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
+	if (error_message_enabled)
+		fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
 }
