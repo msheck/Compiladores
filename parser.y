@@ -96,7 +96,7 @@ var_loc:            var_basic
 // BLOCO COMANDOS
 
 atribuicao:         TK_IDENTIFICADOR '=' expr
-                    | var_multidim '=' '[' list_expr ']';
+                    | TK_IDENTIFICADOR '[' list_expr ']' '=' expr;
 
 arg:                expr
                     | ;
