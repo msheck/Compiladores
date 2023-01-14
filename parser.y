@@ -35,9 +35,13 @@ void yyerror (char const *error_message);
 
 %start programa_ou_vazio
 
-%left '%' '|' '&' '^' '>' '<' TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND
-%left '+' '-' '!'
-%left '*' '/'
+%left TK_OC_OR
+%left TK_OC_AND
+%left TK_OC_EQ TK_OC_NE
+%left '>' '<' TK_OC_LE TK_OC_GE
+%left '+' '-'
+%left '*' '/' '%'
+%left '!'
 
 %%
 
@@ -60,9 +64,12 @@ tipo_var:           TK_PR_INT
 var_basic:          tipo_var TK_IDENTIFICADOR;
 
 list_ident:         list_ident ',' TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR;
+                    | list_ident ',' TK_IDENTIFICADOR TK_OC_LE expr
+                    | TK_IDENTIFICADOR
+                    | TK_IDENTIFICADOR TK_OC_LE expr;
 
-var_poly:           var_basic ',' list_ident;
+var_poly:           var_basic ',' list_ident
+                    | var_inicializada ',' list_ident;
 
 list_dimensoes:     list_dimensoes '^' TK_LIT_INT
                     | TK_LIT_INT;
@@ -88,11 +95,8 @@ var_loc:            var_basic
 
 // BLOCO COMANDOS
 
-list_lits:          list_lits '^' lits
-                    | lits;
-
-atribuicao:         TK_IDENTIFICADOR '=' lits
-                    | var_multidim '=' '[' list_lits ']';
+atribuicao:         TK_IDENTIFICADOR '=' expr
+                    | var_multidim '=' '[' list_expr ']';
 
 arg:                expr
                     | ;
