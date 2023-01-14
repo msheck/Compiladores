@@ -34,6 +34,9 @@ int main (int argc, char **argv)
 	int test_result = true;
 	error_message_enabled = 0;
 
+    // EMPTY PROGRAM
+	test_result = test_result && test_parse("", true);
+
     // DEC VAR GLOBAL
 	test_result = test_result && test_parse("int aa;", true);
 	test_result = test_result && test_parse("int az[13^5];", true);

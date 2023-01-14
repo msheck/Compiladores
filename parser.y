@@ -33,13 +33,16 @@ void yyerror (char const *error_message);
 %token TK_IDENTIFICADOR
 %token TK_ERRO
 
-%start programa
+%start programa_ou_vazio
 
 %left '%' '|' '&' '^' '>' '<' TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE TK_OC_AND
 %left '+' '-' '!'
 %left '*' '/'
 
 %%
+
+programa_ou_vazio:  programa
+                    |;
 
 programa:           programa var_glob
                     | programa funcao
