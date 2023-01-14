@@ -63,13 +63,19 @@ tipo_var:           TK_PR_INT
 
 var_basic:          tipo_var TK_IDENTIFICADOR;
 
-list_ident:         list_ident ',' TK_IDENTIFICADOR
-                    | list_ident ',' TK_IDENTIFICADOR TK_OC_LE expr
+list_var:           list_var ',' TK_IDENTIFICADOR
+                    | list_var ',' TK_IDENTIFICADOR TK_OC_LE expr
+                    | list_var ',' TK_IDENTIFICADOR '[' list_dimensoes ']'
                     | TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR TK_OC_LE expr;
+                    | TK_IDENTIFICADOR TK_OC_LE expr
+                    | TK_IDENTIFICADOR '[' list_dimensoes ']';
 
-var_poly:           var_basic ',' list_ident
-                    | var_inicializada ',' list_ident;
+var_poly_loc:       var_basic ',' list_var
+                    | var_multidim ',' list_var
+                    | var_inicializada ',' list_var;
+
+var_poly_glob:      var_basic ',' list_var
+                    | var_multidim ',' list_var;
 
 list_dimensoes:     list_dimensoes '^' TK_LIT_INT
                     | TK_LIT_INT;
@@ -77,7 +83,7 @@ list_dimensoes:     list_dimensoes '^' TK_LIT_INT
 var_multidim:       var_basic '[' list_dimensoes ']';
 
 var_glob:           var_basic ';'
-                    | var_poly ';'
+                    | var_poly_glob ';'
                     | var_multidim ';';
 
 lits:               TK_LIT_FALSE
@@ -89,7 +95,7 @@ lits:               TK_LIT_FALSE
 var_inicializada:   var_basic TK_OC_LE expr;
 
 var_loc:            var_basic
-                    | var_poly
+                    | var_poly_loc
                     | var_inicializada;
 
 
@@ -107,7 +113,7 @@ list_args:          list_args ',' arg
 comando_simples:    var_loc ';'
                     | atribuicao ';'
                     | chamada_func ';'
-                    | TK_PR_RETURN ';'
+                    | TK_PR_RETURN expr ';'
                     | if_then_else
                     | while
                     | bloc_com;
