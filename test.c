@@ -80,6 +80,36 @@ int main (int argc, char **argv)
         && test_parse("int az[13^5^8];", true)
         && test_parse("int aa[1], ab[2^3], ac[2^3^4];", true)
 
+    // DEC VAR LOCAL
+
+        //ints
+        && test_parse(com_bloc("int a;"), true)
+        && test_parse(com_bloc("int a, b, c;"), true)
+        && test_parse(com_bloc("int a <= 2;"), true)
+        && test_parse(com_bloc("int a, b, c <= 2;"), true)
+        && test_parse(com_bloc("int a <= 2, b <= 2, c <= 2;"), true)
+
+        //floats
+        && test_parse(com_bloc("float a;"), true)
+        && test_parse(com_bloc("float a, b, c;"), true)
+        && test_parse(com_bloc("float a <= 2;"), true)
+        && test_parse(com_bloc("float a, b, c <= 2;"), true)
+        && test_parse(com_bloc("float a <= 2, b <= 2, c <= 2;"), true)
+
+        //chars
+        && test_parse(com_bloc("char a;"), true)
+        && test_parse(com_bloc("char a, b, c;"), true)
+        && test_parse(com_bloc("char a <= 2;"), true)
+        && test_parse(com_bloc("char a, b, c <= 2;"), true)
+        && test_parse(com_bloc("char a <= 2, b <= 2, c <= 2;"), true)
+
+        //bools
+        && test_parse(com_bloc("bool a;"), true)
+        && test_parse(com_bloc("bool a, b, c;"), true)
+        && test_parse(com_bloc("bool a <= 2;"), true)
+        && test_parse(com_bloc("bool a, b, c <= 2;"), true)
+        && test_parse(com_bloc("bool a <= 2, b <= 2, c <= 2;"), true)
+
     // FUNCOES
     
         //ints
@@ -105,7 +135,39 @@ int main (int argc, char **argv)
         && test_parse("bool a (int a) {}", true)
         && test_parse("bool a (int a, float b) {}", true)
         && test_parse("bool a (int a, float b, char c) {}", true)
-        
+
+    // BLOCO DE COMANDOS
+
+        && test_parse(com_bloc("{}"), true)
+        && test_parse(com_bloc("{{{{{}}}}}"), true)
+        && test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();}}"), true)
+
+    // ATRIBUICOES
+
+        && test_parse(com_bloc("foo = bar;"), true)
+        && test_parse(com_bloc("foo = bar"), false)
+        && test_parse(com_bloc("foo = 123545;"), true)
+        && test_parse(com_bloc("foo = !(1234*abcd+47);"), true)
+        && test_parse(com_bloc("int vet[1];"), false)
+        && test_parse(com_bloc("vet[a^2^-(1234*abcd+47)] = 3;"), true)
+        && test_parse(com_bloc("var[var[10^20^30*2^var[20^30/2^40]]] = 5;"), true)
+
+    // CHAMADA DE FUNCAO
+
+        && test_parse(com_bloc("func();"), true)
+        && test_parse(com_bloc("func()"), false)
+        && test_parse(com_bloc("func(1, a, -(1234*abcd+47));"), true)
+
+    // EXPRESSOES
+
+        && test_parse(com_bloc("a = -(1234*!abcd+47);"), true)
+        && test_parse(com_bloc("a = !(1234*-abcd+47);"), true)
+        && test_parse(com_bloc("a = vet[a^2^-(1234*abcd+47)];"), true)
+        && test_parse(com_bloc("a = b;"), true)
+        && test_parse(com_bloc("a = func();"), true)
+        && test_parse(com_bloc("a = (1234*-abcd+47/9) \% (1234*-abcd+47/9) == var*5 != 10\%2;"), true)
+        && test_parse(com_bloc("a = (1234*-abcd+47/9) <= (1234*-abcd+47/9) >= var*5 != 10\%2;"), true)
+        && test_parse(com_bloc("a = (1234*-abcd+47/9) && (1234*-abcd+47/9) || var*5 != 10\%2;"), true)
 
     // CONTROLE DE FLUXO
 
@@ -122,33 +184,65 @@ int main (int argc, char **argv)
         && test_parse("if (!a) then", false)
         && test_parse("if (!a) then {}", false)
         && test_parse("if (!a) then {};", false)
+        && test_parse("if (a) then {} else", false)
+        && test_parse("if (a) then {} else {}", false)
+        && test_parse("if (a) then {} else {};", false)        
+        && test_parse("if (!a) then {} else", false)
+        && test_parse("if (!a) then {} else {}", false)
+        && test_parse("if (!a) then {} else {};", false)
+        && test_parse("while", false)
+        && test_parse("while ()", false)
+        && test_parse("while () {}", false)
+        && test_parse("while () {};", false)
+        && test_parse("while (a)", false)
+        && test_parse("while (a) {}", false)
+        && test_parse("while (a) {};", false)
+        && test_parse("while (!a)", false)
+        && test_parse("while (!a) {}", false)
+        && test_parse("while (!a) {};", false)
         
         //if-then
         && test_parse(com_bloc("if ()"), false)
         && test_parse(com_bloc("if () then"), false)
-        && test_parse(com_bloc("if () then {}"), true)
+        && test_parse(com_bloc("if () then {}"), false)
         && test_parse(com_bloc("if () then {};"), false)        
-        && test_parse(com_bloc("if (a)"), true)
-        && test_parse(com_bloc("if (a) then"), true)
+        && test_parse(com_bloc("if (a)"), false)
+        && test_parse(com_bloc("if (a) then"), false)
         && test_parse(com_bloc("if (a) then {}"), true)
-        && test_parse(com_bloc("if (a) then {};"), true)        
-        && test_parse(com_bloc("if (!a)"), true)
-        && test_parse(com_bloc("if (!a) then"), true)
+        && test_parse(com_bloc("if (a) then {};"), false)        
+        && test_parse(com_bloc("if (!a)"), false)
+        && test_parse(com_bloc("if (!a) then"), false)
         && test_parse(com_bloc("if (!a) then {}"), true)
-        && test_parse(com_bloc("if (!a) then {};"), true)
+        && test_parse(com_bloc("if (!a) then {};"), false)
         
-        ;
+        //if-then-else      
+        && test_parse(com_bloc("if (a) then {} else"), false)
+        && test_parse(com_bloc("if (a) then {} else {}"), true)
+        && test_parse(com_bloc("if (a) then {} else {};"), false)        
+        && test_parse(com_bloc("if (!a) then {} else"), false)
+        && test_parse(com_bloc("if (!a) then {} else {}"), true)
+        && test_parse(com_bloc("if (!a) then {} else {};"), false)
 
-	// test_result = test_result && test_parse("if (a) then{}", false);
-	// test_result = test_result && test_parse("int commBlock (){if () then{}}", false);
-	// test_result = test_result && test_parse("int commBlock (){if (!!(a+b*c)) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if (b*(!c)) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if ((a+d)+b+c) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if((!!!--((----a)))>(!!!!(a))) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if(b[a^a]) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if(abx()*abx()) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if(abx(aaa)) then{}}", true);
-	// test_result = test_result && test_parse("int commBlock (){if((banana[!fff()^ffr(abc)*foo(a, b, d, a+x+50*37*4)] + frr(32)) > 100) then {}}", true);
+        //while
+        && test_parse(com_bloc("while"), false)
+        && test_parse(com_bloc("while ()"), false)
+        && test_parse(com_bloc("while () {}"), false)
+        && test_parse(com_bloc("while () {};"), false)
+        && test_parse(com_bloc("while (a)"), false)
+        && test_parse(com_bloc("while (a) {}"), true)
+        && test_parse(com_bloc("while (a) {};"), false)
+        && test_parse(com_bloc("while (!a)"), false)
+        && test_parse(com_bloc("while (!a) {}"), true)
+        && test_parse(com_bloc("while (!a) {};"), false)
+    
+    // RETURN
+
+        && test_parse(com_bloc("return;"), false)
+        && test_parse(com_bloc("return 1;"), true)
+        && test_parse(com_bloc("return a;"), true)
+        && test_parse(com_bloc("return -(1234*abcd+47);"), true)
+
+    ;
 	
     if (!test_result)
         printf("\n\033[0;31mSOME TESTS FAILED!\033[0m\n\n");

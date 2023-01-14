@@ -12,3 +12,5 @@ Adicionalmente, foi acrescentado o arquivo _**test.c**_ que realiza diversos tes
 ## Etapa 2 - Análise Sintática
 
 O arquivo _**token.h**_ foi deletado e substituido pelo _**parser.y**_. Neste arquivo, também foram escritas as regras de linguagem a serem usadas pelo _**bison**_. Também foi modidicado o _**scanner.l**_ para se adequar as regras declaradas.
+
+O arquivo _**test.c**_ foi modificado para refletir as alterações da etapa e auxiliar no desenvolvimento.
