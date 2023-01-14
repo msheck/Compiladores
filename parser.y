@@ -76,7 +76,7 @@ lits:               TK_LIT_FALSE
                     | TK_LIT_FLOAT
                     | TK_LIT_CHAR;
 
-var_inicializada:   var_basic '<''=' lits;
+var_inicializada:   var_basic TK_OC_LE expr;
 
 var_loc:            var_basic
                     | var_poly

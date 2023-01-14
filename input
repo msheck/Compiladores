@@ -39,6 +39,9 @@ int commBlock ()
 	bool dd;
 	bool dd, de, df;
 
+	float a <= 1.5;
+	float a <= -1.5;
+
 	if (bb == aa) then
 	{
 		if(!!bb) then {}
