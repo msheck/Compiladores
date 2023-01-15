@@ -4,7 +4,6 @@ Função principal para realização da análise sintática.
 Este arquivo será posterioremente substituído, não acrescente nada.
 */
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #define _(s) #s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
 #include "parser.tab.h" //arquivo gerado com bison -d parser.y
@@ -150,6 +149,8 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("int a[];"), false, __LINE__)
         + test_parse(com_bloc("int a[1];"), false, __LINE__)
         + test_parse(com_bloc("int a[1^2];"), false, __LINE__)
+        + test_parse(com_bloc("int a <= '2', b <= '2', c <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("int a <= '2';"), true, __LINE__)
 
         //floats
         + test_parse(com_bloc("float b;"), true, __LINE__)
@@ -160,6 +161,8 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("float b[];"), false, __LINE__)
         + test_parse(com_bloc("float b[1];"), false, __LINE__)
         + test_parse(com_bloc("float b[1^2];"), false, __LINE__)
+        + test_parse(com_bloc("float a <= '2', b <= '2', c <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("float a <= '2';"), true, __LINE__)
 
         //chars
         + test_parse(com_bloc("char c;"), true, __LINE__)
@@ -170,6 +173,8 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("char c[];"), false, __LINE__)
         + test_parse(com_bloc("char c[1];"), false, __LINE__)
         + test_parse(com_bloc("char c[1^2];"), false, __LINE__)
+        + test_parse(com_bloc("char a <= '2', b <= '2', c <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("char a <= '2';"), true, __LINE__)
 
         //bools
         + test_parse(com_bloc("bool d;"), true, __LINE__)
@@ -180,10 +185,14 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("bool d[];"), false, __LINE__)
         + test_parse(com_bloc("bool d[1];"), false, __LINE__)
         + test_parse(com_bloc("bool d[1^2];"), false, __LINE__)
+        + test_parse(com_bloc("bool a <= '2', b <= '2', c <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("bool a <= '2';"), true, __LINE__)
 
     // ATRIBUICOES
 
         + test_parse(com_bloc("foo = bar;"), true, __LINE__)
+        + test_parse(com_bloc("foo = 'a';"), true, __LINE__)
+        + test_parse(com_bloc("foo = 'aaa';"), false, __LINE__)
         + test_parse(com_bloc("foo = bar"), false, __LINE__)
         + test_parse(com_bloc("foo = 123545;"), true, __LINE__)
         + test_parse(com_bloc("foo = !(1234*abcd+47);"), true, __LINE__)
