@@ -294,9 +294,9 @@ int main (int argc, char **argv)
     ;
 	
     if (test_result != test_number)
-        printf("\n\t\033[4;31mSOME TESTS FAILED!\n\nFailed Tests:\033[0m %s\n\n", failed_tests);
+        printf("\n\t\t\033[1;4;31mSOME TESTS FAILED!\n\n\033[0;31mFailed Tests:\033[0m %s\n\n", failed_tests);
     else
-        printf("\n\t\033[4;32mALL TESTS PASSED!\033[0m\n\n");
+        printf("\n\t\t\033[1;4;32mALL TESTS PASSED!\033[0m\n\n");
 
 	return 0;
 }
@@ -371,8 +371,8 @@ char* com_bloc (char* input)
 int test_parse (char* string, int assertion, int line_number) {
     YY_BUFFER_STATE buffer = yy_scan_string(string);
     test_number++;
-    printf("\n\033[1;30mln%d\033[0m\t\033[4;34mTEST NUMBER: %i\033[0m", line_number, test_number);
-    printf("\n\033[1;30m-----------input start-----------\033[0m\n%s\n\033[1;30m------------input end------------\033[0m\n\033[4mResult\033[0m: ", string);    
+    printf("\n\n\033[1;3;30mln%d\033[0m\t\t\033[1;4;34mTEST NUMBER: %i\033[0m", line_number, test_number);
+    printf("\n\033[1;30m-------------------input start-------------------\033[0m\n%s\n\033[1;30m--------------------input end--------------------\033[0m\n\033[4mResult\033[0m: ", string);    
     int ret = yyparse();
     char converted_int[sizeof(char)*sizeof(test_number)];
     sprintf(converted_int,"%d",test_number);
