@@ -4,6 +4,7 @@ Função principal para realização da análise sintática.
 Este arquivo será posterioremente substituído, não acrescente nada.
 */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #define _(s) #s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
 #include "parser.tab.h" //arquivo gerado com bison -d parser.y
@@ -29,6 +30,7 @@ int print_token (int token);
 int test_token(char* string, int expected_token, bool assertion);
 int test_line_numbers(char* string, int expected_line_number);
 int test_parse (char* string, int assertion, int line_number);
+char failed_tests[200];
 char com_bloc_output[200];
 char* com_bloc(char* input);
 int test_number = 0;
@@ -292,7 +294,7 @@ int main (int argc, char **argv)
     ;
 	
     if (test_result != test_number)
-        printf("\n\t\033[4;31mSOME TESTS FAILED!\033[0m\n\n");
+        printf("\n\t\033[4;31mSOME TESTS FAILED!\n\nFailed Tests:\033[0m %s\n\n", failed_tests);
     else
         printf("\n\t\033[4;32mALL TESTS PASSED!\033[0m\n\n");
 
@@ -372,12 +374,16 @@ int test_parse (char* string, int assertion, int line_number) {
     printf("\n\033[1;30mln%d\033[0m\t\033[4;34mTEST NUMBER: %i\033[0m", line_number, test_number);
     printf("\n\033[1;30m-----------input start-----------\033[0m\n%s\n\033[1;30m------------input end------------\033[0m\n\033[4mResult\033[0m: ", string);    
     int ret = yyparse();
+    char converted_int[sizeof(char)*sizeof(test_number)];
+    sprintf(converted_int,"%d",test_number);
     yy_delete_buffer(buffer);
     yylex_destroy();
     
     if (ret==1) { // Failure
         if(assertion) { // Success expected
             printf("\033[0;31mFAILED!\033[0m\n");
+            strcat(converted_int," ");
+            strcat(failed_tests,(const char*)converted_int);
             return false;
         }
         else { // Failure expected
@@ -392,6 +398,8 @@ int test_parse (char* string, int assertion, int line_number) {
         }
         else { // Failure expected
             printf("Success not expexted. \033[0;31mFAILED!\033[0m\n");
+            strcat(converted_int," ");
+            strcat(failed_tests,(const char*)converted_int);
             return false;
         }
     }
