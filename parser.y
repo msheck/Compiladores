@@ -1,3 +1,12 @@
+/*
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
+
+Desenvolvido pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+*/
 %{
 int yylex(void);
 void yyerror (char const *error_message);
