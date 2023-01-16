@@ -1,7 +1,13 @@
 /*
-Função principal para realização da análise sintática.
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
 
-Este arquivo será posterioremente substituído, não acrescente nada.
+Desenvolvido pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+
+Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 */
 #include <stdio.h>
 #include <string.h>
