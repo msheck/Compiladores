@@ -134,9 +134,12 @@ int main (int argc, char **argv)
 
     // BLOCO DE COMANDOS
 
-        + test_parse(com_bloc("{}"), true, __LINE__)
-        + test_parse(com_bloc("{{{{{}}}}}"), true, __LINE__)
-        + test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();}}"), true, __LINE__)
+        + test_parse(com_bloc("{}"), false, __LINE__)
+        + test_parse(com_bloc("{{{{{}}}}}"), false, __LINE__)
+        + test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();}}"), false, __LINE__)
+        + test_parse(com_bloc("{};"), true, __LINE__)
+        + test_parse(com_bloc("{{{{{};};};};};"), true, __LINE__)
+        + test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();};};"), true, __LINE__)
 
     // DEC VAR LOCAL
 
@@ -268,20 +271,20 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("if () then {};"), false, __LINE__)
         + test_parse(com_bloc("if (a)"), false, __LINE__)
         + test_parse(com_bloc("if (a) then"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {}"), true, __LINE__)
-        + test_parse(com_bloc("if (a) then {};"), false, __LINE__)
+        + test_parse(com_bloc("if (a) then {}"), false, __LINE__)
+        + test_parse(com_bloc("if (a) then {};"), true, __LINE__)
         + test_parse(com_bloc("if (!a)"), false, __LINE__)
         + test_parse(com_bloc("if (!a) then"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {}"), true, __LINE__)
-        + test_parse(com_bloc("if (!a) then {};"), false, __LINE__)
+        + test_parse(com_bloc("if (!a) then {}"), false, __LINE__)
+        + test_parse(com_bloc("if (!a) then {};"), true, __LINE__)
         
         //if-then-else      
         + test_parse(com_bloc("if (a) then {} else"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {} else {}"), true, __LINE__)
-        + test_parse(com_bloc("if (a) then {} else {};"), false, __LINE__)
+        + test_parse(com_bloc("if (a) then {} else {}"), false, __LINE__)
+        + test_parse(com_bloc("if (a) then {} else {};"), true, __LINE__)
         + test_parse(com_bloc("if (!a) then {} else"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {} else {}"), true, __LINE__)
-        + test_parse(com_bloc("if (!a) then {} else {};"), false, __LINE__)
+        + test_parse(com_bloc("if (!a) then {} else {}"), false, __LINE__)
+        + test_parse(com_bloc("if (!a) then {} else {};"), true, __LINE__)
 
         //while
         + test_parse(com_bloc("while"), false, __LINE__)
@@ -289,11 +292,11 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("while () {}"), false, __LINE__)
         + test_parse(com_bloc("while () {};"), false, __LINE__)
         + test_parse(com_bloc("while (a)"), false, __LINE__)
-        + test_parse(com_bloc("while (a) {}"), true, __LINE__)
-        + test_parse(com_bloc("while (a) {};"), false, __LINE__)
+        + test_parse(com_bloc("while (a) {}"), false, __LINE__)
+        + test_parse(com_bloc("while (a) {};"), true, __LINE__)
         + test_parse(com_bloc("while (!a)"), false, __LINE__)
-        + test_parse(com_bloc("while (!a) {}"), true, __LINE__)
-        + test_parse(com_bloc("while (!a) {};"), false, __LINE__)
+        + test_parse(com_bloc("while (!a) {}"), false, __LINE__)
+        + test_parse(com_bloc("while (!a) {};"), true, __LINE__)
     
     // RETURN
 

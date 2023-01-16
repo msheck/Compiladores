@@ -114,9 +114,9 @@ comando_simples:    var_loc ';'
                     | atribuicao ';'
                     | chamada_func ';'
                     | TK_PR_RETURN expr ';'
-                    | if_then_else
-                    | while
-                    | bloc_com;
+                    | if_then_else ';'
+                    | while ';'
+                    | bloc_com ';';
 
 comandos:           comandos comando_simples
 		            | comando_simples;
