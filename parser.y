@@ -7,6 +7,7 @@ Desenvolvido pelos alunos:
 	-Mateus Severgnini Heck 
 	-Vinicius Meirelles Pereira
 */
+
 %{
 int yylex(void);
 void yyerror (char const *error_message);
@@ -101,7 +102,7 @@ lits:               TK_LIT_FALSE
                     | TK_LIT_FLOAT
                     | TK_LIT_CHAR;
 
-var_inicializada:   var_basic TK_OC_LE expr;
+var_inicializada:   var_basic TK_OC_LE lits;
 
 var_loc:            var_basic
                     | var_poly_loc

@@ -9,6 +9,7 @@ Desenvolvido pelos alunos:
 
 Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 */
+
 #include <stdio.h>
 #include <string.h>
 #define _(s) #s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
@@ -160,6 +161,7 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("int a[1^2];"), false, __LINE__)
         + test_parse(com_bloc("int a <= '2', b <= '2', c <= '2';"), true, __LINE__)
         + test_parse(com_bloc("int a <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("int a <= 2 + 3;"), false, __LINE__)
 
         //floats
         + test_parse(com_bloc("float b;"), true, __LINE__)
@@ -172,6 +174,7 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("float b[1^2];"), false, __LINE__)
         + test_parse(com_bloc("float a <= '2', b <= '2', c <= '2';"), true, __LINE__)
         + test_parse(com_bloc("float a <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("float a <= 2 + 3;"), false, __LINE__)
 
         //chars
         + test_parse(com_bloc("char c;"), true, __LINE__)
@@ -184,6 +187,7 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("char c[1^2];"), false, __LINE__)
         + test_parse(com_bloc("char a <= '2', b <= '2', c <= '2';"), true, __LINE__)
         + test_parse(com_bloc("char a <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("char a <= 2 + 3;"), false, __LINE__)
 
         //bools
         + test_parse(com_bloc("bool d;"), true, __LINE__)
@@ -196,6 +200,7 @@ int main (int argc, char **argv)
         + test_parse(com_bloc("bool d[1^2];"), false, __LINE__)
         + test_parse(com_bloc("bool a <= '2', b <= '2', c <= '2';"), true, __LINE__)
         + test_parse(com_bloc("bool a <= '2';"), true, __LINE__)
+        + test_parse(com_bloc("bool a <= 2 + 3;"), false, __LINE__)
 
     // ATRIBUICOES
 

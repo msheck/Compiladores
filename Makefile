@@ -6,7 +6,7 @@
 #	-Mateus Severgnini Heck 
 #	-Vinicius Meirelles Pereira
 
-etapa = 2
+etapa = 3
 
 .PHONY: zip unzip compile_test test clean flex etapa$(etapa)
 
@@ -35,7 +35,7 @@ compile_test:
 	gcc lex.yy.c parser.tab.c test.c -o test.o
 
 zip: clean
-	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='README.md' -cvzf etapa$(etapa).tgz .
+	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(etapa).tgz .
 
 unzip:
 	mkdir entrega | tar xf etapa$(etapa).tgz --directory entrega
