@@ -143,31 +143,58 @@ list_expr:          list_expr '^' expr
                     | expr;
 
 expr:               expr_end
-	                | expr op_bin expr_end; // Operações binárias podem ser usadas com quaisquer expressões
+	                | expr_tier7;
 
 expr_end:           '(' expr ')'
-                    | op_pre expr_end // Prefixos só podem ser usados com identificador, literais, etc sozinhos OU com '(' expr ')'
 	                | TK_IDENTIFICADOR
 	                | TK_IDENTIFICADOR '[' list_expr ']'
 	                | lits
 	                | chamada_func;
 
-op_bin:             '*'
-                    | '/'
-                    | '%'
-                    | '+'
-                    | '-'
-                    | '<'
-                    | '>'
-                    | TK_OC_LE
-                    | TK_OC_GE
-                    | TK_OC_EQ
-                    | TK_OC_NE
-                    | TK_OC_AND
-                    | TK_OC_OR;
+expr_tier7:         expr TK_OC_OR expr
+                    | expr_tier6;
 
-op_pre:             '-' 
-                    | '!';
+expr_tier6:         expr TK_OC_AND expr
+                    | expr_tier5;
+
+expr_tier5:         expr TK_OC_EQ expr
+                    | expr TK_OC_NE expr
+                    | expr_tier4;
+
+expr_tier4:         expr '<' expr
+                    | expr '>' expr
+                    | expr TK_OC_LE expr
+                    | expr TK_OC_GE expr
+                    | expr_tier3;
+
+expr_tier3:         expr '+' expr
+                    | expr '-' expr
+                    | expr_tier2;
+
+expr_tier2:         expr '*' expr
+                    | expr '/' expr
+                    | expr '%' expr
+                    | expr_tier1;
+
+expr_tier1:         '-' expr
+                    | '!' expr
+
+// op_bin:             '*'
+//                     | '/'
+//                     | '%'
+//                     | '+'
+//                     | '-'
+//                     | '<'
+//                     | '>'
+//                     | TK_OC_LE
+//                     | TK_OC_GE
+//                     | TK_OC_EQ
+//                     | TK_OC_NE
+//                     | TK_OC_AND
+//                     | TK_OC_OR;
+
+// op_pre:             '-' 
+//                     | '!';
 
 
 // CONTROLE DE FLUXO
