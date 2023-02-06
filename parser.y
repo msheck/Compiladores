@@ -45,14 +45,6 @@ void yyerror (char const *error_message);
 
 %start programa_ou_vazio
 
-%left TK_OC_OR
-%left TK_OC_AND
-%left TK_OC_EQ TK_OC_NE
-%left '>' '<' TK_OC_LE TK_OC_GE
-%left '+' '-'
-%left '*' '/' '%'
-%left '!'
-
 %%
 
 programa_ou_vazio:  programa
@@ -151,29 +143,29 @@ expr_end:           '(' expr ')'
 	                | lits
 	                | chamada_func;
 
-expr_tier7:         expr TK_OC_OR expr
+expr_tier7:         expr_end TK_OC_OR expr
                     | expr_tier6;
 
-expr_tier6:         expr TK_OC_AND expr
+expr_tier6:         expr_end TK_OC_AND expr
                     | expr_tier5;
 
-expr_tier5:         expr TK_OC_EQ expr
-                    | expr TK_OC_NE expr
+expr_tier5:         expr_end TK_OC_EQ expr
+                    | expr_end TK_OC_NE expr
                     | expr_tier4;
 
-expr_tier4:         expr '<' expr
-                    | expr '>' expr
-                    | expr TK_OC_LE expr
-                    | expr TK_OC_GE expr
+expr_tier4:         expr_end '<' expr
+                    | expr_end '>' expr
+                    | expr_end TK_OC_LE expr
+                    | expr_end TK_OC_GE expr
                     | expr_tier3;
 
-expr_tier3:         expr '+' expr
-                    | expr '-' expr
+expr_tier3:         expr_end '+' expr
+                    | expr_end '-' expr
                     | expr_tier2;
 
-expr_tier2:         expr '*' expr
-                    | expr '/' expr
-                    | expr '%' expr
+expr_tier2:         expr_end '*' expr
+                    | expr_end '/' expr
+                    | expr_end '%' expr
                     | expr_tier1;
 
 expr_tier1:         '-' expr
