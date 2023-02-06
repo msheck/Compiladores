@@ -179,23 +179,6 @@ expr_tier2:         expr '*' expr
 expr_tier1:         '-' expr
                     | '!' expr
 
-// op_bin:             '*'
-//                     | '/'
-//                     | '%'
-//                     | '+'
-//                     | '-'
-//                     | '<'
-//                     | '>'
-//                     | TK_OC_LE
-//                     | TK_OC_GE
-//                     | TK_OC_EQ
-//                     | TK_OC_NE
-//                     | TK_OC_AND
-//                     | TK_OC_OR;
-
-// op_pre:             '-' 
-//                     | '!';
-
 
 // CONTROLE DE FLUXO
 
