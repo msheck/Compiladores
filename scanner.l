@@ -54,8 +54,8 @@ for          		{ return TK_PR_FOR; }
 "!="         		{ return TK_OC_NE; }
 "&&"         		{ return TK_OC_AND; }
 "||"         		{ return TK_OC_OR; }
-{lit_i}      		{ return TK_LIT_INT; }
-{lit_f}      		{ return TK_LIT_FLOAT; }
+{lit_i}      		{ yylval.valor = atoi(yytext); return TK_LIT_INT; }
+{lit_f}      		{ yylval.valor = atof(yytext); return TK_LIT_FLOAT; }
 true         		{ return TK_LIT_TRUE; }
 false        		{ return TK_LIT_FALSE; }
 {lit_c}      		{ return TK_LIT_CHAR; }

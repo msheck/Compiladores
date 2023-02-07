@@ -15,10 +15,17 @@ void yyerror (char const *error_message);
 #include <stdio.h>
 %}
 
+%code requires { #include "AbstractSyntaxTree.h" }
+
 %define parse.error verbose
 
-%token TK_PR_INT
-%token TK_PR_FLOAT
+%union {
+  double valor;
+  ASTree *arvore;
+}
+
+%token<valor> TK_PR_INT
+%token<valor> TK_PR_FLOAT
 %token TK_PR_BOOL
 %token TK_PR_CHAR
 %token TK_PR_IF
