@@ -54,11 +54,26 @@ for          		{ return TK_PR_FOR; }
 "!="         		{ return TK_OC_NE; }
 "&&"         		{ return TK_OC_AND; }
 "||"         		{ return TK_OC_OR; }
-{lit_i}      		{ yylval.valor = atoi(yytext); return TK_LIT_INT; }
-{lit_f}      		{ yylval.valor = atof(yytext); return TK_LIT_FLOAT; }
-true         		{ return TK_LIT_TRUE; }
-false        		{ return TK_LIT_FALSE; }
-{lit_c}      		{ return TK_LIT_CHAR; }
+{lit_i}      		{ lexValue lv; lv.value = strdup(yytext);
+					  lv.line_number = yylineno;
+					  lv.type = TYPE_LIT; yylval.valor_lexico = lv;
+					  return TK_LIT_INT; }
+{lit_f}      		{ lexValue lv; lv.value = strdup(yytext);
+					  lv.line_number = yylineno;
+					  lv.type = TYPE_LIT; yylval.valor_lexico = lv;
+					  return TK_LIT_FLOAT; }
+true         		{ lexValue lv; lv.value = strdup(yytext);
+					  lv.line_number = yylineno;
+					  lv.type = TYPE_LIT; yylval.valor_lexico = lv;
+					  return TK_LIT_TRUE; }
+false        		{ lexValue lv; lv.value = strdup(yytext);
+					  lv.line_number = yylineno;
+					  lv.type = TYPE_LIT; yylval.valor_lexico = lv;
+					  return TK_LIT_FALSE; }
+{lit_c}      		{ lexValue lv; lv.value = strdup(yytext);
+					  lv.line_number = yylineno;
+					  lv.type = TYPE_LIT; yylval.valor_lexico = lv;
+					  return TK_LIT_CHAR; }
 {ident}      		{ return TK_IDENTIFICADOR; }
 
 "/*"         		{ BEGIN(B_COMM); }
@@ -79,4 +94,8 @@ int get_line_number() {
 void yyerror (char const *error_message) {
 	if (error_message_enabled)
 		fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
+}
+void exporta(void* arvore){
+}
+void libera(void* arvore){
 }

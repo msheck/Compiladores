@@ -4,7 +4,7 @@
 #include "AbstractSyntaxTree.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
-ASTree *astree_new_node(const char *label, double value)
+ASTree *astree_new_node(const char *label, lexValue value)
 {
   ASTree *ret = NULL;
   ret = calloc(1, sizeof(ASTree));

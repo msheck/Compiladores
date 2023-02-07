@@ -13,6 +13,7 @@ int yylex(void);
 void yyerror (char const *error_message);
 
 #include <stdio.h>
+
 %}
 
 %code requires { #include "AbstractSyntaxTree.h" }
@@ -20,12 +21,12 @@ void yyerror (char const *error_message);
 %define parse.error verbose
 
 %union {
-  double valor;
+  lexValue valor_lexico;
   ASTree *arvore;
 }
 
-%token<valor> TK_PR_INT
-%token<valor> TK_PR_FLOAT
+%token TK_PR_INT
+%token TK_PR_FLOAT
 %token TK_PR_BOOL
 %token TK_PR_CHAR
 %token TK_PR_IF
@@ -42,13 +43,15 @@ void yyerror (char const *error_message);
 %token TK_OC_NE
 %token TK_OC_AND
 %token TK_OC_OR
-%token TK_LIT_INT
-%token TK_LIT_FLOAT
-%token TK_LIT_FALSE
-%token TK_LIT_TRUE
-%token TK_LIT_CHAR
+%token<valor_lexico> TK_LIT_INT
+%token<valor_lexico> TK_LIT_FLOAT
+%token<valor_lexico> TK_LIT_FALSE
+%token<valor_lexico> TK_LIT_TRUE
+%token<valor_lexico> TK_LIT_CHAR
 %token TK_IDENTIFICADOR
 %token TK_ERRO
+
+%type<arvore> lits
 
 %start programa_ou_vazio
 
@@ -95,11 +98,11 @@ var_glob:           var_basic ';'
                     | var_poly_glob ';'
                     | var_multidim ';';
 
-lits:               TK_LIT_FALSE
-                    | TK_LIT_TRUE
-                    | TK_LIT_INT
-                    | TK_LIT_FLOAT
-                    | TK_LIT_CHAR;
+lits:               TK_LIT_FALSE { $$ = astree_new_node("", $1); }
+                    | TK_LIT_TRUE { $$ = astree_new_node("", $1); }
+                    | TK_LIT_INT { $$ = astree_new_node("", $1); }
+                    | TK_LIT_FLOAT { $$ = astree_new_node("", $1); }
+                    | TK_LIT_CHAR { $$ = astree_new_node("", $1); };
 
 var_inicializada:   var_basic TK_OC_LE lits;
 
