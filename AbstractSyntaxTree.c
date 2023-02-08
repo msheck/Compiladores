@@ -4,12 +4,11 @@
 #include "AbstractSyntaxTree.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
-ASTree *astree_new_node(const char *label, lexValue value)
+ASTree *astree_new_node(lexValue value)
 {
   ASTree *ret = NULL;
   ret = calloc(1, sizeof(ASTree));
   if (ret != NULL){
-    ret->label = strdup(label);
     ret->value = value;
     ret->number_of_children = 0;
     ret->children = NULL;
@@ -25,7 +24,7 @@ void astree_free(ASTree *tree)
       astree_free(tree->children[i]);
     }
     free(tree->children);
-    free(tree->label);
+    free(tree->value.value);
     free(tree);
   }else{
     printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
@@ -47,7 +46,7 @@ static void _astree_print (FILE *foutput, ASTree *tree, int profundidade)
 {
   int i;
   if (tree != NULL){
-    fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade*2, "", tree->label, tree->number_of_children);
+    fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade*2, "", tree->value.value, tree->number_of_children);
     for (i = 0; i < tree->number_of_children; i++){
       _astree_print(foutput, tree->children[i], profundidade+1);
     }
@@ -70,7 +69,7 @@ static void _astree_print_graphviz (FILE *foutput, ASTree *tree)
 {
   int i;
   if (tree != NULL){
-    fprintf(foutput, "  %ld [ label=\"%s;%lf\" ];\n", (long)tree, tree->label, tree->value);
+    fprintf(foutput, "  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
     for (i = 0; i < tree->number_of_children; i++){
       fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
       _astree_print_graphviz(foutput, tree->children[i]);
@@ -94,4 +93,12 @@ void astree_print_graphviz(ASTree *tree)
   }else{
     printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
+}
+
+ASTree *astree_get_leaf(ASTree *root){
+  ASTree *leaf = root;
+  while(leaf->number_of_children > 0){
+    leaf = leaf->children[0];
+  }
+  return leaf;
 }

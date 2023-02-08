@@ -25,33 +25,40 @@ void yyerror (char const *error_message);
   ASTree *arvore;
 }
 
-%token TK_PR_INT
-%token TK_PR_FLOAT
-%token TK_PR_BOOL
-%token TK_PR_CHAR
-%token TK_PR_IF
-%token TK_PR_THEN
-%token TK_PR_ELSE
-%token TK_PR_WHILE
-%token TK_PR_INPUT
-%token TK_PR_OUTPUT
-%token TK_PR_RETURN
-%token TK_PR_FOR
-%token TK_OC_LE
-%token TK_OC_GE
-%token TK_OC_EQ
-%token TK_OC_NE
-%token TK_OC_AND
-%token TK_OC_OR
+%token<valor_lexico> TK_PR_INT
+%token<valor_lexico> TK_PR_FLOAT
+%token<valor_lexico> TK_PR_BOOL
+%token<valor_lexico> TK_PR_CHAR
+%token<valor_lexico> TK_PR_IF
+%token<valor_lexico> TK_PR_THEN
+%token<valor_lexico> TK_PR_ELSE
+%token<valor_lexico> TK_PR_WHILE
+%token<valor_lexico> TK_PR_INPUT
+%token<valor_lexico> TK_PR_OUTPUT
+%token<valor_lexico> TK_PR_RETURN
+%token<valor_lexico> TK_PR_FOR
+%token<valor_lexico> TK_OC_LE
+%token<valor_lexico> TK_OC_GE
+%token<valor_lexico> TK_OC_EQ
+%token<valor_lexico> TK_OC_NE
+%token<valor_lexico> TK_OC_AND
+%token<valor_lexico> TK_OC_OR
 %token<valor_lexico> TK_LIT_INT
 %token<valor_lexico> TK_LIT_FLOAT
 %token<valor_lexico> TK_LIT_FALSE
 %token<valor_lexico> TK_LIT_TRUE
 %token<valor_lexico> TK_LIT_CHAR
-%token TK_IDENTIFICADOR
+%token<valor_lexico> TK_IDENTIFICADOR
 %token TK_ERRO
 
 %type<arvore> lits
+%type<arvore> tipo_var
+%type<arvore> var_basic
+%type<arvore> var_glob
+%type<arvore> var_poly_glob
+%type<arvore> var_multidim
+%type<arvore> list_var
+%type<arvore> list_dimensoes
 
 %start programa_ou_vazio
 
@@ -68,41 +75,44 @@ programa:           programa var_glob
 
 // VARIAVEIS
 
-tipo_var:           TK_PR_INT
-                    | TK_PR_FLOAT
-                    | TK_PR_CHAR
-                    | TK_PR_BOOL;
+tipo_var:           TK_PR_INT     { $$ = astree_new_node($1); }
+                    | TK_PR_FLOAT { $$ = astree_new_node($1); }
+                    | TK_PR_CHAR  { $$ = astree_new_node($1); }
+                    | TK_PR_BOOL  { $$ = astree_new_node($1); };
 
-var_basic:          tipo_var TK_IDENTIFICADOR;
+var_basic:          tipo_var TK_IDENTIFICADOR { ASTree* ident = astree_new_node($2);
+                                                astree_add_child($1, ident);
+                                                $$ = $1;
+                                                };
 
-list_var:           list_var ',' TK_IDENTIFICADOR
+list_var:           list_var ',' TK_IDENTIFICADOR { astree_add_child($1, astree_new_node($3)); $$ = $1; }
                     | list_var ',' TK_IDENTIFICADOR TK_OC_LE expr
                     | list_var ',' TK_IDENTIFICADOR '[' list_dimensoes ']'
-                    | TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR TK_OC_LE expr
-                    | TK_IDENTIFICADOR '[' list_dimensoes ']';
+                    | TK_IDENTIFICADOR { $$ = astree_new_node($1); };
+                    //| TK_IDENTIFICADOR TK_OC_LE expr
+                    //| TK_IDENTIFICADOR '[' list_dimensoes ']';
 
 var_poly_loc:       var_basic ',' list_var
                     | var_multidim ',' list_var
                     | var_inicializada ',' list_var;
 
-var_poly_glob:      var_basic ',' list_var
+var_poly_glob:      var_basic ',' list_var { astree_add_child($1->children[0], $3); $$ = $1; }
                     | var_multidim ',' list_var;
 
-list_dimensoes:     list_dimensoes '^' TK_LIT_INT
-                    | TK_LIT_INT;
+list_dimensoes:     list_dimensoes '^' TK_LIT_INT { astree_add_child(astree_get_leaf($1), astree_new_node($3)); $$ = $1; }
+                    | TK_LIT_INT { $$ = astree_new_node($1); };
 
-var_multidim:       var_basic '[' list_dimensoes ']';
+var_multidim:       var_basic '[' list_dimensoes ']'  { astree_add_child($1->children[0], $3); $$ = $1; };
 
-var_glob:           var_basic ';'
-                    | var_poly_glob ';'
-                    | var_multidim ';';
+var_glob:           var_basic ';'       { $$ = $1; } // astree_print_graphviz($$);
+                    | var_poly_glob ';' { $$ = $1; }
+                    | var_multidim ';'  { $$ = $1; astree_print_graphviz($$); };
 
-lits:               TK_LIT_FALSE { $$ = astree_new_node("", $1); }
-                    | TK_LIT_TRUE { $$ = astree_new_node("", $1); }
-                    | TK_LIT_INT { $$ = astree_new_node("", $1); }
-                    | TK_LIT_FLOAT { $$ = astree_new_node("", $1); }
-                    | TK_LIT_CHAR { $$ = astree_new_node("", $1); };
+lits:               TK_LIT_FALSE  { $$ = astree_new_node($1); }
+                  | TK_LIT_TRUE   { $$ = astree_new_node($1); }
+                  | TK_LIT_INT    { $$ = astree_new_node($1); }
+                  | TK_LIT_FLOAT  { $$ = astree_new_node($1); }
+                  | TK_LIT_CHAR   { $$ = astree_new_node($1); };
 
 var_inicializada:   var_basic TK_OC_LE lits;
 

@@ -11,10 +11,10 @@ etapa = 3
 .PHONY: zip unzip compile_test test clean flex etapa$(etapa)
 
 $(etapa): flex bison
-	gcc lex.yy.c parser.tab.c main.c -o etapa$(etapa)
+	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c main.c -o etapa$(etapa)
 
 debug: flex bison_debug
-	gcc lex.yy.c parser.tab.c main.c -o etapa$(etapa)
+	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c main.c -o etapa$(etapa)
 
 flex: scanner.l
 	flex scanner.l
