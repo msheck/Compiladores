@@ -10,10 +10,11 @@ etapa = 3
 
 .PHONY: zip unzip compile_test test clean flex etapa$(etapa)
 
-$(etapa): flex bison
-	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c main.c -o etapa$(etapa)
+$(etapa): flex bison compile
 
-debug: flex bison_debug
+debug: flex bison_debug compile
+
+compile:
 	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c main.c -o etapa$(etapa)
 
 flex: scanner.l
@@ -33,6 +34,12 @@ test: flex bison compile_test
 
 compile_test:
 	gcc lex.yy.c parser.tab.c test.c -o test.o
+
+graph: flex bison compile run_input	
+	dot saida.dot -Tpng -o grafo.png
+
+run_input:
+	./etapa$(etapa) < input
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(etapa).tgz .
