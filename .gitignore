@@ -55,6 +55,8 @@ dkms.conf
 
 lex.yy.c
 entrega
+*.png
+*.dot
 *.output
 *.tab.c
 *.tab.h

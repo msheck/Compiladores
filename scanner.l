@@ -59,7 +59,7 @@ char         		{ get_node_info(TYPE_KEY_WORD); return TK_PR_CHAR; }
 if           		{ get_node_info(TYPE_KEY_WORD); return TK_PR_IF; }
 then         		{ get_node_info(TYPE_KEY_WORD); return TK_PR_THEN; }
 else         		{ get_node_info(TYPE_KEY_WORD); return TK_PR_ELSE; }
-while        		{ get_node_info(TYPE_KEY_WORD); return TK_PR_THEN; } 
+while        		{ get_node_info(TYPE_KEY_WORD); return TK_PR_WHILE; } 
 input        		{ get_node_info(TYPE_KEY_WORD); return TK_PR_INPUT; }
 output       		{ get_node_info(TYPE_KEY_WORD); return TK_PR_OUTPUT; }
 return       		{ get_node_info(TYPE_KEY_WORD); return TK_PR_RETURN; }

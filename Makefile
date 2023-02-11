@@ -26,7 +26,7 @@ bison_debug:
 	bison -d -v parser.y
 
 clean:
-	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output
+	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output *.dot *.png
 
 test: flex bison compile_test
 	./test.o

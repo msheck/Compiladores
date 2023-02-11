@@ -19,17 +19,17 @@ typedef struct AbstractSyntaxTree {
   struct AbstractSyntaxTree **children;
 } ASTree;
 
-ASTree *astree_new_node(lexValue value);
+ASTree *ast_new_node(lexValue value);
 
-void astree_free(ASTree *tree);
+void ast_free(ASTree *tree);
 
-void astree_add_child(ASTree *tree, ASTree *child);
+void ast_add_child(ASTree *tree, ASTree *child);
 
-void astree_print(ASTree *tree);
+void ast_print(ASTree *tree);
 
-void astree_print_graphviz (ASTree *tree);
+void ast_print_graphviz (ASTree *tree);
 
-ASTree *astree_get_leaf(ASTree *root);
+ASTree *ast_get_leaf(ASTree *root);
 
 
 #endif
