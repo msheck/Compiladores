@@ -26,7 +26,7 @@ Adapatando o código fornecido na aula de laboratório, desenvolvemos os arquivo
 
 Modificamos o arquivo _**parser.y**_ e _**scanner.l**_ para que contenham blocos de código _c_ onde manipulamos dados de cada um dos nodos. 
 
-Após o _make_ pode-se executar _./etapa3_, escrever um código seguindo as regras da gramática e acionar _Ctrl+D_ para finalizar a execução.Finalmente a árvore é exportata para _**saida.dot**_ e liberada da memória.
+Após o _make_ pode-se executar _./etapa3_, escrever um código seguindo as regras da gramática e acionar _Ctrl+D_ para finalizar a execução. Finalmente a árvore é exportada para _**saida.dot**_ e liberada da memória.
 
 #### _Geração de grafos:_
 Com o resultado da execução correta, pode-se gerar um grafo que representa a árvore através de:
