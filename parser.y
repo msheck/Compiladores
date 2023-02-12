@@ -68,11 +68,9 @@ extern void* arvore;
 
 %type<astree> programa_ou_vazio
 %type<astree> programa
-%type<astree> var_basic
 %type<astree> ident_multidim
 %type<astree> var_poly_glob
 %type<astree> var_multidim
-%type<astree> var_glob
 %type<astree> lits
 %type<astree> var_inicializada
 %type<astree> var_loc
@@ -105,9 +103,9 @@ extern void* arvore;
 programa_ou_vazio:    programa          { $$ = $1; arvore = $$; }
                     |                   { $$ = NULL; };
 
-programa:             var_glob          { $$ = $1; }
+programa:             var_glob          { $$ = NULL; }
                     | funcao            { $$ = $1; }
-                    | var_glob programa { ast_add_child($1, $2); $$ = $1; }
+                    | var_glob programa { $$ = $2; }
                     | funcao programa   { ast_add_child($1, $2); $$ = $1; };
 
 
@@ -118,7 +116,7 @@ tipo_var:             TK_PR_INT   { free($1.value); }
                     | TK_PR_CHAR  { free($1.value); }
                     | TK_PR_BOOL  { free($1.value); };
 
-var_basic:          tipo_var TK_IDENTIFICADOR { $$ = ast_new_node($2); };
+// var_basic:          tipo_var TK_IDENTIFICADOR { $$ = ast_new_node($2); };
 
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
@@ -129,19 +127,19 @@ list_var:             TK_IDENTIFICADOR                            { free($1.valu
                     | TK_IDENTIFICADOR TK_OC_LE expr ',' list_var { free($1.value); free($2.value); }
                     | ident_multidim ',' list_var;
 
-var_poly_loc:         var_basic ',' list_var        
+var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }       
                     | var_multidim ',' list_var
                     | var_inicializada ',' list_var;
 
-var_poly_glob:        var_basic ',' list_var
+var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
                     | var_multidim ',' list_var;
 
 list_dimensoes:       TK_LIT_INT                      { free($1.value); }
                     | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
 
-var_multidim:       var_basic '[' list_dimensoes ']'  { free($2.value); };
+var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
 
-var_glob:             var_basic ';'
+var_glob:             tipo_var TK_IDENTIFICADOR ';' { free($2.value); }
                     | var_poly_glob ';'
                     | var_multidim ';';
 
@@ -151,17 +149,17 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
                     | TK_LIT_FLOAT  { $$ = ast_new_node($1); }
                     | TK_LIT_CHAR   { $$ = ast_new_node($1); };
 
-var_inicializada:   var_basic TK_OC_LE lits { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
+var_inicializada:   tipo_var TK_IDENTIFICADOR TK_OC_LE lits { $$ = ast_new_node($3); ast_add_child($$, ast_new_node($2)); ast_add_child($$, $4); };
 
-var_loc:              var_basic        { $$ = $$; }
-                    | var_poly_loc     { $$ = $$; }
-                    | var_inicializada { $$ = $1; };
+var_loc:              tipo_var TK_IDENTIFICADOR { $$ = $$; free($2.value); }
+                    | var_poly_loc              { $$ = $$; }
+                    | var_inicializada          { $$ = $1; };
 
 
 // FUNCOES
 
-parametros:           var_basic
-                    | var_basic ',' parametros
+parametros:           tipo_var TK_IDENTIFICADOR                 { free($2.value); }
+                    | tipo_var TK_IDENTIFICADOR ',' parametros  { free($2.value); }
                     | ;
 
 funcao:             tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com { $$ = ast_new_node($2); ast_add_child($$, $6); };
@@ -190,7 +188,7 @@ comandos:             comando_simples ';' comandos  { ast_add_child($1, $3); $$=
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com:             '{' comandos '}'              { $$ = $2; }
-                    | '{' '}'                       { $$ = NULL; };
+                    | '{' '}'                       { $$ = $$; };
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.value); free($1.value); $1.value=strdup(str); $$ = ast_new_node($1); ast_add_child($$, $3);};
 
