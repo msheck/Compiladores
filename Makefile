@@ -38,6 +38,9 @@ compile_test:
 graph: flex bison compile run_input	
 	dot saida.dot -Tpng -o grafo.png
 
+valgrind: debug
+	valgrind -s --leak-check=full ./etapa$(etapa) < input
+
 run_input:
 	./etapa$(etapa) < input
 

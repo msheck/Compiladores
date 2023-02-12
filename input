@@ -7,7 +7,7 @@
 
 // int k(){}
 
-/*int k(int x, int y, int z){}
+int k(int x, int y, int z){}
 int f(){
         k(10+11,20+21,30/31);
-}*/
+}
