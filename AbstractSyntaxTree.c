@@ -26,14 +26,13 @@ void ast_free(ASTree *tree)
     free(tree->children);
     free(tree->value.value);
     free(tree);
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
 void ast_add_child(ASTree *tree, ASTree *child)
 {
-  if (tree != NULL && child != NULL){
+  if (child==NULL){}
+  else if (tree != NULL){
     tree->number_of_children++;
     tree->children = realloc(tree->children, tree->number_of_children * sizeof(ASTree*));
     tree->children[tree->number_of_children-1] = child;
@@ -74,8 +73,6 @@ static void _ast_print_graphviz (FILE *foutput, ASTree *tree)
       fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
       _ast_print_graphviz(foutput, tree->children[i]);
     }
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
@@ -85,14 +82,10 @@ void ast_print_graphviz(ASTree *tree)
   if(foutput == NULL){
     printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
   }
-  if (tree != NULL){
-    fprintf(foutput, "digraph grafo {\n");
-    _ast_print_graphviz(foutput, tree);
-    fprintf(foutput, "}\n");
-    fclose(foutput);
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
-  }
+  fprintf(foutput, "digraph grafo {\n");
+  _ast_print_graphviz(foutput, tree);
+  fprintf(foutput, "}\n");
+  fclose(foutput);
 }
 
 ASTree *ast_get_leaf(ASTree *root){

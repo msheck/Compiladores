@@ -25,6 +25,8 @@ lexValue get_lexValue(char* value, int line_number, int type){
 	lv.type = type; 
 	return lv;
 }
+
+extern void* arvore;
 %}
 
 %option noyywrap
@@ -50,7 +52,7 @@ ignore 				{espaco}|{line_comm}
 
 %%
 
-{spec_char}  		{ return yytext[0]; }
+{spec_char}  		{ get_node_info(TYPE_SPEC_CHAR); return yytext[0]; }
 
 int          		{ get_node_info(TYPE_KEY_WORD); return TK_PR_INT; }
 float        		{ get_node_info(TYPE_KEY_WORD); return TK_PR_FLOAT; }
@@ -98,6 +100,8 @@ void yyerror (char const *error_message) {
 		fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
 }
 void exporta(void* arvore){
+	ast_print_graphviz(arvore);
 }
 void libera(void* arvore){
+	ast_free(arvore);
 }
