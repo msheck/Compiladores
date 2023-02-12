@@ -69,7 +69,9 @@ extern void* arvore;
 %type<astree> programa_ou_vazio
 %type<astree> programa
 %type<astree> ident_multidim
-%type<astree> var_poly_glob
+%type<astree> ident_init
+%type<astree> list_var
+%type<astree> var_poly_loc
 %type<astree> var_multidim
 %type<astree> lits
 %type<astree> var_inicializada
@@ -126,16 +128,17 @@ tipo_var:             TK_PR_INT   { free($1.value); }
 
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-list_var:             TK_IDENTIFICADOR                            { free($1.value); }
-                    | TK_IDENTIFICADOR TK_OC_LE expr              { free($1.value); free($2.value); }
-                    | ident_multidim
-                    | TK_IDENTIFICADOR ',' list_var               { free($1.value); }
-                    | TK_IDENTIFICADOR TK_OC_LE expr ',' list_var { free($1.value); free($2.value); }
-                    | ident_multidim ',' list_var;
+ident_init:         TK_IDENTIFICADOR TK_OC_LE expr  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }       
-                    | var_multidim ',' list_var
-                    | var_inicializada ',' list_var;
+list_var:             TK_IDENTIFICADOR              { free($1.value); $$ = NULL; }
+                    | ident_init                    { $$ = $1; }
+                    | ident_multidim                { $$ = NULL; }
+                    | TK_IDENTIFICADOR ',' list_var { free($1.value); $$ = NULL; }
+                    | ident_init ',' list_var       { ast_add_child($1, $3); $$ = $1; }
+                    | ident_multidim ',' list_var   { $$ = NULL; };
+
+var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; }       
+                    | var_inicializada ',' list_var           { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; };
 
 var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
                     | var_multidim ',' list_var;
@@ -158,7 +161,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
 var_inicializada:   tipo_var TK_IDENTIFICADOR TK_OC_LE lits { $$ = ast_new_node($3); ast_add_child($$, ast_new_node($2)); ast_add_child($$, $4); };
 
 var_loc:              var_inicializada          { $$ = $1; }
-                    | var_poly_loc              { $$ = NULL; }
+                    | var_poly_loc              { $$ = $1; }
                     | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); };
 
 // FUNCOES

@@ -35,11 +35,11 @@ test: flex bison_debug compile_test
 compile_test:
 	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c test.c -o test.o
 
-graph: debug run_input	
-	dot saida.dot -Tpng -o grafo.png
-
-run_input:
+run_input: debug 
 	./etapa$(etapa) < input
+
+graph: run_input	
+	dot saida.dot -Tpng -o grafo.png
 
 valgrind: debug
 	valgrind -s ./etapa$(etapa) < input --leak-check=full

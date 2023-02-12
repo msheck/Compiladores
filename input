@@ -1,18 +1,21 @@
 int b[1^2];
-int f(){ 
-    int c <= 3;
+int foo(){ 
+    int c <= 3, ca <= 4;
     int a;
     a = 1;
     b[0^1] = 0;
     return b[1^a+c];
 }
 
-int k(){ 
+float x;
+
+int goo(float x){ 
     int a <= 1;
+    goo(x);
 }
 
-int f(){
+int hoo(){
     int b;
 }
 
-int g(){}
+int joo(){}
