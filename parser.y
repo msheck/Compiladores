@@ -170,7 +170,7 @@ funcao:             tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com { $$ =
 atribuicao:           TK_IDENTIFICADOR '=' expr     { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); }
                     | ident_multidim '=' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
 
-arg:                expr                            { $$ = $1; }
+arg:                  expr                          { $$ = $1; }
                     |                               { $$ = $$; };
 
 list_args:            arg                           { $$ = $1; }
@@ -241,7 +241,7 @@ expr_tier1:           '-' expr                { $$ = ast_new_node($1); ast_add_c
 
 if_then:            TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com { $$ = ast_new_node($1); ast_add_child($$, $3); ast_add_child($$, $6); };
 
-if_then_else:       if_then                                   { $$ = $1; }
+if_then_else:         if_then                                 { $$ = $1; }
                     | if_then TK_PR_ELSE bloc_com             { $$ = $1; ast_add_child($$, $3); };
 
 while:              TK_PR_WHILE '(' expr ')' bloc_com         { $$ = ast_new_node($1); ast_add_child($$, $3); ast_add_child($$, $5); };

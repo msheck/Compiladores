@@ -35,14 +35,14 @@ test: flex bison_debug compile_test
 compile_test:
 	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c test.c -o test.o
 
-graph: flex bison compile run_input	
+graph: debug run_input	
 	dot saida.dot -Tpng -o grafo.png
-
-valgrind: debug
-	valgrind -s --leak-check=full ./etapa$(etapa) < input
 
 run_input:
 	./etapa$(etapa) < input
+
+valgrind: debug
+	valgrind -s ./etapa$(etapa) < input --leak-check=full
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(etapa).tgz .
