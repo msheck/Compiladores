@@ -102,6 +102,7 @@ void yyerror (char const *error_message) {
 		fprintf (stderr, "%i: %s\n",get_line_number(), error_message);
 }
 void exporta(void* arvore){
+	// ast_print(arvore);
 	ast_print_graphviz(arvore);
 }
 void libera(void* arvore){

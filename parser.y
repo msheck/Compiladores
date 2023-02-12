@@ -151,10 +151,9 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
 
 var_inicializada:   tipo_var TK_IDENTIFICADOR TK_OC_LE lits { $$ = ast_new_node($3); ast_add_child($$, ast_new_node($2)); ast_add_child($$, $4); };
 
-var_loc:              tipo_var TK_IDENTIFICADOR { $$ = $$; free($2.value); }
+var_loc:              var_inicializada          { $$ = $1; }
                     | var_poly_loc              { $$ = $$; }
-                    | var_inicializada          { $$ = $1; };
-
+                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); };
 
 // FUNCOES
 
@@ -188,7 +187,7 @@ comandos:             comando_simples ';' comandos  { ast_add_child($1, $3); $$=
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com:             '{' comandos '}'              { $$ = $2; }
-                    | '{' '}'                       { $$ = $$; };
+                    | '{' '}'                       { $$ = NULL; };
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.value); free($1.value); $1.value=strdup(str); $$ = ast_new_node($1); ast_add_child($$, $3);};
 

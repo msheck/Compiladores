@@ -49,8 +49,6 @@ static void _ast_print (FILE *foutput, ASTree *tree, int profundidade)
     for (i = 0; i < tree->number_of_children; i++){
       _ast_print(foutput, tree->children[i], profundidade+1);
     }
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
@@ -59,8 +57,6 @@ void ast_print(ASTree *tree)
   FILE *foutput = stderr;
   if (tree != NULL){
     _ast_print(foutput, tree, 0);
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);
   }
 }
 
