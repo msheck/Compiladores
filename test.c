@@ -21,6 +21,11 @@ Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 
 typedef struct yy_buffer_state * YY_BUFFER_STATE;
 
+void *arvore = NULL;
+void exporta (void *arvore);
+void libera (void *arvore);
+
+extern int yyparse(void);
 extern int yylex(void);
 extern YY_BUFFER_STATE yy_scan_string(char * string);
 extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
@@ -43,6 +48,7 @@ int test_number = 0;
 
 int main (int argc, char **argv)
 {
+    int ret = yyparse();
 	bool test_result = 0;
 	error_message_enabled = 1;
 

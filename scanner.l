@@ -33,7 +33,8 @@ extern void* arvore;
 
 %option yylineno
 
-spec_char 			[\,\;\:\(\)\{\}\[\]\+\-\*\/\%\^\<\>\=\!]
+spec_char 			[\,\;\:\(\)\{\}\]]
+spec_char_val		[\[\+\-\*\/\%\^\<\>\=\!]
 
 let 				[a-zA-Z]
 dig 				[0-9]
@@ -52,7 +53,8 @@ ignore 				{espaco}|{line_comm}
 
 %%
 
-{spec_char}  		{ set_lexValue(TYPE_KEY_WORD); return yytext[0]; }
+{spec_char}  		{ return yytext[0]; }
+{spec_char_val}		{ set_lexValue(TYPE_SPEC_CHAR); return yytext[0]; }
 
 int          		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_INT; }
 float        		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_FLOAT; }

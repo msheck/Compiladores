@@ -55,9 +55,6 @@ extern void* arvore;
 %token TK_ERRO
 
 %type<valor_lexico> '['
-%type<valor_lexico> ']'
-// %type<valor_lexico> ';'
-// %type<valor_lexico> ','
 %type<valor_lexico> '!'
 %type<valor_lexico> '^'
 %type<valor_lexico> '='
@@ -116,17 +113,17 @@ programa:             var_glob          { $$ = $1; }
 
 // VARIAVEIS
 
-tipo_var:             TK_PR_INT
-                    | TK_PR_FLOAT
-                    | TK_PR_CHAR
-                    | TK_PR_BOOL;
+tipo_var:             TK_PR_INT   { free($1.value); }
+                    | TK_PR_FLOAT { free($1.value); }
+                    | TK_PR_CHAR  { free($1.value); }
+                    | TK_PR_BOOL  { free($1.value); };
 
 var_basic:          tipo_var TK_IDENTIFICADOR { $$ = ast_new_node($2); };
 
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-list_var:             TK_IDENTIFICADOR
-                    | TK_IDENTIFICADOR TK_OC_LE expr
+list_var:             TK_IDENTIFICADOR { free($1.value); }
+                    | TK_IDENTIFICADOR TK_OC_LE expr { free($1.value); free($2.value); }
                     | ident_multidim
                     | TK_IDENTIFICADOR ',' list_var
                     | TK_IDENTIFICADOR TK_OC_LE expr ',' list_var
@@ -140,9 +137,9 @@ var_poly_glob:        var_basic ',' list_var
                     | var_multidim ',' list_var;
 
 list_dimensoes:       TK_LIT_INT
-                    | TK_LIT_INT '^' list_dimensoes;
+                    | TK_LIT_INT '^' list_dimensoes { free($2.value); };
 
-var_multidim:       var_basic '[' list_dimensoes ']';
+var_multidim:       var_basic '[' list_dimensoes ']' { free($2.value); };
 
 var_glob:             var_basic ';'
                     | var_poly_glob ';'
@@ -195,7 +192,7 @@ comandos:             comando_simples ';' comandos  { ast_add_child($1, $3); $$=
 bloc_com:             '{' comandos '}'  { $$ = $2; }
                     | '{' '}'    { $$ = NULL; };
 
-chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.value); $1.value=strdup(str); $$ = ast_new_node($1); ast_add_child($$, $3);};
+chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.value); free($1.value); $1.value=strdup(str); $$ = ast_new_node($1); ast_add_child($$, $3);};
 
 
 // EXPRESSOES
