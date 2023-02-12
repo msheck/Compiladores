@@ -29,11 +29,11 @@ bison_debug:
 clean:
 	rm -rf entrega | rm -rf etapa$(etapa) lex.yy.c test.o *.tgz parser.tab.* *.output *.dot *.png
 
-test: flex bison compile_test
+test: flex bison_debug compile_test
 	./test.o
 
 compile_test:
-	gcc lex.yy.c parser.tab.c test.c -o test.o
+	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c test.c -o test.o
 
 graph: flex bison compile run_input	
 	dot saida.dot -Tpng -o grafo.png

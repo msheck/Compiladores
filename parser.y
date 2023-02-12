@@ -122,11 +122,11 @@ var_basic:          tipo_var TK_IDENTIFICADOR { $$ = ast_new_node($2); };
 
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-list_var:             TK_IDENTIFICADOR { free($1.value); }
-                    | TK_IDENTIFICADOR TK_OC_LE expr { free($1.value); free($2.value); }
+list_var:             TK_IDENTIFICADOR                            { free($1.value); }
+                    | TK_IDENTIFICADOR TK_OC_LE expr              { free($1.value); free($2.value); }
                     | ident_multidim
-                    | TK_IDENTIFICADOR ',' list_var
-                    | TK_IDENTIFICADOR TK_OC_LE expr ',' list_var
+                    | TK_IDENTIFICADOR ',' list_var               { free($1.value); }
+                    | TK_IDENTIFICADOR TK_OC_LE expr ',' list_var { free($1.value); free($2.value); }
                     | ident_multidim ',' list_var;
 
 var_poly_loc:         var_basic ',' list_var        
@@ -136,10 +136,10 @@ var_poly_loc:         var_basic ',' list_var
 var_poly_glob:        var_basic ',' list_var
                     | var_multidim ',' list_var;
 
-list_dimensoes:       TK_LIT_INT
-                    | TK_LIT_INT '^' list_dimensoes { free($2.value); };
+list_dimensoes:       TK_LIT_INT                      { free($1.value); }
+                    | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
 
-var_multidim:       var_basic '[' list_dimensoes ']' { free($2.value); };
+var_multidim:       var_basic '[' list_dimensoes ']'  { free($2.value); };
 
 var_glob:             var_basic ';'
                     | var_poly_glob ';'
@@ -169,46 +169,46 @@ funcao:             tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com { $$ =
 
 // BLOCO COMANDOS
 
-atribuicao:           TK_IDENTIFICADOR '=' expr { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); }
-                    | ident_multidim '=' expr   { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
+atribuicao:           TK_IDENTIFICADOR '=' expr     { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); }
+                    | ident_multidim '=' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
 
-arg:                expr  { $$ = $1; }
-                    |     { $$ = $$; };
+arg:                expr                            { $$ = $1; }
+                    |                               { $$ = $$; };
 
-list_args:            arg                 { $$ = $1; }
-                    | arg ',' list_args   { ast_add_child($1, $3); $$ = $1; };
+list_args:            arg                           { $$ = $1; }
+                    | arg ',' list_args             { ast_add_child($1, $3); $$ = $1; };
 
-comando_simples:      var_loc           { $$ = $1; }
-                    | atribuicao        { $$ = $1; }
-                    | chamada_func      { $$ = $1; }
-                    | TK_PR_RETURN expr { $$ = ast_new_node($1); ast_add_child($$, $2); }
-                    | if_then_else      { $$ = $1; }
-                    | while             { $$ = $1; }
-                    | bloc_com          { $$ = $1; };
+comando_simples:      var_loc                       { $$ = $1; }
+                    | atribuicao                    { $$ = $1; }
+                    | chamada_func                  { $$ = $1; }
+                    | TK_PR_RETURN expr             { $$ = ast_new_node($1); ast_add_child($$, $2); }
+                    | if_then_else                  { $$ = $1; }
+                    | while                         { $$ = $1; }
+                    | bloc_com                      { $$ = $1; };
 
 comandos:             comando_simples ';' comandos  { ast_add_child($1, $3); $$=$1; }
                     | comando_simples ';'           { $$ = $1; };
 
-bloc_com:             '{' comandos '}'  { $$ = $2; }
-                    | '{' '}'    { $$ = NULL; };
+bloc_com:             '{' comandos '}'              { $$ = $2; }
+                    | '{' '}'                       { $$ = NULL; };
 
 chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.value); free($1.value); $1.value=strdup(str); $$ = ast_new_node($1); ast_add_child($$, $3);};
 
 
 // EXPRESSOES
 
-list_expr:            expr                { $$ = $1; }
-                    | expr '^' list_expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
+list_expr:            expr                    { $$ = $1; }
+                    | expr '^' list_expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
 
 
-expr:                 expr_end    { $$ = $1; }
-	                  | expr_tier7  { $$ = $1; };
+expr:                 expr_end                { $$ = $1; }
+	                  | expr_tier7              { $$ = $1; };
 
-expr_end:             '(' expr ')'      { $$ = $2; }
-                    | TK_IDENTIFICADOR  { $$ = ast_new_node($1); }
-                    | ident_multidim    { $$ = $1; }
-                    | lits              { $$ = $1; }
-                    | chamada_func      { $$ = $1; };
+expr_end:             '(' expr ')'            { $$ = $2; }
+                    | TK_IDENTIFICADOR        { $$ = ast_new_node($1); }
+                    | ident_multidim          { $$ = $1; }
+                    | lits                    { $$ = $1; }
+                    | chamada_func            { $$ = $1; };
 
 expr_tier7:           expr_end TK_OC_OR expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier6              { $$ = $1; };
@@ -235,17 +235,17 @@ expr_tier2:           expr_end '*' expr       { $$ = ast_new_node($2); ast_add_c
                     | expr_end '%' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier1              { $$ = $1; };
 
-expr_tier1:           '-' expr  { $$ = ast_new_node($1); ast_add_child($$, $2); }
-                    | '!' expr  { $$ = ast_new_node($1); ast_add_child($$, $2); };
+expr_tier1:           '-' expr                { $$ = ast_new_node($1); ast_add_child($$, $2); }
+                    | '!' expr                { $$ = ast_new_node($1); ast_add_child($$, $2); };
 
 
 // CONTROLE DE FLUXO
 
 if_then:            TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com { $$ = ast_new_node($1); ast_add_child($$, $3); ast_add_child($$, $6); };
 
-if_then_else:       if_then                         { $$ = $1; }
-                    | if_then TK_PR_ELSE bloc_com   { $$ = $1; ast_add_child($$, $3); };
+if_then_else:       if_then                                   { $$ = $1; }
+                    | if_then TK_PR_ELSE bloc_com             { $$ = $1; ast_add_child($$, $3); };
 
-while:              TK_PR_WHILE '(' expr ')' bloc_com { $$ = ast_new_node($1); ast_add_child($$, $3); ast_add_child($$, $5); };
+while:              TK_PR_WHILE '(' expr ')' bloc_com         { $$ = ast_new_node($1); ast_add_child($$, $3); ast_add_child($$, $5); };
 
 %%

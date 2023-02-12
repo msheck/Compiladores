@@ -48,7 +48,6 @@ int test_number = 0;
 
 int main (int argc, char **argv)
 {
-    int ret = yyparse();
 	bool test_result = 0;
 	error_message_enabled = 1;
 
