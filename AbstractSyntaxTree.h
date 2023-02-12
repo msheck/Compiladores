@@ -1,3 +1,14 @@
+/*
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
+
+Adaptado pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+A partir do código fornecido pelo professor.
+*/
+
 #ifndef _ARVORE_H_
 #define _ARVORE_H_
 
@@ -25,11 +36,6 @@ void ast_free(ASTree *tree);
 
 void ast_add_child(ASTree *tree, ASTree *child);
 
-void ast_print(ASTree *tree);
-
 void ast_print_graphviz (ASTree *tree);
-
-ASTree *ast_get_leaf(ASTree *root);
-
 
 #endif

@@ -96,6 +96,14 @@ extern void* arvore;
 %type<astree> if_then_else
 %type<astree> while
 
+%left TK_OC_OR
+%left TK_OC_AND
+%left TK_OC_EQ TK_OC_NE
+%left '>' '<' TK_OC_LE TK_OC_GE
+%left '+' '-'
+%left '*' '/' '%'
+%left '!'
+
 %start programa_ou_vazio
 
 %%
@@ -115,8 +123,6 @@ tipo_var:             TK_PR_INT   { free($1.value); }
                     | TK_PR_FLOAT { free($1.value); }
                     | TK_PR_CHAR  { free($1.value); }
                     | TK_PR_BOOL  { free($1.value); };
-
-// var_basic:          tipo_var TK_IDENTIFICADOR { $$ = ast_new_node($2); };
 
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
@@ -152,7 +158,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
 var_inicializada:   tipo_var TK_IDENTIFICADOR TK_OC_LE lits { $$ = ast_new_node($3); ast_add_child($$, ast_new_node($2)); ast_add_child($$, $4); };
 
 var_loc:              var_inicializada          { $$ = $1; }
-                    | var_poly_loc              { $$ = $$; }
+                    | var_poly_loc              { $$ = NULL; }
                     | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); };
 
 // FUNCOES
@@ -170,7 +176,7 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { $$ = ast_new_node($2); ast
                     | ident_multidim '=' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
 
 arg:                  expr                          { $$ = $1; }
-                    |                               { $$ = $$; };
+                    |                               { $$ = NULL; };
 
 list_args:            arg                           { $$ = $1; }
                     | arg ',' list_args             { ast_add_child($1, $3); $$ = $1; };
@@ -183,7 +189,7 @@ comando_simples:      var_loc                       { $$ = $1; }
                     | while                         { $$ = $1; }
                     | bloc_com                      { $$ = $1; };
 
-comandos:             comando_simples ';' comandos  { ast_add_child($1, $3); $$=$1; }
+comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; }
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com:             '{' comandos '}'              { $$ = $2; }
@@ -207,29 +213,29 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | lits                    { $$ = $1; }
                     | chamada_func            { $$ = $1; };
 
-expr_tier7:           expr_end TK_OC_OR expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier7:           expr TK_OC_OR expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier6              { $$ = $1; };
 
-expr_tier6:           expr_end TK_OC_AND expr { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier6:           expr TK_OC_AND expr     { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier5              { $$ = $1; };
 
-expr_tier5:           expr_end TK_OC_EQ expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end TK_OC_NE expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier5:           expr TK_OC_EQ expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_NE expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier4              { $$ = $1; };
 
-expr_tier4:           expr_end '<' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end '>' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end TK_OC_LE expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end TK_OC_GE expr  { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier4:           expr '<' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '>' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_LE expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_GE expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier3              { $$ = $1; };
 
-expr_tier3:           expr_end '+' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end '-' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier3:           expr '+' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '-' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier2              { $$ = $1; };
 
-expr_tier2:           expr_end '*' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end '/' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr_end '%' expr       { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier2:           expr '*' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '/' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '%' expr           { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier1              { $$ = $1; };
 
 expr_tier1:           '-' expr                { $$ = ast_new_node($1); ast_add_child($$, $2); }

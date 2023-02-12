@@ -1,10 +1,11 @@
-// int b[1^2];
-// int f(){ 
-//     int c <= 3;
-//     int a;
-//     a = 1;
-//     b[0^1] = 0;
-// }
+int b[1^2];
+int f(){ 
+    int c <= 3;
+    int a;
+    a = 1;
+    b[0^1] = 0;
+    return b[1^a+c];
+}
 
 int k(){ 
     int a <= 1;
@@ -15,15 +16,3 @@ int f(){
 }
 
 int g(){}
-
-// int k(int x, int y, int z){}
-// int f(){
-//         k(10+11,20+21,30/31);
-// }
-
-// int b[5];
-// int g(int x){}
-// int f(){ 
-//         int a;
-//         a = 1;
-// }

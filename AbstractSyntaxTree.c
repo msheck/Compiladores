@@ -1,3 +1,14 @@
+/*
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
+
+Adaptado pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+A partir do código fornecido pelo professor.
+*/
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,27 +47,6 @@ void ast_add_child(ASTree *tree, ASTree *child)
     tree->number_of_children++;
     tree->children = realloc(tree->children, tree->number_of_children * sizeof(ASTree*));
     tree->children[tree->number_of_children-1] = child;
-  }else{
-    printf("Erro: %s recebeu parâmetro tree = %p / %p.\n", __FUNCTION__, tree, child);
-  }
-}
-
-static void _ast_print (FILE *foutput, ASTree *tree, int profundidade)
-{
-  int i;
-  if (tree != NULL){
-    fprintf(foutput, "%d%*s: Nó '%s' tem %d filhos:\n", profundidade, profundidade*2, "", tree->value.value, tree->number_of_children);
-    for (i = 0; i < tree->number_of_children; i++){
-      _ast_print(foutput, tree->children[i], profundidade+1);
-    }
-  }
-}
-
-void ast_print(ASTree *tree)
-{
-  FILE *foutput = stderr;
-  if (tree != NULL){
-    _ast_print(foutput, tree, 0);
   }
 }
 
@@ -82,12 +72,4 @@ void ast_print_graphviz(ASTree *tree)
   _ast_print_graphviz(foutput, tree);
   fprintf(foutput, "}\n");
   fclose(foutput);
-}
-
-ASTree *ast_get_leaf(ASTree *root){
-  ASTree *leaf = root;
-  while(leaf->number_of_children > 0){
-    leaf = leaf->children[0];
-  }
-  return leaf;
 }
