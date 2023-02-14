@@ -49,3 +49,6 @@ zip: clean
 
 unzip:
 	mkdir entrega | tar xf etapa$(etapa).tgz --directory entrega
+
+table_test:
+	gcc Tabela.h -o table_test
