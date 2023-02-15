@@ -126,9 +126,14 @@ tipo_var:             TK_PR_INT   { free($1.value); }
                     | TK_PR_CHAR  { free($1.value); }
                     | TK_PR_BOOL  { free($1.value); };
 
-ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
+lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
+                    | TK_LIT_TRUE   { $$ = ast_new_node($1); }
+                    | TK_LIT_INT    { $$ = ast_new_node($1); }
+                    | TK_LIT_FLOAT  { $$ = ast_new_node($1); }
+                    | TK_LIT_CHAR   { $$ = ast_new_node($1); };
 
-ident_init:         TK_IDENTIFICADOR TK_OC_LE expr  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
+list_dimensoes:       TK_LIT_INT                      { free($1.value); }
+                    | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
 
 list_var:             TK_IDENTIFICADOR              { free($1.value); $$ = NULL; }
                     | ident_init                    { $$ = $1; }
@@ -137,28 +142,23 @@ list_var:             TK_IDENTIFICADOR              { free($1.value); $$ = NULL;
                     | ident_init ',' list_var       { ast_add_child($1, $3); $$ = $1; }
                     | ident_multidim ',' list_var   { $$ = NULL; };
 
+ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
+
+ident_init:         TK_IDENTIFICADOR TK_OC_LE lits  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
+
+var_inicializada:   tipo_var ident_init { $$ = $2; };
+
+var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
+
 var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; }       
                     | var_inicializada ',' list_var           { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; };
 
 var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
                     | var_multidim ',' list_var;
 
-list_dimensoes:       TK_LIT_INT                      { free($1.value); }
-                    | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
-
-var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
-
 var_glob:             tipo_var TK_IDENTIFICADOR ';' { free($2.value); }
                     | var_poly_glob ';'
                     | var_multidim ';';
-
-lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
-                    | TK_LIT_TRUE   { $$ = ast_new_node($1); }
-                    | TK_LIT_INT    { $$ = ast_new_node($1); }
-                    | TK_LIT_FLOAT  { $$ = ast_new_node($1); }
-                    | TK_LIT_CHAR   { $$ = ast_new_node($1); };
-
-var_inicializada:   tipo_var TK_IDENTIFICADOR TK_OC_LE lits { $$ = ast_new_node($3); ast_add_child($$, ast_new_node($2)); ast_add_child($$, $4); };
 
 var_loc:              var_inicializada          { $$ = $1; }
                     | var_poly_loc              { $$ = $1; }
