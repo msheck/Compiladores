@@ -11,24 +11,26 @@
 #define NAT_ARR 3
 #define NAT_FUN 4
 
-#define TYPE_BOOL  1
-#define TYPE_CHAR  2
-#define TYPE_INT   3
-#define TYPE_FLOAT 4
+#define LIT_TYPE_BOOL  1
+#define LIT_TYPE_CHAR  2
+#define LIT_TYPE_INT   3
+#define LIT_TYPE_FLOAT 4
 
-#define SIZE_BOOL  1
-#define SIZE_CHAR  1
-#define SIZE_INT   4
-#define SIZE_FLOAT 8
+#define LIT_SIZE_BOOL  1
+#define LIT_SIZE_CHAR  1
+#define LIT_SIZE_INT   4
+#define LIT_SIZE_FLOAT 8
+
+#define false 0
+#define true  1
 
 
 typedef struct content_{
     lexValue lex_value;
     int nature;
-    int type;
-    int size;
-    //dimensions???
-    int* dimensions;
+    int lit_type;
+    int total_size;
+    int** dimensions; // ALWAYS END WITH -1!!!
     //TODO: args???
 } Content;
 
@@ -37,9 +39,6 @@ typedef struct symbol_table{
     char** keys;
     Content** content;
 } SymbolTable;
-
-
-
 
 SymbolTable *table_new()
 {
@@ -53,28 +52,136 @@ SymbolTable *table_new()
     return ret;
 }
 
-void table_add_entry(SymbolTable* table, char* key, Content* content){
-	table->size += 1;
-	table->keys = realloc(table->keys, table->size * sizeof(char**));
-	table->keys[table->size-1] = key;
-	table->content = realloc(table->content, table->size * sizeof(Content**));
-	table->content[table->size-1] = content;
+int table_get_hash(char* key) {
+    int sum = 0;
+    char current = key[0];
+    int i = 0;
+    while(current != '\0'){
+        current = key[i];
+        sum += (int)current;
+        i++;
+    }
+    return sum % 1000;
 }
 
-int table_get_index(SymbolTable* table, char* key){ //TODO
-	return 0;
+void table_add_entry(SymbolTable *table, char* key, Content* content){
+    int hash = table_get_hash(key);
+    // Se hash >= table->size, aumenta a tabela até hash+1 populando com null. Coloca na última pos.
+    if(hash >= table->size) {
+        int start = table->size;
+	    table->size = hash+1;
+        table->keys = realloc(table->keys, table->size * sizeof(char**));
+        table->content = realloc(table->content, table->size * sizeof(Content**));
+        for(int i=start; i++; i<table->size) {
+            table->keys[i] = NULL;
+            table->content[i] = NULL;
+        }
+        table->keys[table->size-1] = key;
+        table->content[table->size-1] = content;
+    }
+    // Se hash < table->size, encontra a primeira pos vazia e coloca.
+    // Caso esteja cheia, table->size+=1. Coloca na última pos.
+    else {
+        int i;
+        int is_on_table = false;
+        for(i=hash; i<table->size; i++) {
+            if(table->keys[i]==NULL) {
+                table->keys[i] = key;
+                table->content[i] = content;
+                is_on_table = true;
+                break;
+            }
+        }
+        if(i==table->size-1 && !is_on_table) {
+            table->size += 1;
+            table->keys = realloc(table->keys, table->size * sizeof(char**));
+            table->content = realloc(table->content, table->size * sizeof(Content**));
+            table->keys[table->size-1] = key;
+            table->content[table->size-1] = content;
+        }
+    }
 }
 
-void table_remove_index(SymbolTable* table, int index){
-	free(table->keys[index]);
-	free(table->content[index]);
-	// TODO: free table->content[index].dimension
-	table->size -= 1;
+int table_get_index(SymbolTable* table, char* key){
+    int i = table_get_hash(key);
+    while(i<table->size) {
+        if (table->keys[i]==key){
+            break;
+        }
+        i++;
+    }
+	return i;
 }
 
-void table_remove_entry(SymbolTable* table, char* key){
-	table_remove_index(table, table_get_index(table, key));
+void table_free(SymbolTable* table){
+    for(int i=0; i<table->size; i++){
+        if (table->content[i] != NULL){
+            if (table->content[i]->dimensions != NULL){
+                free(table->content[i]->dimensions);
+            }
+            free(table->content[i]->lex_value.value);
+            free(table->content[i]);
+        }
+    }
+    free(table->keys);
+    free(table->content);
+    free(table);
 }
+
+int calculate_by_type(int size, int** dimensions){
+    int num_dimensions = 0;
+    int i = 0;
+    
+    if (dimensions != NULL){        
+        while (dimensions[i] >= 0){
+            num_dimensions += *dimensions[i];
+            i++;
+        }
+    }
+    else{
+        num_dimensions = 1;
+    }
+
+    return num_dimensions * size;
+}
+
+int calculate_total_size(int lit_type, int** dimensions) {
+    int total_size = 0;
+    
+    switch (lit_type){
+        case LIT_TYPE_INT:
+            total_size = calculate_by_type(LIT_SIZE_INT, dimensions);
+            break;
+
+        case LIT_TYPE_FLOAT:
+            total_size = calculate_by_type(LIT_SIZE_FLOAT, dimensions);
+            break;
+
+        case LIT_TYPE_CHAR:
+            total_size = calculate_by_type(LIT_SIZE_CHAR, dimensions);
+            break;
+
+        case LIT_TYPE_BOOL:
+            total_size = calculate_by_type(LIT_SIZE_BOOL, dimensions);
+            break;
+    }
+
+    return total_size;
+}
+
+Content* content_new(lexValue lex_val, int nat, int lit_type, int** dimensions){
+    Content* content = NULL;
+    content = calloc(1, sizeof(Content));
+    content->lex_value = lex_val;
+    content->nature = nat;
+    content->lit_type = lit_type;
+    content->dimensions = dimensions;
+    content->total_size = calculate_total_size(lit_type, dimensions);
+    return content;
+}
+
+    
+
 
 int main(){
     printf("\nSTARTING");
@@ -82,22 +189,20 @@ int main(){
     lexValue lex_val;
     lex_val.line_number = 3;
     lex_val.type = TYPE_LIT;
-    lex_val.value = "12345";
+    lex_val.value = strdup("12345");
     printf("\nLEXVAL CREATED");
-    Content content;
-    content.lex_value = lex_val;
-    content.nature = NAT_LIT;
-    content.type = TYPE_INT;
-    content.size = SIZE_INT;
+    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL);
     printf("\nCONTENT CREATED");
 
-    table_add_entry(table, "key0", &content);
+    table_add_entry(table, "key0", content);
     printf("\nENTRY ADDED");
 
-    printf("\nkey: %s", table->keys[0]);
-    printf("\nvalue: %s\n", table->content[0]->lex_value.value);
+    printf("\nkey: %s", table->keys[table_get_index(table, "key0")]);
+    printf("\nvalue: %s\n", table->content[table_get_index(table, "key0")]->lex_value.value);
 
-    table_remove_entry(table, "");
+    table_free(table);
+    printf("\nFREE DONE!!!");
+    exit(0);
     return 0;
 }
 
