@@ -55,6 +55,7 @@ dkms.conf
 
 lex.yy.c
 entrega
+debug
 *.png
 *.dot
 *.output
