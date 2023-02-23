@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.y": "c",
+        "*.y": "bison",
         "stdio.h": "c",
         "compare": "c",
         "type_traits": "c"
