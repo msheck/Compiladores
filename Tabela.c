@@ -30,8 +30,10 @@ typedef struct content_{
     int nature;
     int lit_type;
     int total_size;
-    int** dimensions; // ALWAYS END WITH NULL!!!
-    struct content_ **args; // ALWAYS END WITH NULL!!!
+    int** dimensions;
+    int dimensions_size;
+    struct content_ **args;
+    int args_size;
 } Content;
 
 typedef struct symbol_table{
@@ -140,56 +142,41 @@ void table_free(SymbolTable* table){
     free(table);
 }
 
-int calculate_by_type(int size, int** dimensions){
-    int num_dimensions = 0;
-    int i = 0;
-    
-    if (dimensions != NULL){        
-        while (dimensions[i] != NULL){
-            num_dimensions += *dimensions[i];
-            i++;
-        }
-    }
-    else{
-        num_dimensions = 1;
-    }
-
-    return num_dimensions * size;
-}
-
-int calculate_total_size(int lit_type, int** dimensions) {
+int calculate_total_size(int lit_type, int** dimensions, int dims_size) {
     int total_size = 0;
     
     switch (lit_type){
         case LIT_TYPE_INT:
-            total_size = calculate_by_type(LIT_SIZE_INT, dimensions);
+            total_size = LIT_SIZE_INT * dims_size;
             break;
 
         case LIT_TYPE_FLOAT:
-            total_size = calculate_by_type(LIT_SIZE_FLOAT, dimensions);
+            total_size = LIT_SIZE_FLOAT * dims_size;
             break;
 
         case LIT_TYPE_CHAR:
-            total_size = calculate_by_type(LIT_SIZE_CHAR, dimensions);
+            total_size = LIT_SIZE_CHAR * dims_size;
             break;
 
         case LIT_TYPE_BOOL:
-            total_size = calculate_by_type(LIT_SIZE_BOOL, dimensions);
+            total_size = LIT_SIZE_BOOL * dims_size;
             break;
     }
 
     return total_size;
 }
 
-Content* content_new(lexValue lex_val, int nat, int lit_type, int** dimensions, Content** args){
+Content* content_new(lexValue lex_val, int nat, int lit_type, int** dimensions, int dims_size, Content** args, int args_size){
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
     content->lex_value = lex_val;
     content->nature = nat;
     content->lit_type = lit_type;
     content->dimensions = dimensions;
+    content->dimensions_size = dims_size;
     content->args = args;
-    content->total_size = calculate_total_size(lit_type, dimensions);
+    content->args_size = args_size;
+    content->total_size = calculate_total_size(lit_type, dimensions, dims_size);
     return content;
 }
 
@@ -207,30 +194,39 @@ int main(){
     lexValue lex_val2;
     lex_val2.line_number = 3;
     lex_val2.type = TYPE_LIT;
-    lex_val2.value = strdup("12345");
+    lex_val2.value = strdup("123456");
     printf("\nLEXVALS CREATED");
 
     int **dimensions = malloc(sizeof(int*) * 3);
     int dim1 = 1;
     int dim2 = 2;
+    int dim3 = 3;
     dimensions[0] = &dim1;
     dimensions[1] = &dim2;
-    dimensions[2] = NULL;
+    dimensions[2] = &dim3;
     printf("\nDIMS CREATED");
 
-    Content *arg1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *arg2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content** args = malloc(sizeof(Content*)*4);
+    Content *arg1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
+    Content *arg2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
+    Content** args = malloc(sizeof(Content*)*2);
     args[0] = arg1;
     args[1] = arg2;
-    args[2] = NULL;
+    printf("\nARGS CREATED");
+    printf("\nARGS CREATED");
+    printf("\nARGS CREATED");
     printf("\nARGS CREATED");
 
     //Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, args);
+    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    printf("\nCONTENT CREATED");
+    printf("\nCONTENT CREATED");
+    printf("\nCONTENT CREATED");
     printf("\nCONTENT CREATED");
 
     table_add_entry(table, "key0", content);
+    printf("\nENTRY ADDED");
+    printf("\nENTRY ADDED");
+    printf("\nENTRY ADDED");
     printf("\nENTRY ADDED");
 
     printf("\nkey: %s", table->keys[table_get_index(table, "key0")]);
