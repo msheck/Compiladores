@@ -15,10 +15,10 @@
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
-                "lex.yy.c",                
+                "lex.yy.c",
                 "AbstractSyntaxTree.c",
                 "parser.tab.c",
-                "main.c",                
+                "main.c",
                 "-o",
                 "${workspaceFolder}/debug"
             ],
