@@ -1,46 +1,104 @@
-#ifndef _TABELA_H_
-#define _TABELA_H_
-
-#include "AbstractSyntaxTree.c"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#define NAT_LIT 1
-#define NAT_VAR 2
-#define NAT_ARR 3
-#define NAT_FUN 4
+#include "Tabela.h"
 
-#define LIT_TYPE_BOOL  1
-#define LIT_TYPE_CHAR  2
-#define LIT_TYPE_INT   3
-#define LIT_TYPE_FLOAT 4
+// ---------------------------- MAIN ----------------------------
 
-#define LIT_SIZE_BOOL  1
-#define LIT_SIZE_CHAR  1
-#define LIT_SIZE_INT   4
-#define LIT_SIZE_FLOAT 8
+int main(){
 
-#define false 0
-#define true  1
+    IntList *intList = intList_new();
+    printf("\nPUSHING");
+    intList = intList_pushLeft(intList, 1);
+    intList = intList_pushLeft(intList, 2);
+    intList = intList_pushLeft(intList, 3);
+    intList = intList_pushLeft(intList, 4);
+    intList = intList_pushLeft(intList, 69);
+    
+    printf("\nPRINTING");
+    intList_print(intList);
+
+    printf("\nFREEING");
+    intList_free(intList);
 
 
-typedef struct content_{
-    lexValue lex_value;
-    int nature;
-    int lit_type;
-    int total_size;
-    int** dimensions;
-    int dimensions_size;
-    struct content_ **args;
-    int args_size;
-} Content;
+    //SymbolTable *table = table_new();
+    lexValue lex_val;
+    lex_val.line_number = 3;
+    lex_val.type = TYPE_LIT;
+    lex_val.value = strdup("1");
+    
+    lexValue lex_val2;
+    lex_val2.line_number = 3;
+    lex_val2.type = TYPE_LIT;
+    lex_val2.value = strdup("2");
+    printf("\nLEXVALS CREATED");
+    
+    lexValue lex_val3;
+    lex_val3.line_number = 3;
+    lex_val3.type = TYPE_LIT;
+    lex_val3.value = strdup("3");
+    printf("\nLEXVALS CREATED");
 
-typedef struct symbol_table{
-    int size; // How many entries in the table
-    char** keys;
-    Content** content;
-} SymbolTable;
+    int **dimensions = malloc(sizeof(int*) * 3);
+    int dim1 = 1;
+    int dim2 = 2;
+    int dim3 = 3;
+    dimensions[0] = &dim1;
+    dimensions[1] = &dim2;
+    dimensions[2] = &dim3;
+    printf("\nDIMS CREATED");
+
+    Content *arg1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
+    Content *arg2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
+    Content** args = malloc(sizeof(Content*)*2);
+    args[0] = arg1;
+    args[1] = arg2;
+    printf("\nARGS CREATED");
+    printf("\nARGS CREATED");
+    printf("\nARGS CREATED");
+    printf("\nARGS CREATED");
+
+    //Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
+    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    printf("\nCONTENT CREATED");
+    printf("\nCONTENT CREATED");
+    printf("\nCONTENT CREATED");
+    printf("\nCONTENT CREATED");
+
+
+
+    Content *content1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    Content *content2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    Content *content3 = content_new(lex_val3, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    ContentList *cList = contentList_new();
+    printf("\nPUSHING");
+    cList = contentList_pushLeft(cList, content1);
+    cList = contentList_pushLeft(cList, content2);
+    cList = contentList_pushLeft(cList, content3);
+    
+    printf("\nPRINTING");
+    contentList_print(cList);
+
+    printf("\nFREEING");
+    contentList_free(cList);
+
+    //table_add_entry(table, "key0", content);
+    printf("\nENTRY ADDED");
+    printf("\nENTRY ADDED");
+    printf("\nENTRY ADDED");
+    printf("\nENTRY ADDED");
+
+    //printf("\nkey: %s", table->keys[table_get_index(table, "key0")]);
+    //printf("\nvalue: %s\n", table->content[table_get_index(table, "key0")]->lex_value.value);
+
+    //table_free(table);
+    //printf("\nFREE DONE!!!\n");
+    return 0;
+}
+
+//---------------------------- TABLE ----------------------------
 
 SymbolTable *table_new()
 {
@@ -115,6 +173,33 @@ int table_get_index(SymbolTable* table, char* key){
 	return i;
 }
 
+void table_free(SymbolTable* table){
+    for(int i=0; i<table->size; i++){
+        if (table->content[i] != NULL){
+            content_free(table->content[i]);
+        }
+    }
+    free(table->keys);
+    free(table->content);
+    free(table);
+}
+
+//---------------------------- CONTENT ----------------------------
+
+Content* content_new(lexValue lex_val, int nat, int lit_type, int** dimensions, int dims_size, Content** args, int args_size){
+    Content* content = NULL;
+    content = calloc(1, sizeof(Content));
+    content->lex_value = lex_val;
+    content->nature = nat;
+    content->lit_type = lit_type;
+    content->dimensions = dimensions;
+    content->dimensions_size = dims_size;
+    content->args = args;
+    content->args_size = args_size;
+    content->total_size = calculate_total_size(lit_type, dimensions, dims_size);
+    return content;
+}
+
 void content_free(Content *content){
     if (content->dimensions != NULL){
         free(content->dimensions);
@@ -131,16 +216,88 @@ void content_free(Content *content){
     free(content);
 }
 
-void table_free(SymbolTable* table){
-    for(int i=0; i<table->size; i++){
-        if (table->content[i] != NULL){
-            content_free(table->content[i]);
-        }
-    }
-    free(table->keys);
-    free(table->content);
-    free(table);
+//---------------------------- INT LIST ----------------------------
+
+IntList* intList_new() {
+    return NULL;
 }
+
+IntList*  intList_pushLeft(IntList* list, int value) {
+    IntList* new_node;
+    new_node = malloc(sizeof(IntList*));
+    if(list==NULL)
+        new_node->next = NULL;
+    else
+        new_node->next = list;
+    new_node->value = value;
+    return new_node;
+}
+
+void intList_free(IntList* list){
+    if(list->next != NULL)
+        intList_free(list->next);
+    free(list);
+}
+
+void _intList_print(IntList* list){
+    printf("%d", list->value);
+    if(list->next != NULL){
+        printf(", ");
+        _intList_print(list->next);
+    }
+    else{
+        printf(".");
+    }
+}
+
+void intList_print(IntList* list){
+    printf("\n");
+    _intList_print(list);
+    printf("\n");
+}
+
+//---------------------------- CONTENT LIST ----------------------------
+
+ContentList* contentList_new() {
+    return NULL;
+}
+
+ContentList*  contentList_pushLeft(ContentList* list, Content* value) {
+    ContentList* new_node;
+    new_node = malloc(sizeof(ContentList*));
+    if(list==NULL)
+        new_node->next = NULL;
+    else
+        new_node->next = list;
+    new_node->value = value;
+    return new_node;
+}
+
+void contentList_free(ContentList* list){
+    if(list->next != NULL)
+        contentList_free(list->next);
+    content_free(list->value);
+    free(list);
+}
+
+void _contentList_print(ContentList* list){
+    printf("%s", list->value->lex_value.value);
+    if(list->next != NULL){
+        printf(", ");
+        _contentList_print(list->next);
+    }
+    else{
+        printf(".");
+    }
+}
+
+void contentList_print(ContentList* list){
+    printf("\n");
+    _contentList_print(list);
+    printf("\n");
+}
+
+//---------------------------- MISC ----------------------------
 
 int calculate_total_size(int lit_type, int** dimensions, int dims_size) {
     int total_size = 0;
@@ -165,77 +322,3 @@ int calculate_total_size(int lit_type, int** dimensions, int dims_size) {
 
     return total_size;
 }
-
-Content* content_new(lexValue lex_val, int nat, int lit_type, int** dimensions, int dims_size, Content** args, int args_size){
-    Content* content = NULL;
-    content = calloc(1, sizeof(Content));
-    content->lex_value = lex_val;
-    content->nature = nat;
-    content->lit_type = lit_type;
-    content->dimensions = dimensions;
-    content->dimensions_size = dims_size;
-    content->args = args;
-    content->args_size = args_size;
-    content->total_size = calculate_total_size(lit_type, dimensions, dims_size);
-    return content;
-}
-
-    
-
-
-int main(){
-    printf("\nSTARTING");
-    SymbolTable *table = table_new();
-    lexValue lex_val;
-    lex_val.line_number = 3;
-    lex_val.type = TYPE_LIT;
-    lex_val.value = strdup("12345");
-    
-    lexValue lex_val2;
-    lex_val2.line_number = 3;
-    lex_val2.type = TYPE_LIT;
-    lex_val2.value = strdup("123456");
-    printf("\nLEXVALS CREATED");
-
-    int **dimensions = malloc(sizeof(int*) * 3);
-    int dim1 = 1;
-    int dim2 = 2;
-    int dim3 = 3;
-    dimensions[0] = &dim1;
-    dimensions[1] = &dim2;
-    dimensions[2] = &dim3;
-    printf("\nDIMS CREATED");
-
-    Content *arg1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
-    Content *arg2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
-    Content** args = malloc(sizeof(Content*)*2);
-    args[0] = arg1;
-    args[1] = arg2;
-    printf("\nARGS CREATED");
-    printf("\nARGS CREATED");
-    printf("\nARGS CREATED");
-    printf("\nARGS CREATED");
-
-    //Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
-    printf("\nCONTENT CREATED");
-    printf("\nCONTENT CREATED");
-    printf("\nCONTENT CREATED");
-    printf("\nCONTENT CREATED");
-
-    table_add_entry(table, "key0", content);
-    printf("\nENTRY ADDED");
-    printf("\nENTRY ADDED");
-    printf("\nENTRY ADDED");
-    printf("\nENTRY ADDED");
-
-    printf("\nkey: %s", table->keys[table_get_index(table, "key0")]);
-    printf("\nvalue: %s\n", table->content[table_get_index(table, "key0")]->lex_value.value);
-
-    table_free(table);
-    printf("\nFREE DONE!!!\n");
-    exit(0);
-    return 0;
-}
-
-#endif
