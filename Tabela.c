@@ -227,6 +227,11 @@ int table_get_hash(char* key) {
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content){
+    int has_duplicate = table_has_duplicate(table, key);
+    if(has_duplicate){ // TODO: ERR_DECLARED
+        printf("\nERRO! linha %d: Variavel previamente declarada na linha %d.", content->lex_value.line_number, has_duplicate);
+        return;
+    }
     int hash = table_get_hash(key);
     // Se hash >= table->size, aumenta a tabela até hash+1 populando com null. Coloca na última pos.
     if(hash >= table->size) {
@@ -284,6 +289,15 @@ void table_free(SymbolTable* table){
     free(table->keys);
     free(table->content);
     free(table);
+}
+
+// Retorna a linha em que o simbolo foi previamente declarado caso exista na tabela. Caso contrario, retorna 0.
+int table_has_duplicate(SymbolTable* table, char* key) {
+    for(int i=0; i<table->size; i++){
+        if(table->keys[i]==key)
+           return table->content[i]->lex_value->line_number;
+    }
+    return false;
 }
 
 //---------------------------- CONTENT ----------------------------

@@ -21,23 +21,6 @@
 #define false 0
 #define true  1
 
-typedef struct content_{
-    lexValue lex_value;
-    int nature;
-    int lit_type;
-    int total_size;
-    int** dimensions;
-    int dimensions_size;
-    struct content_ **args;
-    int args_size;
-} Content;
-
-typedef struct symbol_table{
-    int size; // How many entries in the table
-    char** keys;
-    Content** content;
-} SymbolTable;
-
 typedef struct int_list{
     int value;
     struct int_list* next;
@@ -47,6 +30,23 @@ typedef struct content_list{
     Content* value;
     struct content_list* next;
 } ContentList;
+
+typedef struct content_{
+    lexValue lex_value;
+    int nature;
+    int lit_type;
+    int total_size;
+    int** dimensions;
+    int dimensions_size;
+    ContentList *args;
+    int args_size;
+} Content;
+
+typedef struct symbol_table{
+    int size; // How many entries in the table
+    char** keys;
+    Content** content;
+} SymbolTable;
 
 //---------------------------- TABLE ----------------------------
 
@@ -59,6 +59,8 @@ void table_add_entry(SymbolTable *table, char* key, Content* content);
 int table_get_index(SymbolTable* table, char* key);
 
 void table_free(SymbolTable* table);
+
+int table_has_duplicate(SymbolTable* table, char* key);
 
 //---------------------------- CONTENT ----------------------------
 
