@@ -74,6 +74,8 @@ IntList* intList_new();
 
 IntList*  intList_pushLeft(IntList* list, int value);
 
+IntList*  intList_pushRight(IntList* list, int value);
+
 void intList_free(IntList* list);
 
 void intList_print(IntList* list);
@@ -83,6 +85,8 @@ void intList_print(IntList* list);
 ContentList* contentList_new();
 
 ContentList*  contentList_pushLeft(ContentList* list, Content* value);
+
+ContentList*  contentList_pushRight(ContentList* list, Content* value);
 
 void contentList_free(ContentList* list);
 
