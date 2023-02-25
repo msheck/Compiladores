@@ -55,8 +55,10 @@ static void _ast_print_graphviz (FILE *foutput, ASTree *tree)
   int i;
   if (tree != NULL){
     fprintf(foutput, "  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
+    printf("  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
     for (i = 0; i < tree->number_of_children; i++){
       fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
+      printf("  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
       _ast_print_graphviz(foutput, tree->children[i]);
     }
   }
