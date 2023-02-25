@@ -3,6 +3,7 @@
         "*.y": "bison",
         "stdio.h": "c",
         "compare": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "abstractsyntaxtree.c": "cpp"
     }
 }

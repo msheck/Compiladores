@@ -12,7 +12,7 @@ A partir do código fornecido pelo professor.
 #include "AbstractSyntaxTree.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
-ASTree *ast_new_node(lexValue value)
+ASTree *ast_new_node(lexValue value, int node_type)
 {
   ASTree *ret = NULL;
   ret = calloc(1, sizeof(ASTree));
@@ -20,6 +20,7 @@ ASTree *ast_new_node(lexValue value)
     ret->value = value;
     ret->number_of_children = 0;
     ret->children = NULL;
+    ret->node_type = node_type;
   }
   return ret;
 }
@@ -52,8 +53,10 @@ static void _ast_print_graphviz (FILE *foutput, ASTree *tree)
   int i;
   if (tree != NULL){
     fprintf(foutput, "  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
+    printf("  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
     for (i = 0; i < tree->number_of_children; i++){
       fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
+      printf("  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
       _ast_print_graphviz(foutput, tree->children[i]);
     }
   }
@@ -69,4 +72,46 @@ void ast_print_graphviz(ASTree *tree)
   _ast_print_graphviz(foutput, tree);
   fprintf(foutput, "}\n");
   fclose(foutput);
+}
+
+void ast_check_type(ASTree* node1, ASTree* node2) {
+  if(node1->node_type == node2->node_type)
+    return;
+  if(node2->node_type == NODE_TYPE_CHAR) {
+    if(node1->node_type == NODE_TYPE_INT){
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para INT.\033[0m",
+        node1->value.line_number);
+      exit(ERR_CHAR_TO_INT);
+    }
+    if(node1->node_type == NODE_TYPE_FLOAT){
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para FLOAT.\033[0m",
+        node1->value.line_number);
+      exit(ERR_CHAR_TO_FLOAT);
+    }
+    if(node1->node_type == NODE_TYPE_BOOL){
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para BOOL.\033[0m",
+        node1->value.line_number);
+      exit(ERR_CHAR_TO_BOOL);
+    }
+    else {
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
+        node1->value.line_number, node1->value.value);
+      exit(-1);
+    }
+  }
+  if(node2->node_type == NODE_TYPE_CHAR){
+    if(node1->node_type == NODE_TYPE_BOOL)
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de BOOL para CHAR.\033[0m",
+        node1->value.line_number);
+    if(node1->node_type == NODE_TYPE_FLOAT)
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de FLOAT para CHAR.\033[0m",
+        node1->value.line_number);
+    if(node1->node_type == NODE_TYPE_INT)
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de INT para CHAR.\033[0m",
+        node1->value.line_number);
+    else
+      printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
+        node1->value.line_number, node1->value.value);
+    exit(ERR_X_TO_CHAR);
+  }
 }
