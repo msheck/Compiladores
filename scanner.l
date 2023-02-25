@@ -16,6 +16,7 @@ void set_lexValue(int type){
 	lv.value = strdup(yytext);
 	lv.line_number = yylineno;
 	lv.type = type; 
+	lv.node_type = 0;
 	yylval.valor_lexico = lv;
 }
 lexValue get_lexValue(char* value, int line_number, int type){
@@ -23,6 +24,7 @@ lexValue get_lexValue(char* value, int line_number, int type){
 	lv.value = strdup(value);
 	lv.line_number = line_number;
 	lv.type = type; 
+	lv.node_type = 0;
 	return lv;
 }
 

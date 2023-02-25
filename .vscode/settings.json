@@ -4,7 +4,9 @@
         "stdio.h": "c",
         "compare": "c",
         "type_traits": "c",
+        "abstractsyntaxtree.h": "c",
         "abstractsyntaxtree.c": "c",
+        "table.h": "c",
         "table.c": "c"
     }
 }

@@ -18,26 +18,10 @@ Desenvolvido pelos alunos:
 #define NAT_ARR 3
 #define NAT_FUN 4
 
-#define NODE_TYPE_BOOL  1
-#define NODE_TYPE_CHAR  2
-#define NODE_TYPE_INT   3
-#define NODE_TYPE_FLOAT 4
-
 #define LIT_SIZE_BOOL  1
 #define LIT_SIZE_CHAR  1
 #define LIT_SIZE_INT   4
 #define LIT_SIZE_FLOAT 8
-
-#define ERR_UNDECLARED 10
-#define ERR_DECLARED 11
-#define ERR_VARIABLE 20
-#define ERR_ARRAY 21
-#define ERR_FUNCTION 22
-#define ERR_CHAR_TO_INT 31
-#define ERR_CHAR_TO_FLOAT 32
-#define ERR_CHAR_TO_BOOL 33
-#define ERR_CHAR_VECTOR 34
-#define ERR_X_TO_CHAR 35
 
 #define false 0
 #define true  1

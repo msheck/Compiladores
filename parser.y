@@ -12,12 +12,16 @@ Desenvolvido pelos alunos:
 int yylex(void);
 void yyerror (char const *error_message);
 
+extern void* tabela;
 extern void* arvore;
+
+#include "Table.h"
+#include "AbstractSyntaxTree.h"
 
 %}
 
-%code requires { #include "AbstractSyntaxTree.h" }
 %code requires { #include "Table.h" }
+%code requires { #include "AbstractSyntaxTree.h" }
 
 %define parse.error verbose
 
@@ -96,6 +100,8 @@ extern void* arvore;
 %type<astree> if_then_else
 %type<astree> while
 
+%type<valor_lexico> tipo_var
+
 %left TK_OC_OR
 %left TK_OC_AND
 %left TK_OC_EQ TK_OC_NE
@@ -119,10 +125,10 @@ programa:             var_glob          { $$ = NULL; }
 
 // VARIAVEIS
 
-tipo_var:             TK_PR_INT   { free($1.value); }
-                    | TK_PR_FLOAT { free($1.value); }
-                    | TK_PR_CHAR  { free($1.value); }
-                    | TK_PR_BOOL  { free($1.value); };
+tipo_var:             TK_PR_INT   { free($1.value); $$.node_type = NODE_TYPE_INT;}
+                    | TK_PR_FLOAT { free($1.value); $$.node_type = NODE_TYPE_FLOAT; }
+                    | TK_PR_CHAR  { free($1.value); $$.node_type = NODE_TYPE_CHAR; }
+                    | TK_PR_BOOL  { free($1.value); $$.node_type = NODE_TYPE_BOOL; };
 
 lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
                     | TK_LIT_TRUE   { $$ = ast_new_node($1); }
@@ -144,11 +150,11 @@ ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.val
 
 ident_init:         TK_IDENTIFICADOR TK_OC_LE lits  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-var_inicializada:   tipo_var ident_init { $$ = $2; };
+var_inicializada:   tipo_var ident_init { $$ = $2; table_add_entry(tabela, $2->value.value, content_new($2->value, NAT_VAR, $1.node_type, NULL, NULL)); };
 
 var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
 
-var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; }       
+var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); }
                     | var_inicializada ',' list_var           { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; };
 
 var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
@@ -160,7 +166,7 @@ var_glob:             tipo_var TK_IDENTIFICADOR ';' { free($2.value); }
 
 var_loc:              var_inicializada          { $$ = $1; }
                     | var_poly_loc              { $$ = $1; }
-                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); };
+                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); };
 
 // FUNCOES
 

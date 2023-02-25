@@ -51,4 +51,4 @@ unzip:
 	mkdir entrega | tar xf etapa$(etapa).tgz --directory entrega
 
 table:
-	gcc Tabela.c -o table_test
+	gcc AbstractSyntaxTree.c Table.c main.c -o table_test
