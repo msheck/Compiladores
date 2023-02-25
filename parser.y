@@ -12,9 +12,6 @@ Desenvolvido pelos alunos:
 int yylex(void);
 void yyerror (char const *error_message);
 
-#include <stdio.h>
-#include <string.h>
-
 extern void* arvore;
 
 %}
@@ -130,7 +127,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
                     | TK_LIT_TRUE   { $$ = ast_new_node($1); }
                     | TK_LIT_INT    { $$ = ast_new_node($1); }
                     | TK_LIT_FLOAT  { $$ = ast_new_node($1); }
-                    | TK_LIT_CHAR   { $$ = ast_new_node($1); };
+                    | TK_LIT_CHAR   { $1.value[0]=$1.value[1]; $1.value[1] = '\0'; $1.value = realloc($1.value, sizeof(char)*2); $$ = ast_new_node($1); };
 
 list_dimensoes:       TK_LIT_INT                      { free($1.value); }
                     | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
@@ -204,7 +201,7 @@ chamada_func:       TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; 
 // EXPRESSOES
 
 list_expr:            expr                    { $$ = $1; }
-                    | expr '^' list_expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
+                    | list_expr '^' expr      { $$ = ast_new_node($2); ast_add_child($$, $1); ast_add_child($$, $3); };
 
 
 expr:                 expr_end                { $$ = $1; }

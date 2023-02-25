@@ -9,9 +9,6 @@ Adaptado pelos alunos:
 A partir do código fornecido pelo professor.
 */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include "AbstractSyntaxTree.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
@@ -68,7 +65,7 @@ void ast_print_graphviz(ASTree *tree)
   if(foutput == NULL){
     printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
   }
-  fprintf(foutput, "digraph grafo {\n");
+  fprintf(foutput, "digraph {\n");
   _ast_print_graphviz(foutput, tree);
   fprintf(foutput, "}\n");
   fclose(foutput);

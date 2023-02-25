@@ -18,6 +18,10 @@ A partir do código fornecido pelo professor.
 #define TYPE_IDENT 3
 #define TYPE_LIT 4
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef struct lexical_value{
   int line_number;
   int type;
