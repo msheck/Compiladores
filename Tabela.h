@@ -8,10 +8,10 @@
 #define NAT_ARR 3
 #define NAT_FUN 4
 
-#define LIT_TYPE_BOOL  1
-#define LIT_TYPE_CHAR  2
-#define LIT_TYPE_INT   3
-#define LIT_TYPE_FLOAT 4
+#define NODE_TYPE_BOOL  1
+#define NODE_TYPE_CHAR  2
+#define NODE_TYPE_INT   3
+#define NODE_TYPE_FLOAT 4
 
 #define LIT_SIZE_BOOL  1
 #define LIT_SIZE_CHAR  1
@@ -50,7 +50,7 @@ struct content_list{
 struct content_{
     lexValue lex_value;
     int nature;
-    int lit_type;
+    int node_type;
     int total_size;
     IntList *dimensions;
     ContentList *args;
@@ -72,6 +72,8 @@ int table_get_hash(char* key);
 
 int table_get_index(SymbolTable* table, char* key);
 
+int table_get_type(SymbolTable* table, char* key);
+
 void table_add_entry(SymbolTable *table, char* key, Content* content);
 
 void table_free(SymbolTable* table);
@@ -90,7 +92,7 @@ void table_pop_nest(SymbolTable* root);
 
 //---------------------------- CONTENT ----------------------------
 
-Content* content_new(lexValue lex_val, int nat, int lit_type, IntList *dimensions, ContentList *args);
+Content* content_new(lexValue lex_val, int nat, int node_type, IntList *dimensions, ContentList *args);
 
 void content_free(Content *content);
 
@@ -120,7 +122,7 @@ void contentList_print(ContentList* list);
 
 //---------------------------- MISC ----------------------------
 
-int calculate_total_size(int lit_type, IntList* dimensions);
+int calculate_total_size(int node_type, IntList* dimensions);
 
 
 #endif

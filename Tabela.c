@@ -69,10 +69,10 @@ int main(){
     dimensions = intList_pushLeft(dimensions, 3);
     printf("\n\n--------------\tDIMENSIONS CREATED\t--------------\n");
 
-    Content *arg1 = content_new(lex_arg1, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *arg2 = content_new(lex_arg2, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *arg3 = content_new(lex_arg3, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *arg4 = content_new(lex_arg4, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
+    Content *arg1 = content_new(lex_arg1, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+    Content *arg2 = content_new(lex_arg2, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+    Content *arg3 = content_new(lex_arg3, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+    Content *arg4 = content_new(lex_arg4, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
     ContentList *args1 = contentList_new();
     args1 = contentList_pushLeft(args1, arg1);
     args1 = contentList_pushLeft(args1, arg2);
@@ -81,10 +81,10 @@ int main(){
     args2 = contentList_pushLeft(args2, arg4);
     printf("\n\n--------------\tARGUMENTS CREATED\t--------------\n");
 
-    Content *cont1 = content_new(lex_val1, NAT_LIT, LIT_TYPE_INT, NULL, args1);
-    Content *cont2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, args2);
-    Content *cont3 = content_new(lex_val3, NAT_LIT, LIT_TYPE_INT, dimensions, NULL);
-    Content *cont4 = content_new(lex_val4, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
+    Content *cont1 = content_new(lex_val1, NAT_LIT, NODE_TYPE_INT, NULL, args1);
+    Content *cont2 = content_new(lex_val2, NAT_LIT, NODE_TYPE_INT, NULL, args2);
+    Content *cont3 = content_new(lex_val3, NAT_LIT, NODE_TYPE_INT, dimensions, NULL);
+    Content *cont4 = content_new(lex_val4, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
     printf("\n\n--------------\tCONTENT NEW COMPLETE\t--------------\n");
 
     /*CONTENT LIST*/
@@ -119,22 +119,22 @@ int main(){
     // table_check_declared(table2, key1, __LINE__); // Descomentar p/ testar ERR_DECLARED
     // table_check_undeclared(table2, "key7", __LINE__); // Descomentar p/ testar ERR_UNDECLARED
     
-    // Content *cont_err_1 = content_new(lex_arg1, NAT_VAR, LIT_TYPE_INT, dimensions, NULL);
+    // Content *cont_err_1 = content_new(lex_arg1, NAT_VAR, NODE_TYPE_INT, dimensions, NULL);
     // table_check_use(table2, cont_err_1, __LINE__);
 
-    // Content *cont_err_2 = content_new(lex_arg2, NAT_VAR, LIT_TYPE_INT, NULL, args1);
+    // Content *cont_err_2 = content_new(lex_arg2, NAT_VAR, NODE_TYPE_INT, NULL, args1);
     // table_check_use(table2, cont_err_2, __LINE__);
 
-    // Content *cont_err_3 = content_new(lex_arg3, NAT_ARR, LIT_TYPE_INT, NULL, NULL);
+    // Content *cont_err_3 = content_new(lex_arg3, NAT_ARR, NODE_TYPE_INT, NULL, NULL);
     // table_check_use(table2, cont_err_3, __LINE__);
 
-    // Content *cont_err_4 = content_new(lex_arg3, NAT_ARR, LIT_TYPE_INT, NULL, args1);
+    // Content *cont_err_4 = content_new(lex_arg3, NAT_ARR, NODE_TYPE_INT, NULL, args1);
     // table_check_use(table2, cont_err_4, __LINE__);
 
-    // Content *cont_err_5 = content_new(lex_arg4, NAT_FUN, LIT_TYPE_INT, NULL, NULL);
+    // Content *cont_err_5 = content_new(lex_arg4, NAT_FUN, NODE_TYPE_INT, NULL, NULL);
     // table_check_use(table2, cont_err_5, __LINE__);
 
-    // Content *cont_err_6 = content_new(lex_arg4, NAT_FUN, LIT_TYPE_INT, dimensions, NULL);
+    // Content *cont_err_6 = content_new(lex_arg4, NAT_FUN, NODE_TYPE_INT, dimensions, NULL);
     // table_check_use(table2, cont_err_6, __LINE__);
 
     printf("\ntable1.value[key1]: %s", table1->content[table_get_index(table1, key1)]->lex_value.value);
@@ -187,8 +187,8 @@ int main(){
     dimensions[2] = &dim3;
     printf("\nDIMS CREATED");
 
-    Content *arg1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
-    Content *arg2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, NULL, 0, NULL, 0);
+    Content *arg1 = content_new(lex_val, NAT_LIT, NODE_TYPE_INT, NULL, 0, NULL, 0);
+    Content *arg2 = content_new(lex_val2, NAT_LIT, NODE_TYPE_INT, NULL, 0, NULL, 0);
     Content** args = malloc(sizeof(Content*)*2);
     args[0] = arg1;
     args[1] = arg2;
@@ -197,8 +197,8 @@ int main(){
     printf("\nARGS CREATED");
     printf("\nARGS CREATED");
 
-    //Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, NULL, NULL);
-    Content *content = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    //Content *content = content_new(lex_val, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+    Content *content = content_new(lex_val, NAT_LIT, NODE_TYPE_INT, dimensions, 3, args, 2);
     printf("\nCONTENT CREATED");
     printf("\nCONTENT CREATED");
     printf("\nCONTENT CREATED");
@@ -206,9 +206,9 @@ int main(){
 
 
 
-    Content *content1 = content_new(lex_val, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
-    Content *content2 = content_new(lex_val2, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
-    Content *content3 = content_new(lex_val3, NAT_LIT, LIT_TYPE_INT, dimensions, 3, args, 2);
+    Content *content1 = content_new(lex_val, NAT_LIT, NODE_TYPE_INT, dimensions, 3, args, 2);
+    Content *content2 = content_new(lex_val2, NAT_LIT, NODE_TYPE_INT, dimensions, 3, args, 2);
+    Content *content3 = content_new(lex_val3, NAT_LIT, NODE_TYPE_INT, dimensions, 3, args, 2);
     ContentList *cList = contentList_new();
     printf("\nPUSHING");
     cList = contentList_pushLeft(cList, content1);
@@ -267,12 +267,17 @@ int table_get_hash(char* key) {
 int table_get_index(SymbolTable* table, char* key) {
     int i = table_get_hash(key);
     while(i<table->size) {
-        if (table->keys[i]==key) {
+        if(table->keys[i]==key) {
             break;
         }
         i++;
     }
 	return i;
+}
+
+int table_get_type(SymbolTable* table, char* key) {
+    int i = table_get_index(table, key);
+    return table->content[i]->node_type;
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
@@ -431,15 +436,15 @@ void table_pop_nest(SymbolTable* root) {
 
 //---------------------------- CONTENT ----------------------------
 
-Content* content_new(lexValue lex_val, int nat, int lit_type, IntList *dimensions, ContentList *args) {
+Content* content_new(lexValue lex_val, int nat, int node_type, IntList *dimensions, ContentList *args) {
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
     content->lex_value = lex_val;
     content->nature = nat;
-    content->lit_type = lit_type;
+    content->node_type = node_type;
     content->dimensions = dimensions;
     content->args = args;
-    content->total_size = calculate_total_size(lit_type, dimensions);
+    content->total_size = calculate_total_size(node_type, dimensions);
     return content;
 }
 
@@ -611,7 +616,7 @@ void contentList_print(ContentList* list) {
 
 //---------------------------- MISC ----------------------------
 
-int calculate_total_size(int lit_type, IntList* dimensions) {
+int calculate_total_size(int node_type, IntList* dimensions) {
     int total_size = 0;
 
     IntList *next = dimensions;
@@ -621,20 +626,20 @@ int calculate_total_size(int lit_type, IntList* dimensions) {
         next = next->next;
     }
     
-    switch (lit_type) {
-        case LIT_TYPE_INT:
+    switch (node_type) {
+        case NODE_TYPE_INT:
             total_size = LIT_SIZE_INT * dims_size;
             break;
 
-        case LIT_TYPE_FLOAT:
+        case NODE_TYPE_FLOAT:
             total_size = LIT_SIZE_FLOAT * dims_size;
             break;
 
-        case LIT_TYPE_CHAR:
+        case NODE_TYPE_CHAR:
             total_size = LIT_SIZE_CHAR * dims_size;
             break;
 
-        case LIT_TYPE_BOOL:
+        case NODE_TYPE_BOOL:
             total_size = LIT_SIZE_BOOL * dims_size;
             break;
     }

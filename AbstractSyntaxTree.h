@@ -12,6 +12,8 @@ A partir do código fornecido pelo professor.
 #ifndef _ARVORE_H_
 #define _ARVORE_H_
 
+#include "Tabela.h"
+
 #define TYPE_SPEC_CHAR 0
 #define TYPE_KEY_WORD 1
 #define TYPE_COMP_OP 2
@@ -28,14 +30,17 @@ typedef struct AbstractSyntaxTree {
   lexValue value;
   int number_of_children;
   struct AbstractSyntaxTree **children;
+  int node_type;
 } ASTree;
 
-ASTree *ast_new_node(lexValue value);
+ASTree *ast_new_node(lexValue value, int node_type);
 
 void ast_free(ASTree *tree);
 
 void ast_add_child(ASTree *tree, ASTree *child);
 
-void ast_print_graphviz (ASTree *tree);
+void ast_print_graphviz(ASTree *tree);
+
+void ast_check_type(ASTree *node1, ASTree *node2);
 
 #endif
