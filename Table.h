@@ -1,5 +1,15 @@
-#ifndef _TABELA_H_
-#define _TABELA_H_
+/*
+INF01147 - Compiladores 2022/2
+Professor: 
+	-Lucas Schnorr
+
+Desenvolvido pelos alunos:
+	-Mateus Severgnini Heck 
+	-Vinicius Meirelles Pereira
+*/
+
+#ifndef _TABLE_H_
+#define _TABLE_H_
 
 #include "AbstractSyntaxTree.h"
 

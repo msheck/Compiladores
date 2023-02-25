@@ -6,7 +6,7 @@
 #	-Mateus Severgnini Heck 
 #	-Vinicius Meirelles Pereira
 
-etapa = 3
+etapa = 4
 
 .PHONY: zip unzip compile_test test clean flex etapa$(etapa)
 
@@ -15,7 +15,7 @@ $(etapa): flex bison compile
 debug: flex bison_debug compile
 
 compile:
-	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c main.c -o etapa$(etapa)
+	gcc lex.yy.c AbstractSyntaxTree.c Table.c parser.tab.c main.c -o etapa$(etapa)
 
 flex: scanner.l
 	flex scanner.l
@@ -33,7 +33,7 @@ test: flex bison_debug compile_test
 	./test.o
 
 compile_test:
-	gcc lex.yy.c AbstractSyntaxTree.c parser.tab.c test.c -o test.o
+	gcc lex.yy.c AbstractSyntaxTree.c Table.c parser.tab.c test.c -o test.o
 
 run_input: debug 
 	./etapa$(etapa) < input

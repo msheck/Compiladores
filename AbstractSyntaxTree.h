@@ -12,7 +12,7 @@ A partir do código fornecido pelo professor.
 #ifndef _ARVORE_H_
 #define _ARVORE_H_
 
-#include "Tabela.h"
+#include "Table.h"
 
 #define TYPE_SPEC_CHAR 0
 #define TYPE_KEY_WORD 1

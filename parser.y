@@ -17,6 +17,7 @@ extern void* arvore;
 %}
 
 %code requires { #include "AbstractSyntaxTree.h" }
+%code requires { #include "Table.h" }
 
 %define parse.error verbose
 
