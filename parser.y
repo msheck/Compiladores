@@ -146,8 +146,8 @@ var_glob:             TK_IDENTIFICADOR                { free($1.value); $$ = NUL
 
 var_loc:              TK_IDENTIFICADOR                { free($1.value); $$ = NULL; }
                     | ident_init                      { $$ = $1; }
-                    | var_loc ',' TK_IDENTIFICADOR    { free($3.value); $$ = NULL; }
-                    | var_loc ',' ident_init          { ast_add_child($1, $3); $$ = $1; };
+                    | TK_IDENTIFICADOR ',' var_loc    { free($1.value); $$ = NULL; }
+                    | ident_init ',' var_loc          { ast_add_child($1, $3); $$ = $1; };
 
 // FUNCOES
 
@@ -177,7 +177,7 @@ comando_simples:      tipo_var var_loc              { $$ = $2; }
                     | while                         { $$ = $1; }
                     | bloc_com                      { $$ = $1; };
 
-comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; }
+comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; }
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com:             '{' comandos '}'              { $$ = $2; }
