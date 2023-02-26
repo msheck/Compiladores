@@ -40,12 +40,15 @@ int table_get_hash(char* key) {
 
 int table_get_index(SymbolTable* table, char* key) {
     int i = table_get_hash(key);
+    printf("\nGET INDEX ~%s~! INDEX IS %d", key, i);
     while(i<table->size) {
-        if(table->keys[i]==key) {
+        if(table->keys[i]!=NULL && strcmp(table->keys[i], key)==0) {
+            printf("\nKEY FOUND!");
             break;
         }
         i++;
     }
+    printf("\nRETURNING %d", i);
 	return i;
 }
 
@@ -86,7 +89,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             if(table->keys[i] == NULL) {
                 table->keys[i] = strdup(key);
                 table->content[i] = content;
-                if(content->node_type==NODE_TYPE_UNDECLARED){
+                if(content->node_type == NODE_TYPE_UNDECLARED){
                     printf("\nADDING TYPELESS\n");
                     table->typeless = intList_pushLeft(table->typeless, i);
                 }
@@ -100,7 +103,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->content = realloc(table->content, table->size * sizeof(Content**));
             table->keys[table->size-1] = strdup(key);
             table->content[table->size-1] = content;
-            if(content->node_type==NODE_TYPE_UNDECLARED){
+            if(content->node_type == NODE_TYPE_UNDECLARED){
                 printf("\nADDING TYPELESS\n");
                 table->typeless = intList_pushLeft(table->typeless, table->size-1);
             }
@@ -131,14 +134,16 @@ void table_abort(SymbolTable* table) {
 
 // Retorna a linha em que o simbolo foi previamente declarado caso exista na tabela. Caso contrario, retorna 0.
 int table_has_declared(SymbolTable* table, char* key) {
-    for(int i=0; i<table->size; i++) {
-        if(table->keys[i] == key) {
-            return table->content[i]->lex_value.line_number;
-        }
+    int i = table_get_index(table, key);
+    if((i < table->size) && (strcmp(table->keys[i], key) == 0)){
+        return i;
     }
-    if(table->parent == NULL)
-        return false;
-    return table_has_declared(table->parent, key);
+    else{
+        if(table->parent == NULL)
+            return 0;
+        else
+            return table_has_declared(table->parent, key);
+    }
 }
 
 void table_check_declared(SymbolTable* table, char* key, int line) {
@@ -153,45 +158,45 @@ void table_check_declared(SymbolTable* table, char* key, int line) {
 void table_check_undeclared(SymbolTable* table, char* key, int line) {
     int line_declared = table_has_declared(table, key);
     printf("\nDECLARADO NA LINHA %d", line_declared);
-    if(line_declared==0) {
-        table_abort(table);
+    if(line_declared == 0) {
+        //table_abort(table);
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s nao declarado.\033[0m", line, key);
         exit(ERR_UNDECLARED);
     }
 }
 
 void table_check_use(SymbolTable* table, Content* content, int line) {
-    if(content->nature==NAT_VAR) {
-        if(content->dimensions!=NULL) {
+    if(content->nature == NAT_VAR) {
+        if(content->dimensions != NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_value.value);
             exit(ERR_VARIABLE);
         }
-        if(content->args!=NULL) {
+        if(content->args != NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_value.value);
             exit(ERR_VARIABLE);
         }
     }
-    if(content->nature==NAT_ARR) {
-        if(content->args!=NULL) {
+    if(content->nature == NAT_ARR) {
+        if(content->args != NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_value.value);
             exit(ERR_ARRAY);
         }
-        if(content->dimensions==NULL) {
+        if(content->dimensions == NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_value.value);
             exit(ERR_ARRAY);
         }
     }
-    if(content->nature==NAT_FUN) {
-        if(content->dimensions!=NULL) {
+    if(content->nature == NAT_FUN) {
+        if(content->dimensions != NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_value.value);
             exit(ERR_FUNCTION);
         }
-        if(content->args==NULL) {
+        if(content->args == NULL) {
             table_abort(table);
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_value.value);
             exit(ERR_FUNCTION);

@@ -1,25 +1,37 @@
-int b[1^2];
-int foo(){ 
-    int c <= 3, ca <= 4, d<=6;
-    float x <= 2.2;
-    int a;
-    a = 1;
-    b[0^1] = 0;
-    return b[1^a+c];
+int i;
+float h [1^2^3];
+
+int bar(){
+    int a, b, c, d;
+
+    teste = true;
+
+    h[i+2^b^c] = d;
 }
 
-float x;
 
-int goo(float x){ 
-    int a <= 1;
-    goo(x);
-}
+// int b[1^2];
+// int foo(){ 
+//     int c <= 3, ca <= 4, d<=6;
+//     float x <= 2.2;
+//     int a;
+//     a = 1;
+//     b[0^1] = 0;
+//     return b[1^a+c];
+// }
 
-int hoo(){
-    int b;
-}
+// float x;
 
-int joo(){}
+// int goo(float x){ 
+//     int a <= 1;
+//     goo(x);
+// }
+
+// int hoo(){
+//     int b;
+// }
+
+// int joo(){}
 
 // int f(){
 //     char a <= 'A';
