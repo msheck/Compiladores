@@ -21,6 +21,7 @@ SymbolTable *table_new() {
         ret->content = NULL;
         ret->next = NULL;
         ret->parent = NULL;
+        ret->typeless = intList_new();
     }
     return ret;
 }
@@ -54,7 +55,10 @@ int table_get_type(SymbolTable* table, char* key) {
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
+    printf("\nADDING %s\n", content->lex_value.value);
     table_check_declared(table, key, content->lex_value.line_number);
+    if(content->node_type!=NODE_TYPE_UNDECLARED)
+        table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
     // Se hash >= table->size, aumenta a tabela até hash+1 populando com null. Coloca na última pos.
     if(hash >= table->size) {
@@ -66,8 +70,12 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->keys[i] = NULL;
             table->content[i] = NULL;
         }
-        table->keys[table->size-1] = key;
+        table->keys[table->size-1] = strdup(key);
         table->content[table->size-1] = content;
+        if(content->node_type==NODE_TYPE_UNDECLARED){
+            printf("\nADDING TYPELESS\n");
+            table->typeless = intList_pushLeft(table->typeless, table->size-1);
+        }
     }
     // Se hash < table->size, encontra a primeira pos vazia e coloca.
     // Caso esteja cheia, table->size+=1. Coloca na última pos.
@@ -76,8 +84,12 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
         int is_on_table = false;
         for(i=hash; i<table->size; i++) {
             if(table->keys[i] == NULL) {
-                table->keys[i] = key;
+                table->keys[i] = strdup(key);
                 table->content[i] = content;
+                if(content->node_type==NODE_TYPE_UNDECLARED){
+                    printf("\nADDING TYPELESS\n");
+                    table->typeless = intList_pushLeft(table->typeless, i);
+                }
                 is_on_table = true;
                 break;
             }
@@ -86,8 +98,12 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->size += 1;
             table->keys = realloc(table->keys, table->size * sizeof(char**));
             table->content = realloc(table->content, table->size * sizeof(Content**));
-            table->keys[table->size-1] = key;
+            table->keys[table->size-1] = strdup(key);
             table->content[table->size-1] = content;
+            if(content->node_type==NODE_TYPE_UNDECLARED){
+                printf("\nADDING TYPELESS\n");
+                table->typeless = intList_pushLeft(table->typeless, table->size-1);
+            }
         }
     }
 }
@@ -205,6 +221,41 @@ void table_pop_nest(SymbolTable* root) {
             last->next = NULL;
         }
     }
+}
+
+void table_update_type(SymbolTable* table, int type){
+    IntList* typeless_idx = table->typeless;
+    while(typeless_idx!=NULL){
+        printf("\nUPDATING TYPE FOR IDX %d\n", typeless_idx->value);
+        table->content[typeless_idx->value]->node_type = type;
+        typeless_idx = typeless_idx->next;
+    }
+    intList_free(table->typeless);
+    table->typeless = intList_new();
+}
+
+char* int_to_type(int i){
+    switch (i) {
+        case NODE_TYPE_BOOL:
+            return "bool";
+        case NODE_TYPE_CHAR:
+            return "char";
+        case NODE_TYPE_FLOAT:
+            return "float";
+        case NODE_TYPE_INT:
+            return "int";
+        default:
+            return "TYPE_ERROR";
+    }
+}
+void table_print(SymbolTable* table) {
+    for(int i=0; i<table->size; i++){
+        if(table->keys[i]!=NULL){
+            char* type = int_to_type(table->content[i]->node_type);
+            printf("\n%d: %s, %s", i, table->keys[i], type);
+        }
+    }
+    printf("\n");
 }
 
 //---------------------------- CONTENT ----------------------------

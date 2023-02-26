@@ -139,7 +139,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
 list_dimensoes:       TK_LIT_INT                      { free($1.value); }
                     | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
 
-list_var:             TK_IDENTIFICADOR              { free($1.value); $$ = NULL; }
+list_var:             TK_IDENTIFICADOR              { $$ = NULL; table_add_entry(tabela, $1.value, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL)); free($1.value); }
                     | ident_init                    { $$ = $1; }
                     | ident_multidim                { $$ = NULL; }
                     | TK_IDENTIFICADOR ',' list_var { free($1.value); $$ = NULL; }
@@ -150,11 +150,11 @@ ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.val
 
 ident_init:         TK_IDENTIFICADOR TK_OC_LE lits  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-var_inicializada:   tipo_var ident_init { $$ = $2; table_add_entry(tabela, $2->value.value, content_new($2->value, NAT_VAR, $1.node_type, NULL, NULL)); };
+var_inicializada:   tipo_var ident_init { $$ = $2; table_add_entry(tabela, $2->children[0]->value.value, content_new($2->value, NAT_VAR, $1.node_type, NULL, NULL)); };
 
 var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
 
-var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); }
+var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { $$ = NULL; table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); free($2.value); }
                     | var_inicializada ',' list_var           { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; };
 
 var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
@@ -166,7 +166,7 @@ var_glob:             tipo_var TK_IDENTIFICADOR ';' { free($2.value); }
 
 var_loc:              var_inicializada          { $$ = $1; }
                     | var_poly_loc              { $$ = $1; }
-                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); };
+                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); free($2.value); };
 
 // FUNCOES
 

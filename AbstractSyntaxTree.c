@@ -46,32 +46,47 @@ void ast_add_child(ASTree *tree, ASTree *child)
         tree->children = realloc(tree->children, tree->number_of_children * sizeof(ASTree*));
         tree->children[tree->number_of_children-1] = child;
     }
-    }
+}
 
-static void _ast_print_graphviz (FILE *foutput, ASTree *tree)
+static void ast_print_label (FILE *foutput, ASTree *tree)
 {
-    int i;
     if (tree != NULL){
-        fprintf(foutput, "  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
-        printf("  %ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
-        for (i = 0; i < tree->number_of_children; i++){
-            fprintf(foutput, "  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
-            printf("  %ld -> %ld;\n", (long)tree, (long)tree->children[i]);
-            _ast_print_graphviz(foutput, tree->children[i]);
+        fprintf(foutput, "\t%ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
+        printf("\t%p [ label=\"%s\" ]\n", tree, tree->value.value);
+        if (tree->number_of_children != 0){
+            for (int i = 0; i < tree->number_of_children; i++){                
+                ast_print_label(foutput, tree->children[i]);
+            }
         }
     }
 }
 
-void ast_print_graphviz(ASTree *tree)
+static void ast_print_children (FILE *foutput, ASTree *tree)
 {
-    FILE *foutput = fopen(ARQUIVO_SAIDA, "w+");
-    if(foutput == NULL){
-        printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
+    if ((tree != NULL) && (tree->number_of_children != 0)){
+        for (int i = 0; i < tree->number_of_children; i++){
+            fprintf(foutput, "\t%ld -> %ld;\n", (long)tree, (long)tree->children[i]);
+            printf("\t%p -> %p;\n", tree, tree->children[i]);
+            ast_print_children(foutput, tree->children[i]);
+        }
     }
-    fprintf(foutput, "digraph {\n");
-    _ast_print_graphviz(foutput, tree);
-    fprintf(foutput, "}\n");
-    fclose(foutput);
+}
+
+void ast_print(ASTree *tree)
+{
+    if(tree != NULL){
+        FILE *foutput = fopen(ARQUIVO_SAIDA, "w+");
+        if(foutput == NULL){
+            printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
+        }
+        fprintf(foutput, "digraph {\n");
+        printf("digraph {\n");
+        ast_print_children(foutput, tree);
+        ast_print_label(foutput, tree);
+        fprintf(foutput, "}\n");
+        printf("}\n");
+        fclose(foutput);
+    }
 }
 
 void ast_check_type(ASTree* node1, ASTree* node2) {

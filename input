@@ -1,4 +1,12 @@
-int b[1^2];
+int foo(){
+    int a;
+    //bool b, c, e, f, g<=false;
+    bool h, i;
+    float d <= 2.5;
+}
+
+
+/*int b[1^2];
 int foo(){ 
     int c <= 3, ca <= 4, d<=6;
     int a;
@@ -18,4 +26,4 @@ int hoo(){
     int b;
 }
 
-int joo(){}
+int joo(){}*/

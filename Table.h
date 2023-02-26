@@ -56,6 +56,7 @@ struct symbol_table{
     Content** content;
     SymbolTable *next;
     SymbolTable *parent;
+    IntList* typeless;
 };
 
 //---------------------------- TABLE ----------------------------
@@ -83,6 +84,10 @@ void table_check_use(SymbolTable* table, Content* content, int line);
 void table_nest(SymbolTable* root, SymbolTable* new_table);
 
 void table_pop_nest(SymbolTable* root);
+
+void table_update_type(SymbolTable* table, int type);
+
+void table_print(SymbolTable* table);
 
 //---------------------------- CONTENT ----------------------------
 
