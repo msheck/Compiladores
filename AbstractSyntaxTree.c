@@ -78,17 +78,6 @@ static void ast_print_children (FILE *foutput, ASTree *tree)
     }
 }
 
-static void ast_print_children (FILE *foutput, ASTree *tree)
-{
-    if ((tree != NULL) && (tree->number_of_children != 0)){
-        for (int i = 0; i < tree->number_of_children; i++){
-            fprintf(foutput, "\t%ld -> %ld;\n", (long)tree, (long)tree->children[i]);
-            printf("\t%p -> %p;\n", tree, tree->children[i]);
-            ast_print_children(foutput, tree->children[i]);
-        }
-    }
-}
-
 void ast_print(ASTree *tree)
 {
     if(tree != NULL){
