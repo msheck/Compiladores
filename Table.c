@@ -58,7 +58,7 @@ int table_get_type(SymbolTable* table, char* key) {
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
-    printf("\nADDING %s\n", content->lex_value.value);
+    printf("\nADDING %s\n", content->lex_value.label);
     table_check_declared(table, key, content->lex_value.line_number);
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
@@ -169,36 +169,36 @@ void table_check_use(SymbolTable* table, Content* content, int line) {
     if(content->nature == NAT_VAR) {
         if(content->dimensions != NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_value.label);
             exit(ERR_VARIABLE);
         }
         if(content->args != NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_value.label);
             exit(ERR_VARIABLE);
         }
     }
     if(content->nature == NAT_ARR) {
         if(content->args != NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_value.label);
             exit(ERR_ARRAY);
         }
         if(content->dimensions == NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_value.label);
             exit(ERR_ARRAY);
         }
     }
     if(content->nature == NAT_FUN) {
         if(content->dimensions != NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_value.label);
             exit(ERR_FUNCTION);
         }
         if(content->args == NULL) {
             table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_value.value);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_value.label);
             exit(ERR_FUNCTION);
         }
     }
@@ -241,7 +241,10 @@ void table_update_type(SymbolTable* table, int type){
 
 void table_update_data_value(SymbolTable* table, char* key, lexValue data_value){    
     int hash = table_has_declared(table, key);
-    table->content[hash]->data_value = strdup(data_value.value); 
+    if(data_value.value == NULL)
+        table->content[hash]->data_value = strdup(data_value.label); 
+    else
+        table->content[hash]->data_value = strdup(data_value.value);
 }
 
 char* int_to_type(int i){
@@ -260,12 +263,17 @@ char* int_to_type(int i){
 }
 
 void table_print(SymbolTable* table) {
+    printf("\n-----------------------------------\n")
+    printf("\nPrinting table of size")
+    printf("\n-----------------------------------\n")
     for(int i=0; i<table->size; i++){
         if(table->keys[i] != NULL){
             char* type = int_to_type(table->content[i]->node_type);
             printf("\n%d: %s (%s) = %s", i, table->keys[i], type, table->content[i]->data_value);
         }
     }
+    if(table->next!=NULL)
+        table_print(table->next);
     printf("\n\n");
 }
 
@@ -312,6 +320,7 @@ void content_free(Content *content) {
         contentList_free(content->args);
         printf("\n\tArguments freed.");
     }
+    free(content->lex_value.label);
     free(content->lex_value.value);
     free(content->data_value);
     free(content);
@@ -419,7 +428,7 @@ ContentList*  contentList_pushLeft(ContentList* list, Content* value) {
         new_node->next = list;
     }
     new_node->value = value;
-    printf("\n%s: Pushing %ld before %ld", new_node->value->lex_value.value, (long)new_node, (long)new_node->next);
+    printf("\n%s: Pushing %ld before %ld", new_node->value->lex_value.label, (long)new_node, (long)new_node->next);
     return new_node;
 }
 
@@ -430,7 +439,7 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         list = malloc(sizeof(ContentList*)+sizeof(NULL));
         list->value = value;
         list->next = NULL;
-        printf("\n%s: Pushing %ld after %ld", list->value->lex_value.value, (long)list, (long)last_node);
+        printf("\n%s: Pushing %ld after %ld", list->value->lex_value.label, (long)list, (long)last_node);
         return list;
     }
     else {
@@ -439,7 +448,7 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         new_node->next = NULL;
     }
     new_node->value = value;
-    printf("\n%s: Pushing %ld after %ld", new_node->value->lex_value.value, (long)new_node, (long)last_node);
+    printf("\n%s: Pushing %ld after %ld", new_node->value->lex_value.label, (long)new_node, (long)last_node);
     return list;
 }
 
@@ -447,14 +456,14 @@ void contentList_free(ContentList* list) {
     if(list != NULL) {
         if(list->next != NULL)
             contentList_free(list->next);
-        printf("\nFreeing %s: %ld...", list->value->lex_value.value, (long)list );
+        printf("\nFreeing %s: %ld...", list->value->lex_value.label, (long)list );
         content_free(list->value);
         free(list);
     }
 }
 
 void _contentList_print(ContentList* list) {
-    printf("%s", list->value->lex_value.value);
+    printf("%s", list->value->lex_value.label);
     if(list->next != NULL){
         printf(", ");
         _contentList_print(list->next);
