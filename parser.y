@@ -70,13 +70,10 @@ extern void* arvore;
 
 %type<astree> programa_ou_vazio
 %type<astree> programa
+%type<astree> lits
 %type<astree> ident_multidim
 %type<astree> ident_init
-%type<astree> list_var
-%type<astree> var_poly_loc
-%type<astree> var_multidim
-%type<astree> lits
-%type<astree> var_inicializada
+%type<astree> var_glob
 %type<astree> var_loc
 %type<astree> funcao
 %type<astree> atribuicao
@@ -117,18 +114,18 @@ extern void* arvore;
 programa_ou_vazio:    programa          { $$ = $1; arvore = $$; }
                     |                   { $$ = NULL; };
 
-programa:             var_glob          { $$ = NULL; }
-                    | funcao            { $$ = $1; }
-                    | var_glob programa { $$ = $2; }
-                    | funcao programa   { ast_add_child($1, $2); $$ = $1; };
+programa:             dec_var_glob          { $$ = NULL; }
+                    | funcao                { $$ = $1; }
+                    | dec_var_glob programa { $$ = $2; }
+                    | funcao programa       { ast_add_child($1, $2); $$ = $1; };
 
 
 // VARIAVEIS
 
-tipo_var:             TK_PR_INT   { free($1.value); $$.node_type = NODE_TYPE_INT;}
-                    | TK_PR_FLOAT { free($1.value); $$.node_type = NODE_TYPE_FLOAT; }
-                    | TK_PR_CHAR  { free($1.value); $$.node_type = NODE_TYPE_CHAR; }
-                    | TK_PR_BOOL  { free($1.value); $$.node_type = NODE_TYPE_BOOL; };
+tipo_var:             TK_PR_INT     { free($1.value); $$.node_type = NODE_TYPE_INT;}
+                    | TK_PR_FLOAT   { free($1.value); $$.node_type = NODE_TYPE_FLOAT; }
+                    | TK_PR_CHAR    { free($1.value); $$.node_type = NODE_TYPE_CHAR; }
+                    | TK_PR_BOOL    { free($1.value); $$.node_type = NODE_TYPE_BOOL; };
 
 lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
                     | TK_LIT_TRUE   { $$ = ast_new_node($1); }
@@ -136,42 +133,26 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1); }
                     | TK_LIT_FLOAT  { $$ = ast_new_node($1); }
                     | TK_LIT_CHAR   { $1.value[0]=$1.value[1]; $1.value[1] = '\0'; $1.value = realloc($1.value, sizeof(char)*2); $$ = ast_new_node($1); };
 
-list_dimensoes:       TK_LIT_INT                      { free($1.value); }
-                    | TK_LIT_INT '^' list_dimensoes   { free($1.value); free($2.value); };
-
-list_var:             TK_IDENTIFICADOR              { free($1.value); $$ = NULL; }
-                    | ident_init                    { $$ = $1; }
-                    | ident_multidim                { $$ = NULL; }
-                    | TK_IDENTIFICADOR ',' list_var { free($1.value); $$ = NULL; }
-                    | ident_init ',' list_var       { ast_add_child($1, $3); $$ = $1; }
-                    | ident_multidim ',' list_var   { $$ = NULL; };
-
 ident_multidim:     TK_IDENTIFICADOR '[' list_expr ']'  { free($2.value); $2.value=strdup("[]"); $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-ident_init:         TK_IDENTIFICADOR TK_OC_LE lits  { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
+ident_init:         TK_IDENTIFICADOR TK_OC_LE lits      { $$ = ast_new_node($2); ast_add_child($$, ast_new_node($1)); ast_add_child($$, $3); };
 
-var_inicializada:   tipo_var ident_init { $$ = $2; table_add_entry(tabela, $2->value.value, content_new($2->value, NAT_VAR, $1.node_type, NULL, NULL)); };
+dec_var_glob:       tipo_var var_glob ';';
 
-var_multidim:       tipo_var TK_IDENTIFICADOR '[' list_dimensoes ']'  { free($2.value); free($3.value); };
+var_glob:             TK_IDENTIFICADOR                { free($1.value); $$ = NULL; }
+                    | ident_multidim                  { $$ = NULL; }
+                    | var_glob ',' TK_IDENTIFICADOR   { free($3.value); $$ = NULL; }
+                    | var_glob ',' ident_multidim     { $$ = NULL; };
 
-var_poly_loc:         tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); $$ = NULL; table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); }
-                    | var_inicializada ',' list_var           { if($1==NULL){ $1 = $3;} else{ast_add_child($1, $3);} $$=$1; };
-
-var_poly_glob:        tipo_var TK_IDENTIFICADOR ',' list_var  { free($2.value); }
-                    | var_multidim ',' list_var;
-
-var_glob:             tipo_var TK_IDENTIFICADOR ';' { free($2.value); }
-                    | var_poly_glob ';'
-                    | var_multidim ';';
-
-var_loc:              var_inicializada          { $$ = $1; }
-                    | var_poly_loc              { $$ = $1; }
-                    | tipo_var TK_IDENTIFICADOR { $$ = NULL; free($2.value); table_add_entry(tabela, $2.value, content_new($2, NAT_VAR, $1.node_type, NULL, NULL)); };
+var_loc:              TK_IDENTIFICADOR                { free($1.value); $$ = NULL; }
+                    | ident_init                      { $$ = $1; }
+                    | var_loc ',' TK_IDENTIFICADOR    { free($3.value); $$ = NULL; }
+                    | var_loc ',' ident_init          { ast_add_child($1, $3); $$ = $1; };
 
 // FUNCOES
 
-parametros:           tipo_var TK_IDENTIFICADOR                 { free($2.value); }
-                    | tipo_var TK_IDENTIFICADOR ',' parametros  { free($2.value); }
+parametros:           tipo_var TK_IDENTIFICADOR                   { free($2.value); }
+                    | tipo_var TK_IDENTIFICADOR ',' parametros    { free($2.value); }
                     | ;
 
 funcao:             tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com { $$ = ast_new_node($2); ast_add_child($$, $6); };
@@ -188,7 +169,7 @@ arg:                  expr                          { $$ = $1; }
 list_args:            arg                           { $$ = $1; }
                     | arg ',' list_args             { ast_add_child($1, $3); $$ = $1; };
 
-comando_simples:      var_loc                       { $$ = $1; }
+comando_simples:      tipo_var var_loc              { $$ = $2; }
                     | atribuicao                    { $$ = $1; }
                     | chamada_func                  { $$ = $1; }
                     | TK_PR_RETURN expr             { $$ = ast_new_node($1); ast_add_child($$, $2); }

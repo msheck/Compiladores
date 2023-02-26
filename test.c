@@ -21,6 +21,7 @@ Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 
 typedef struct yy_buffer_state * YY_BUFFER_STATE;
 
+void *tabela = NULL;
 void *arvore = NULL;
 void exporta (void *arvore);
 void libera (void *arvore);

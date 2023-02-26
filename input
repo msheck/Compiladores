@@ -1,6 +1,7 @@
 int b[1^2];
 int foo(){ 
     int c <= 3, ca <= 4, d<=6;
+    float x <= 2.2;
     int a;
     a = 1;
     b[0^1] = 0;
@@ -19,3 +20,7 @@ int hoo(){
 }
 
 int joo(){}
+
+// int f(){
+//     char a <= 'A';
+// }
