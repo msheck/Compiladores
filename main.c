@@ -19,7 +19,7 @@ int main (int argc, char **argv)
 	arvore = NULL;
 	yylex_destroy();
 
-    table_print(tabela);
+    table_print_contexts(tabela);
 
 	return ret;
 }
@@ -89,10 +89,10 @@ int main2(){
 	dimensions = intList_pushLeft(dimensions, 3);
 	printf("\n\n--------------\tDIMENSIONS CREATED\t--------------\n");
 
-	Content *arg1 = content_new(lex_arg1, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
-	Content *arg2 = content_new(lex_arg2, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
-	Content *arg3 = content_new(lex_arg3, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
-	Content *arg4 = content_new(lex_arg4, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+	Content *arg1 = content_new(lex_arg1, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
+	Content *arg2 = content_new(lex_arg2, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
+	Content *arg3 = content_new(lex_arg3, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
+	Content *arg4 = content_new(lex_arg4, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
 	ContentList *args1 = contentList_new();
 	args1 = contentList_pushLeft(args1, arg1);
 	args1 = contentList_pushLeft(args1, arg2);
@@ -101,10 +101,10 @@ int main2(){
 	args2 = contentList_pushLeft(args2, arg4);
 	printf("\n\n--------------\tARGUMENTS CREATED\t--------------\n");
 
-	Content *cont1 = content_new(lex_val1, NAT_LIT, NODE_TYPE_INT, NULL, args1);
-	Content *cont2 = content_new(lex_val2, NAT_LIT, NODE_TYPE_INT, NULL, args2);
-	Content *cont3 = content_new(lex_val3, NAT_LIT, NODE_TYPE_INT, dimensions, NULL);
-	Content *cont4 = content_new(lex_val4, NAT_LIT, NODE_TYPE_INT, NULL, NULL);
+	Content *cont1 = content_new(lex_val1, NAT_LIT, NODE_TYPE_INT, NULL, NULL, args1);
+	Content *cont2 = content_new(lex_val2, NAT_LIT, NODE_TYPE_INT, NULL, NULL, args2);
+	Content *cont3 = content_new(lex_val3, NAT_LIT, NODE_TYPE_INT, NULL, dimensions, NULL);
+	Content *cont4 = content_new(lex_val4, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
 	printf("\n\n--------------\tCONTENT NEW COMPLETE\t--------------\n");
 
 	/*CONTENT LIST*/

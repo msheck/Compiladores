@@ -45,8 +45,9 @@ struct content_{
     lexValue lex_value;
     int nature;
     int node_type;
-    int total_size;
+    char* data_value;
     IntList *dimensions;
+    int total_size;
     ContentList *args;
 };
 
@@ -87,11 +88,15 @@ void table_pop_nest(SymbolTable* root);
 
 void table_update_type(SymbolTable* table, int type);
 
+void table_update_data_value(SymbolTable* table, char* key, lexValue data_value);
+
 void table_print(SymbolTable* table);
+
+void table_print_contexts(SymbolTable* table);
 
 //---------------------------- CONTENT ----------------------------
 
-Content* content_new(lexValue lex_val, int nat, int node_type, IntList *dimensions, ContentList *args);
+Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value, IntList *dimensions, ContentList *args);
 
 void content_free(Content *content);
 

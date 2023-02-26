@@ -1,10 +1,13 @@
 int i;
 float h [1^2^3];
+bool isFalse, isTrue;
 
 int bar(){
-    int a, b, c, d;
+    float x, y;
+    int a, b, c<=1, d;
+    char teste;
 
-    teste = true;
+    a = 100;
 
     h[i+2^b^c] = d;
 }

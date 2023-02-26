@@ -40,15 +40,15 @@ int table_get_hash(char* key) {
 
 int table_get_index(SymbolTable* table, char* key) {
     int i = table_get_hash(key);
-    printf("\nGET INDEX ~%s~! INDEX IS %d", key, i);
+    // printf("\nGET INDEX ~%s~! INDEX IS %d", key, i);
     while(i<table->size) {
         if(table->keys[i]!=NULL && strcmp(table->keys[i], key)==0) {
-            printf("\nKEY FOUND!");
+            // printf("\nKEY FOUND!");
             break;
         }
         i++;
     }
-    printf("\nRETURNING %d", i);
+    // printf("\nRETURNING %d", i);
 	return i;
 }
 
@@ -60,7 +60,7 @@ int table_get_type(SymbolTable* table, char* key) {
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
     printf("\nADDING %s\n", content->lex_value.value);
     table_check_declared(table, key, content->lex_value.line_number);
-    if(content->node_type!=NODE_TYPE_UNDECLARED)
+    if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
     // Se hash >= table->size, aumenta a tabela até hash+1 populando com null. Coloca na última pos.
@@ -239,6 +239,11 @@ void table_update_type(SymbolTable* table, int type){
     table->typeless = intList_new();
 }
 
+void table_update_data_value(SymbolTable* table, char* key, lexValue data_value){    
+    int hash = table_has_declared(table, key);
+    table->content[hash]->data_value = strdup(data_value.value); 
+}
+
 char* int_to_type(int i){
     switch (i) {
         case NODE_TYPE_BOOL:
@@ -253,27 +258,48 @@ char* int_to_type(int i){
             return "TYPE_ERROR";
     }
 }
+
 void table_print(SymbolTable* table) {
     for(int i=0; i<table->size; i++){
-        if(table->keys[i]!=NULL){
+        if(table->keys[i] != NULL){
             char* type = int_to_type(table->content[i]->node_type);
-            printf("\n%d: %s, %s", i, table->keys[i], type);
+            printf("\n%d: %s (%s) = %s", i, table->keys[i], type, table->content[i]->data_value);
         }
     }
-    printf("\n");
+    printf("\n\n");
+}
+
+void _table_print_contexts(SymbolTable* table, int i) {
+    i++;
+    printf("\t===============\t PRINTING CONTEXT %d!  =============== \n", i);
+    table_print(table);
+    if(table->next != NULL)
+        _table_print_contexts(table->next, i);
+}
+
+void table_print_contexts(SymbolTable* table) {
+    int i = 1;
+    printf("\t===============\t PRINTING CONTEXT %d! (ROOT)  =============== \n", i);
+    table_print(table);
+    if(table->next != NULL)
+        _table_print_contexts(table->next, i);
 }
 
 //---------------------------- CONTENT ----------------------------
 
-Content* content_new(lexValue lex_val, int nat, int node_type, IntList *dimensions, ContentList *args) {
+Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value, IntList *dimensions, ContentList *args) {
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
     content->lex_value = lex_val;
     content->nature = nat;
     content->node_type = node_type;
+    if(data_value != NULL)
+        content->data_value = strdup(data_value);
+    else
+        content->data_value = NULL;
     content->dimensions = dimensions;
-    content->args = args;
     content->total_size = calculate_total_size(node_type, dimensions);
+    content->args = args;
     return content;
 }
 
@@ -287,6 +313,7 @@ void content_free(Content *content) {
         printf("\n\tArguments freed.");
     }
     free(content->lex_value.value);
+    free(content->data_value);
     free(content);
 }
 
