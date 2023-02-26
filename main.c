@@ -10,7 +10,7 @@ void *arvore = NULL;
 void exporta (void *arvore);
 void libera (void *arvore);
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
     tabela = table_new();
 	int ret = yyparse(); 
@@ -25,8 +25,22 @@ int main (int argc, char **argv)
 }
 
 // ---------------------------- MAIN ----------------------------
-
 int main2(){
+	lexValue lex_val1;
+	lex_val1.line_number = 1;
+	lex_val1.type = TYPE_LIT;
+	lex_val1.label = strdup("conteudo1");
+	lex_val1.value = NULL;
+
+	Content *cont1 = content_new(lex_val1, NAT_LIT, NODE_TYPE_INT, NULL, NULL, NULL);
+	// char* key1 = strdup("key1");
+	SymbolTable *table1 = table_new();
+	table_add_entry(table1, "key1", cont1);
+
+	table_free(table1);
+}
+
+int main3(){
 	/*INT LIST*/
 	IntList *list_ints = intList_new();
 	list_ints = intList_pushLeft(list_ints, 667);
@@ -45,42 +59,50 @@ int main2(){
 	lexValue lex_val1;
 	lex_val1.line_number = 1;
 	lex_val1.type = TYPE_LIT;
-	lex_val1.value = strdup("conteudo1");
+	lex_val1.label = strdup("conteudo1");
+	lex_val1.value = NULL;
 
 	lexValue lex_val2;
 	lex_val2.line_number = 2;
 	lex_val2.type = TYPE_LIT;
-	lex_val2.value = strdup("conteudo2");
+	lex_val2.label = strdup("conteudo2");
+	lex_val2.value = NULL;
 
 	lexValue lex_val3;
 	lex_val3.line_number = 3;
 	lex_val3.type = TYPE_LIT;
-	lex_val3.value = strdup("conteudo3");
+	lex_val3.label = strdup("conteudo3");
+	lex_val3.value = NULL;
 
 	lexValue lex_val4;
 	lex_val4.line_number = 4;
 	lex_val4.type = TYPE_LIT;
-	lex_val4.value = strdup("conteudo4");
+	lex_val4.label = strdup("conteudo4");
+	lex_val4.value = NULL;
 
 	lexValue lex_arg1;
 	lex_arg1.line_number = 3;
 	lex_arg1.type = TYPE_LIT;
-	lex_arg1.value = strdup("arg1");
+	lex_arg1.label = strdup("arg1");
+	lex_arg1.value = NULL;
 
 	lexValue lex_arg2;
 	lex_arg2.line_number = 3;
 	lex_arg2.type = TYPE_LIT;
-	lex_arg2.value = strdup("arg2");
+	lex_arg2.label = strdup("arg2");
+	lex_arg2.value = NULL;
 
 	lexValue lex_arg3;
 	lex_arg3.line_number = 3;
 	lex_arg3.type = TYPE_LIT;
-	lex_arg3.value = strdup("arg3");
+	lex_arg3.label = strdup("arg3");
+	lex_arg3.value = NULL;
 
 	lexValue lex_arg4;
 	lex_arg4.line_number = 3;
 	lex_arg4.type = TYPE_LIT;
-	lex_arg4.value = strdup("arg4");
+	lex_arg4.label = strdup("arg4");
+	lex_arg4.value = NULL;
 	printf("\n\n--------------\tLEXVALS CREATED\t--------------\n");
 
 	IntList* dimensions = intList_new();
@@ -157,10 +179,10 @@ int main2(){
 	// Content *cont_err_6 = content_new(lex_arg4, NAT_FUN, NODE_TYPE_INT, dimensions, NULL);
 	// table_check_use(table2, cont_err_6, __LINE__);
 
-	printf("\ntable1.value[key1]: %s", table1->content[table_get_index(table1, key1)]->lex_value.value);
-	printf("\ntable2.value[key3]: %s", table1->next->content[table_get_index(table2, key3)]->lex_value.value);
+	printf("\ntable1.label[key1]: %s", table1->content[table_get_index(table1, key1)]->lex_value.label);
+	printf("\ntable2.label[key3]: %s", table1->next->content[table_get_index(table2, key3)]->lex_value.label);
 	table_pop_nest(table1);
-	printf("\ntable1.value[key1]: %s", table1->content[table_get_index(table1, key1)]->lex_value.value);
+	printf("\ntable1.label[key1]: %s", table1->content[table_get_index(table1, key1)]->lex_value.label);
 
 	table_free(table1);
 

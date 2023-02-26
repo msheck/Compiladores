@@ -263,17 +263,17 @@ char* int_to_type(int i){
 }
 
 void table_print(SymbolTable* table) {
-    printf("\n-----------------------------------\n")
-    printf("\nPrinting table of size")
-    printf("\n-----------------------------------\n")
+    //printf("\n-----------------------------------\n")
+    //printf("\nPrinting table of size %d", table->size);
+    //printf("\n-----------------------------------\n")
     for(int i=0; i<table->size; i++){
         if(table->keys[i] != NULL){
             char* type = int_to_type(table->content[i]->node_type);
             printf("\n%d: %s (%s) = %s", i, table->keys[i], type, table->content[i]->data_value);
         }
     }
-    if(table->next!=NULL)
-        table_print(table->next);
+    //if(table->next!=NULL)
+    //    table_print(table->next);
     printf("\n\n");
 }
 

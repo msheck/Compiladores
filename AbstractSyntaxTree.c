@@ -12,7 +12,7 @@ A partir do código fornecido pelo professor.
 #include "AbstractSyntaxTree.h"
 #define ARQUIVO_SAIDA "saida.dot"
 
-ASTree *ast_new_node(lexValue value)//, int node_type)
+ASTree* ast_new_node(lexValue value, int node_type)
 {
     ASTree *ret = NULL;
     ret = calloc(1, sizeof(ASTree));
@@ -20,12 +20,12 @@ ASTree *ast_new_node(lexValue value)//, int node_type)
     ret->value = value;
     ret->number_of_children = 0;
     ret->children = NULL;
-    //ret->node_type = node_type;
+    ret->node_type = node_type;
     }
     return ret;
 }
 
-ASTree *ast_get_node(ASTree *tree){
+ASTree* ast_get_node(ASTree *tree){
     if ((tree != NULL) && (tree->number_of_children > 2))
         return ast_get_node(tree->children[tree->number_of_children-1]);
     return tree;

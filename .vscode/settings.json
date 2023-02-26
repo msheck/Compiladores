@@ -1,13 +1,10 @@
 {
     "files.associations": {
         "*.y": "bison",
-        "stdio.h": "c",
+        "*.h": "c",
+        "*.c": "c",
         "compare": "c",
         "type_traits": "c",
-        "abstractsyntaxtree.h": "c",
-        "abstractsyntaxtree.c": "c",
-        "table.h": "c",
-        "table.c": "c",
-        "input": "cpp"
+        "input": "c"
     }
 }

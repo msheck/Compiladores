@@ -43,6 +43,7 @@ typedef struct lexical_value{
     int line_number;
     int type;
     int node_type;
+    char* label;
     char* value;
 } lexValue;
 
@@ -53,9 +54,9 @@ typedef struct AbstractSyntaxTree {
     int node_type;
 } ASTree;
 
-ASTree *ast_new_node(lexValue value);//, int node_type);
+ASTree* ast_new_node(lexValue value, int node_type);
 
-ASTree *ast_get_node(ASTree *tree);
+ASTree* ast_get_node(ASTree *tree);
 
 void ast_free(ASTree *tree);
 

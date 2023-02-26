@@ -9,11 +9,13 @@ Desenvolvido pelos alunos:
 */
 
 %{
+	
 #include "parser.tab.h"
 
 void set_lexValue(int type){
 	lexValue lv; 
-	lv.value = strdup(yytext);
+	lv.label = strdup(yytext);
+	lv.value = NULL;
 	lv.line_number = yylineno;
 	lv.type = type; 
 	lv.node_type = 0;
