@@ -18,6 +18,7 @@ A partir do código fornecido pelo professor.
 #define TYPE_IDENT 3
 #define TYPE_LIT 4
 
+#define NODE_TYPE_UNDECLARED  0
 #define NODE_TYPE_BOOL  1
 #define NODE_TYPE_CHAR  2
 #define NODE_TYPE_INT   3
@@ -60,7 +61,7 @@ void ast_free(ASTree *tree);
 
 void ast_add_child(ASTree *tree, ASTree *child);
 
-void ast_print_graphviz(ASTree *tree);
+void ast_print(ASTree *tree);
 
 void ast_check_type(ASTree *node1, ASTree *node2);
 

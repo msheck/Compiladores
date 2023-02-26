@@ -18,6 +18,9 @@ int main (int argc, char **argv)
 	libera(arvore);
 	arvore = NULL;
 	yylex_destroy();
+
+    table_print(tabela);
+
 	return ret;
 }
 
