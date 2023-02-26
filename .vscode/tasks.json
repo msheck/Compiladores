@@ -17,6 +17,7 @@
                 "-g",
                 "lex.yy.c",
                 "AbstractSyntaxTree.c",
+                "Table.c",
                 "parser.tab.c",
                 "main.c",
                 "-o",

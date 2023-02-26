@@ -25,6 +25,12 @@ ASTree *ast_new_node(lexValue value)//, int node_type)
     return ret;
 }
 
+ASTree *ast_get_node(ASTree *tree){
+    if ((tree != NULL) && (tree->number_of_children > 2))
+        return ast_get_node(tree->children[tree->number_of_children-1]);
+    return tree;
+}
+
 void ast_free(ASTree *tree)
 {
     if (tree != NULL){

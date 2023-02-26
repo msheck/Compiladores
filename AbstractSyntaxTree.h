@@ -55,6 +55,8 @@ typedef struct AbstractSyntaxTree {
 
 ASTree *ast_new_node(lexValue value);//, int node_type);
 
+ASTree *ast_get_node(ASTree *tree);
+
 void ast_free(ASTree *tree);
 
 void ast_add_child(ASTree *tree, ASTree *child);

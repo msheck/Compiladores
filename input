@@ -1,14 +1,7 @@
-int foo(){
-    int a;
-    //bool b, c, e, f, g<=false;
-    bool h, i;
-    float d <= 2.5;
-}
-
-
-/*int b[1^2];
+int b[1^2];
 int foo(){ 
     int c <= 3, ca <= 4, d<=6;
+    float x <= 2.2;
     int a;
     a = 1;
     b[0^1] = 0;
@@ -26,4 +19,8 @@ int hoo(){
     int b;
 }
 
-int joo(){}*/
+int joo(){}
+
+// int f(){
+//     char a <= 'A';
+// }
