@@ -11,9 +11,9 @@ int bar(float param, bool outroParam){
         c = c + 1;
     };*/
 
-    a = 100+10;
+    a = (100+10)/10+1;
 
-    h[i+2^b^c] = d;
+    // h[i+2^b^c] = d;
 }
 
 

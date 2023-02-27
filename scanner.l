@@ -15,7 +15,10 @@ Desenvolvido pelos alunos:
 void set_lexValue(int type, int node_type){
 	lexValue lv; 
 	lv.label = strdup(yytext);
-	lv.value = NULL;
+	if(type == TYPE_LIT)
+		lv.value = strdup(yytext);
+	else
+		lv.value = NULL;
 	lv.line_number = yylineno;
 	lv.type = type; 
 	lv.node_type = node_type;
