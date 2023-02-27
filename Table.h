@@ -38,6 +38,7 @@ struct int_list{
 
 struct content_list{
     Content* value;
+    char* key; // Optional
     struct content_list* next;
 };
 
@@ -82,13 +83,23 @@ void table_check_undeclared(SymbolTable* table, char* key, int line);
 
 void table_check_use(SymbolTable* table, Content* content, int line);
 
-void table_nest(SymbolTable* root, SymbolTable* new_table);
+SymbolTable* table_nest(SymbolTable* root);
 
 void table_pop_nest(SymbolTable* root);
 
 void table_update_type(SymbolTable* table, int type);
 
 void table_update_data_value(SymbolTable* table, char* key, lexValue data_value);
+
+void table_add_to_buffer(Content* content, char* key);
+
+void table_flush_buffer(SymbolTable* table);
+
+ContentList* table_dup_buffer();
+
+void table_print_buffer();
+
+char* int_to_type(int i);
 
 void table_print(SymbolTable* table);
 
@@ -107,6 +118,8 @@ IntList* intList_new();
 IntList*  intList_pushLeft(IntList* list, int value);
 
 IntList*  intList_pushRight(IntList* list, int value);
+
+IntList* intList_convert_tree(ASTree* ast);
 
 void intList_free(IntList* list);
 

@@ -12,22 +12,14 @@ Desenvolvido pelos alunos:
 	
 #include "parser.tab.h"
 
-void set_lexValue(int type){
+void set_lexValue(int type, int node_type){
 	lexValue lv; 
 	lv.label = strdup(yytext);
 	lv.value = NULL;
 	lv.line_number = yylineno;
 	lv.type = type; 
-	lv.node_type = 0;
+	lv.node_type = node_type;
 	yylval.valor_lexico = lv;
-}
-lexValue get_lexValue(char* value, int line_number, int type){
-	lexValue lv; 
-	lv.value = strdup(value);
-	lv.line_number = line_number;
-	lv.type = type; 
-	lv.node_type = 0;
-	return lv;
 }
 
 extern void* arvore;
@@ -58,32 +50,32 @@ ignore 				{espaco}|{line_comm}
 %%
 
 {spec_char}  		{ return yytext[0]; }
-{spec_char_val}		{ set_lexValue(TYPE_SPEC_CHAR); return yytext[0]; }
+{spec_char_val}		{ set_lexValue(TYPE_SPEC_CHAR, NODE_TYPE_UNDECLARED); return yytext[0]; }
 
-int          		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_INT; }
-float        		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_FLOAT; }
-bool         		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_BOOL; }
-char         		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_CHAR; }
-if           		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_IF; }
-then         		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_THEN; }
-else         		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_ELSE; }
-while        		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_WHILE; } 
-input        		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_INPUT; }
-output       		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_OUTPUT; }
-return       		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_RETURN; }
-for          		{ set_lexValue(TYPE_KEY_WORD); return TK_PR_FOR; }
-"<="         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_LE; }
-">="         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_GE; }
-"=="         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_EQ; }
-"!="         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_NE; }
-"&&"         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_AND; }
-"||"         		{ set_lexValue(TYPE_COMP_OP); return TK_OC_OR; }
-{lit_i}      		{ set_lexValue(TYPE_LIT); return TK_LIT_INT; }
-{lit_f}      		{ set_lexValue(TYPE_LIT); return TK_LIT_FLOAT; }
-true         		{ set_lexValue(TYPE_LIT); return TK_LIT_TRUE; }
-false        		{ set_lexValue(TYPE_LIT); return TK_LIT_FALSE; }
-{lit_c}      		{ set_lexValue(TYPE_LIT); return TK_LIT_CHAR; }					  
-{ident}      		{ set_lexValue(TYPE_IDENT); return TK_IDENTIFICADOR; }
+int          		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_INT; }
+float        		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_FLOAT; }
+bool         		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_BOOL; }
+char         		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_CHAR; }
+if           		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_IF; }
+then         		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_THEN; }
+else         		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_ELSE; }
+while        		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_WHILE; } 
+input        		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_INPUT; }
+output       		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_OUTPUT; }
+return       		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_RETURN; }
+for          		{ set_lexValue(TYPE_KEY_WORD, NODE_TYPE_UNDECLARED); return TK_PR_FOR; }
+"<="         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_LE; }
+">="         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_GE; }
+"=="         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_EQ; }
+"!="         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_NE; }
+"&&"         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_AND; }
+"||"         		{ set_lexValue(TYPE_COMP_OP, NODE_TYPE_UNDECLARED); return TK_OC_OR; }
+{lit_i}      		{ set_lexValue(TYPE_LIT, NODE_TYPE_INT); return TK_LIT_INT; }
+{lit_f}      		{ set_lexValue(TYPE_LIT, NODE_TYPE_FLOAT); return TK_LIT_FLOAT; }
+true         		{ set_lexValue(TYPE_LIT, NODE_TYPE_BOOL); return TK_LIT_TRUE; }
+false        		{ set_lexValue(TYPE_LIT, NODE_TYPE_BOOL); return TK_LIT_FALSE; }
+{lit_c}      		{ set_lexValue(TYPE_LIT, NODE_TYPE_CHAR); return TK_LIT_CHAR; }					  
+{ident}      		{ set_lexValue(TYPE_IDENT, NODE_TYPE_UNDECLARED); return TK_IDENTIFICADOR; }
 
 "/*"         		{ BEGIN(B_COMM); }
 <B_COMM>"*/" 		{ BEGIN(INITIAL); }

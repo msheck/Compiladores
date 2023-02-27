@@ -13,6 +13,7 @@ int yylex(void);
 void yyerror (char const *error_message);
 
 extern void* tabela;
+extern void* escopo;
 extern void* arvore;
 
 #include "Table.h"
@@ -77,6 +78,7 @@ extern void* arvore;
 %type<astree> ident_init
 %type<astree> var_glob
 %type<astree> var_loc
+%type<astree> funcao_dec
 %type<astree> funcao
 %type<astree> atribuicao
 %type<astree> arg
@@ -138,44 +140,46 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1, NODE_TYPE_BOOL); }
 list_int:             TK_LIT_INT              { $$ = ast_new_node($1, NODE_TYPE_INT); }
                     | list_int '^' TK_LIT_INT { $$ = ast_new_node($2, NODE_TYPE_INT); ast_add_child($$, $1); ast_add_child($$, ast_new_node($3, NODE_TYPE_INT)); };
 
-dec_ident_multidim:   TK_IDENTIFICADOR '[' list_int ']'   { table_add_entry(tabela, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
+dec_ident_multidim:   TK_IDENTIFICADOR '[' list_int ']'   { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, intList_convert_tree($3), NULL));
                                                             free($2.label); $2.label=strdup("[]"); $$ = ast_new_node($2, $3->value.node_type); ast_add_child($$, ast_new_node($1, $1.node_type)); ast_add_child($$, $3); };
 
-ident_multidim:       TK_IDENTIFICADOR '[' list_expr ']'  { table_check_undeclared(tabela, $1.label, $1.line_number);
+ident_multidim:       TK_IDENTIFICADOR '[' list_expr ']'  { table_check_undeclared(escopo, $1.label, $1.line_number);
                                                             free($2.label); $2.label=strdup("[]"); $$ = ast_new_node($2, $3->value.node_type); ast_add_child($$, ast_new_node($1, $1.node_type)); ast_add_child($$, $3); };
 
-ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(tabela, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, $3->value.label, NULL, NULL)); 
+ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, $3->value.label, NULL, NULL)); 
                                                             $$ = ast_new_node($2, $3->value.node_type); ast_add_child($$, ast_new_node($1, $3->value.node_type)); ast_add_child($$, $3); };
 
-dec_var_glob:         tipo_var var_glob ';'           { table_update_type(tabela, $1.node_type); };
+dec_var_glob:         tipo_var var_glob ';'           { table_update_type(escopo, $1.node_type); };
 
-var_glob:             TK_IDENTIFICADOR                { table_add_entry(tabela, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
+var_glob:             TK_IDENTIFICADOR                { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                         free($1.label); $$ = NULL; }
                     | dec_ident_multidim              { $$ = NULL; }
-                    | var_glob ',' TK_IDENTIFICADOR   { table_add_entry(tabela, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
+                    | var_glob ',' TK_IDENTIFICADOR   { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
                                                         free($3.label); $$ = NULL; }
                     | var_glob ',' dec_ident_multidim { $$ = NULL; };
 
-var_loc:              TK_IDENTIFICADOR                { table_add_entry(tabela, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
+var_loc:              TK_IDENTIFICADOR                { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
                                                         free($1.label); $$ = NULL; }
                     | ident_init                      { $$ = $1; }
-                    | var_loc ',' TK_IDENTIFICADOR    { table_add_entry(tabela, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
+                    | var_loc ',' TK_IDENTIFICADOR    { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
                                                         free($3.label); }
                     | var_loc ',' ident_init          { ast_add_child($3, $1); $$ = $3; };
 
 // FUNCOES
 
-parametros:           tipo_var TK_IDENTIFICADOR                   { free($2.label); }
-                    | tipo_var TK_IDENTIFICADOR ',' parametros    { free($2.label); }
+parametros:           tipo_var TK_IDENTIFICADOR                   { table_add_to_buffer(content_new($2, NAT_VAR, $1.node_type, NULL, NULL, NULL), $2.label); }
+                    | tipo_var TK_IDENTIFICADOR ',' parametros    { table_add_to_buffer(content_new($2, NAT_VAR, $1.node_type, NULL, NULL, NULL), $2.label); }
                     | ;
 
-funcao:               tipo_var TK_IDENTIFICADOR '(' parametros ')' bloc_com { table_add_entry(tabela, $2.label, content_new($2, NAT_FUN, $1.node_type, NULL, NULL, NULL));
-                                                                              $$ = ast_new_node($2, $6->value.node_type); ast_add_child($$, $6); };
+funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1.node_type, NULL, NULL, table_dup_buffer()));
+                                                                      $$ = ast_new_node($2, $1.node_type); };
+
+funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); };
 
 
 // BLOCO COMANDOS
 
-atribuicao:           TK_IDENTIFICADOR '=' expr     { table_update_data_value(tabela, $1.label, $3->value);
+atribuicao:           TK_IDENTIFICADOR '=' expr     { table_update_data_value(escopo, $1.label, $3->value);
                                                       $$ = ast_new_node($2, $3->value.node_type); ast_add_child($$, ast_new_node($1, $1.node_type)); ast_add_child($$, $3); }
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->value.node_type); ast_add_child($$, $1); ast_add_child($$, $3); };
 
@@ -185,7 +189,7 @@ arg:                  expr                          { $$ = $1; }
 list_args:            arg                           { $$ = $1; }
                     | arg ',' list_args             { ast_add_child($1, $3); $$ = $1; };
 
-comando_simples:      tipo_var var_loc              { $$ = $2; table_update_type(tabela, $1.node_type); }
+comando_simples:      tipo_var var_loc              { $$ = $2; table_update_type(escopo, $1.node_type); }
                     | atribuicao                    { $$ = $1; }
                     | chamada_func                  { $$ = $1; }
                     | TK_PR_RETURN expr             { $$ = ast_new_node($1, $2->value.node_type); ast_add_child($$, $2); }
@@ -196,8 +200,10 @@ comando_simples:      tipo_var var_loc              { $$ = $2; table_update_type
 comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; }
                     | comando_simples ';'           { $$ = $1; };
 
-bloc_com:             '{' comandos '}'              { $$ = $2; }
-                    | '{' '}'                       { $$ = NULL; };
+bloc_com_dec:         '{'                           {escopo = table_nest(escopo);};
+
+bloc_com:             bloc_com_dec comandos '}'     { $$ = $2; }
+                    | bloc_com_dec '}'              { $$ = NULL; };
 
 chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, $3->value.node_type); ast_add_child($$, $3);};
 
@@ -217,33 +223,33 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | lits                    { $$ = $1; }
                     | chamada_func            { $$ = $1; };
 
-expr_tier7:           expr TK_OC_OR expr      { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier7:           expr TK_OC_OR expr      { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier6              { $$ = $1; };
 
-expr_tier6:           expr TK_OC_AND expr     { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier6:           expr TK_OC_AND expr     { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier5              { $$ = $1; };
 
-expr_tier5:           expr TK_OC_EQ expr      { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr TK_OC_NE expr      { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier5:           expr TK_OC_EQ expr      { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_NE expr      { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier4              { $$ = $1; };
 
-expr_tier4:           expr '<' expr           { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr '>' expr           { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr TK_OC_LE expr      { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr TK_OC_GE expr      { $$ = ast_new_node($2, NODE_TYPE_BOOL); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier4:           expr '<' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '>' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_LE expr      { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr TK_OC_GE expr      { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier3              { $$ = $1; };
 
-expr_tier3:           expr '+' expr           { $$ = ast_new_node($2, NODE_TYPE_UNDECLARED); ast_add_child($$, $1); ast_add_child($$, $3); } // TROCAR O NODE TYPE
-                    | expr '-' expr           { $$ = ast_new_node($2, NODE_TYPE_UNDECLARED); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier3:           expr '+' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '-' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier2              { $$ = $1; };
 
-expr_tier2:           expr '*' expr           { $$ = ast_new_node($2, NODE_TYPE_UNDECLARED); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr '/' expr           { $$ = ast_new_node($2, NODE_TYPE_UNDECLARED); ast_add_child($$, $1); ast_add_child($$, $3); }
-                    | expr '%' expr           { $$ = ast_new_node($2, NODE_TYPE_UNDECLARED); ast_add_child($$, $1); ast_add_child($$, $3); }
+expr_tier2:           expr '*' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '/' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
+                    | expr '%' expr           { $$ = ast_expr_node($1->value, $2, $3->value); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier1              { $$ = $1; };
 
-expr_tier1:           '-' expr                { $$ = ast_new_node($1, NODE_TYPE_UNDECLARED); ast_add_child($$, $2); }
-                    | '!' expr                { $$ = ast_new_node($1, NODE_TYPE_UNDECLARED); ast_add_child($$, $2); };
+expr_tier1:           '-' expr                { lexValue lv; lv.label = NULL; $$ = ast_expr_node(lv, $1, $2->value); ast_add_child($$, $2); }
+                    | '!' expr                { lexValue lv; lv.label = NULL; $$ = ast_expr_node(lv, $1, $2->value); ast_add_child($$, $2); };
 
 
 // CONTROLE DE FLUXO

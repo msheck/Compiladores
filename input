@@ -2,12 +2,16 @@ int i;
 float h[1^2^3];
 bool isFalse, isTrue;
 
-int bar(){
+int bar(float param, bool outroParam){
     float x, y;
     int a, b, c<=1, d;
     char teste;
 
-    a = 100;
+    /*if(isFalse == false) then {
+        c = c + 1;
+    };*/
+
+    a = 100+10;
 
     h[i+2^b^c] = d;
 }

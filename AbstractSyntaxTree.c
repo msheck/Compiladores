@@ -25,6 +25,354 @@ ASTree* ast_new_node(lexValue value, int node_type)
     return ret;
 }
 
+char* resolve_unary_expr(char operator, lexValue expr, int node_type){
+    int expr_intValue;
+    float expr_floatValue;
+    char expr_charValue;
+    char* buffer= malloc(sizeof(char*)*(strlen(expr.label)+1));
+    switch (node_type){
+        case 1: //bool
+        case 3: //int
+            expr_intValue = atoi(expr.label);
+            break;
+        case 4: //float
+            expr_floatValue = atof(expr.label);
+            break;
+        case 2: // char
+            expr_charValue = expr.label[0];
+            break;
+        default:
+            printf("\n\033[1;4;31mINVALID PARAMETER IN UNARY EXPRESSION IN LINE %d!\033[0;31m Couldn't convert %s to appropriate type!\033[0m\n", expr.line_number, expr.label);
+            return NULL;
+    }
+    switch (operator)
+    {
+    case 33: //'!'
+        if(expr.label == 0){ //false
+            return strdup("1");
+        }
+        else{ //true
+            return strdup("0");
+        }
+        printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator \"!\" couldn't complete the operation!\033[0m\n");
+        return NULL;
+    case 45: //'-'
+        switch (expr.node_type){
+            case 1: //bool
+                return resolve_unary_expr('!', expr, node_type);
+            case 3: //int
+                sprintf(buffer, "%d", expr_intValue);
+                return strdup(buffer);              
+            case 4: //float
+                sprintf(buffer, "%f", expr_floatValue);
+                return strdup(buffer);
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator \"-\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }        
+    default:
+        printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator unidentified!\033[0m\n");
+        return NULL;
+    }
+}
+
+char* resolve_binary_expr(lexValue expr1, char* operator, lexValue expr2, int node_type){
+    int expr1_intValue, expr2_intValue;
+    float expr1_floatValue, expr2_floatValue;
+    char expr1_charValue, expr2_charValue;
+    char* buffer;
+    int value_i;
+    float value_f;
+    switch (node_type){
+        case 1: //bool
+        case 3: //int
+            expr1_intValue = atoi(expr1.label);
+            expr2_intValue = atoi(expr2.label);
+            break;
+        case 4: //float
+            expr1_floatValue = atof(expr1.label);
+            expr2_floatValue = atof(expr2.label);
+            break;
+        case 2: // char
+            expr1_charValue = expr1.label[0];
+            expr2_charValue = expr2.label[0];
+            break;
+        default:
+            printf("\n\033[1;4;31mINVALID PARAMETER IN BINARY EXPRESSION!\033[0;31m Couldn't convert %s %s %s to appropriate type!\033[0m\n", expr1.label, operator, expr2.label);
+            return NULL;
+    }
+    switch (operator[0]+operator[1])
+    {
+    case 37: //'%'
+        switch (node_type){
+            case 1:
+            case 3: //int or bool
+                buffer = malloc(sizeof(char*)*abs((strlen(expr2.label)+1)));
+                value_i = atoi(expr1.label) % atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;                                        
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"%%\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 47: //'/'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1.label)-strlen(expr2.label))));
+                value_i = atoi(expr1.label) / atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1.label)-strlen(expr2.label))));
+                value_f = atof(expr1.label) / atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"//\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }        
+    case 42: //'*'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1.label)+strlen(expr2.label))));
+                value_i = atoi(expr1.label) * atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1.label)+strlen(expr2.label))));
+                value_f = atof(expr1.label) * atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"**\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 45: //'-'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                if(strlen(expr1.label)>strlen(expr2.label))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1.label)));
+                else
+                    buffer= malloc(sizeof(char*)*(strlen(expr2.label)));
+                value_i = atoi(expr1.label) - atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                if(strlen(expr1.label)>strlen(expr2.label))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1.label)));
+                else
+                    buffer= malloc(sizeof(char*)*(strlen(expr2.label)));
+                value_f = atof(expr1.label) - atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"-\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 43: //'+'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                if(strlen(expr1.label)>strlen(expr2.label))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1.label)+1));
+                else
+                    buffer= malloc(sizeof(char*)*(strlen(expr2.label)+1));
+                value_i = atoi(expr1.label) + atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                if(strlen(expr1.label)>strlen(expr2.label))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1.label)+1));
+                else
+                    buffer= malloc(sizeof(char*)*(strlen(expr2.label)+1));
+                value_f = atof(expr1.label) + atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"+\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 123: //'>='
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) >= atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) >= atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">=\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 121: //'<='
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) <= atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) <= atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<=\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 62: //'>'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) > atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1.label)-strlen(expr2.label))));
+                value_f = atof(expr1.label) > atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 60: //'<'
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) < atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) < atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 94: //'!='
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) != atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) != atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"!=\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 122: //'=='
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) == atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) == atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"==\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 76: //"&&"
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) && atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) && atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"&&\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    case 248: //"||"
+        switch (node_type){
+            case 1: //bool
+            case 3: //int
+                buffer= malloc(sizeof(char*)*2);
+                value_i = atoi(expr1.label) || atoi(expr2.label);
+                sprintf(buffer, "%d", value_i);
+                return buffer;
+            case 4: //float
+                buffer= malloc(sizeof(char*)*2);
+                value_f = atof(expr1.label) || atof(expr2.label);
+                sprintf(buffer, "%f", value_f);
+                return buffer;
+            default:
+                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"||\" couldn't complete the operation!\033[0m\n");
+                return NULL;
+        }
+    default:
+        printf("\n\033[1;4;31mINVALID CONVERTION!\033[0;31m Binary operator unidentified!\033[0m\n");
+        return NULL;
+    }
+}
+
+ASTree* ast_expr_node(lexValue expr1, lexValue operator, lexValue expr2){
+    int node_type = expr2.node_type;
+    char* expr_result;
+    if(expr1.label != NULL){
+        if(expr1.node_type != node_type){
+            if(expr1.node_type != 2 && node_type != 2){
+                if(((expr1.node_type == 1) && (expr2.node_type == 3))
+                ||((expr1.node_type == 3) && (expr2.node_type == 1)))
+                    node_type = 3;
+                else 
+                if(((expr1.node_type == 1) && (expr2.node_type == 4))
+                ||((expr1.node_type == 4) && (expr2.node_type == 1)))
+                    node_type = 4;
+                else 
+                if(((expr1.node_type == 3) && (expr2.node_type == 4))
+                ||((expr1.node_type == 4) && (expr2.node_type == 3)))
+                    node_type = 4;
+            }        
+            else if((expr1.node_type == 2) || (expr2.node_type == 2)){
+                printf("\n\033[1;4;31mINVALID EXPRESSION ON %d!\033[0;31m Can't coerce char type with different types!\033[0m\n", operator.line_number);
+                return NULL;
+            }
+            else{
+                printf("\n\033[1;4;31mINVALID EXPRESSION ON %d!\033[0;31m Type was not clearly defined!\033[0m\n", operator.line_number);
+                return NULL;
+            }
+        }
+        expr_result = resolve_binary_expr(expr1, operator.label, expr2, node_type);
+    }
+    else
+        expr_result = resolve_unary_expr(operator.label[0], expr2, node_type);
+    ASTree* expr_node = ast_new_node(operator, node_type);
+    expr_node->value.value = expr_result;   
+    return expr_node;
+}
+
 ASTree* ast_get_node(ASTree *tree){
     if ((tree != NULL) && (tree->number_of_children > 2))
         return ast_get_node(tree->children[tree->number_of_children-1]);
@@ -39,6 +387,7 @@ void ast_free(ASTree *tree)
             ast_free(tree->children[i]);
         }
         free(tree->children);
+        free(tree->value.label);
         free(tree->value.value);
         free(tree);
     }
@@ -57,8 +406,8 @@ void ast_add_child(ASTree *tree, ASTree *child)
 static void ast_print_label (FILE *foutput, ASTree *tree)
 {
     if (tree != NULL){
-        fprintf(foutput, "\t%ld [ label=\"%s\" ]\n", (long)tree, tree->value.value);
-        printf("\t%p [ label=\"%s\" ]\n", tree, tree->value.value);
+        fprintf(foutput, "\t%ld [ label=\"%s\" ]\n", (long)tree, tree->value.label);
+        printf("\t%p [ label=\"%s\" ]\n", tree, tree->value.label);
         if (tree->number_of_children != 0){
             for (int i = 0; i < tree->number_of_children; i++){                
                 ast_print_label(foutput, tree->children[i]);
@@ -86,7 +435,7 @@ void ast_print(ASTree *tree)
             printf("Erro: %s não pude abrir o arquivo [%s] para escrita.\n", __FUNCTION__, ARQUIVO_SAIDA);
         }
         fprintf(foutput, "digraph {\n");
-        printf("digraph {\n");
+        printf("\ndigraph {\n");
         ast_print_children(foutput, tree);
         ast_print_label(foutput, tree);
         fprintf(foutput, "}\n");
