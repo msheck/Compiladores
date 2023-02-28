@@ -383,7 +383,7 @@ void table_print(SymbolTable* table) {
             if(table->content[i]->data_value != NULL)
                 value_len = strlen(table->content[i]->data_value);
             else
-                value_len = 6;            
+                value_len = 6;
             printf("\n| %04d: (%s) %s = %s %*c", i, type, table->keys[i], table->content[i]->data_value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+14)),'|');
             if(table->content[i]->args == NULL)
                 printf(" args is null %*c", width-15,'|');
