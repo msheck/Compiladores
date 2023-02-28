@@ -42,7 +42,6 @@ A partir do código fornecido pelo professor.
 typedef struct lexical_value{
     int line_number;
     int type;
-    int node_type;
     char* label;
     char* value;
 } lexValue;

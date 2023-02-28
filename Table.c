@@ -43,7 +43,7 @@ int table_get_index(SymbolTable* table, char* key) {
     int i = table_get_hash(key);
     // printf("\nGET INDEX ~%s~! INDEX IS %d", key, i);
     while(i<table->size) {
-        if(table->keys[i]!=NULL && strcmp(table->keys[i], key)==0) {
+        if((table->keys[i] != NULL) && (strcmp(table->keys[i], key)==0)) {
             // printf("\nKEY FOUND!");
             break;
         }
@@ -55,7 +55,10 @@ int table_get_index(SymbolTable* table, char* key) {
 
 int table_get_type(SymbolTable* table, char* key) {
     int i = table_get_index(table, key);
-    return table->content[i]->node_type;
+    if(i != 0)
+        return table->content[i]->node_type;
+    else
+        return 0;
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
@@ -243,13 +246,13 @@ void table_update_type(SymbolTable* table, int type){
     table->typeless = intList_new();
 }
 
-void table_update_data_value(SymbolTable* table, char* key, lexValue data_value){    
-    table_check_undeclared(table, key, data_value.line_number);
+void table_update_data_value(SymbolTable* table, char* key, ASTree* data_value){    
+    table_check_undeclared(table, key, data_value->value.line_number);
     int hash = table_get_index(table, key);
-    if(data_value.value == NULL)
-        table->content[hash]->data_value = strdup(data_value.label); 
+    if(data_value->value.value == NULL)
+        table->content[hash]->data_value = strdup(data_value->value.label); 
     else
-        table->content[hash]->data_value = strdup(data_value.value);
+        table->content[hash]->data_value = strdup(data_value->value.value);
 }
 
 void table_add_to_buffer(Content* content, char* key){
@@ -330,42 +333,92 @@ char* int_to_type(int i){
     }
 }
 
+int count_digits(int n)  
+{  
+    int counter=0;
+    while(n!=0)  
+    {  
+        n=n/10;  
+        counter++;  
+    }  
+    return counter;  
+}  
+
+void print_line(int width, int newline){
+    printf("\n+");
+    for(int i = 0; i<2*width-2; i++){
+        printf("-");
+    }
+    printf("+");
+    if(newline)
+        printf("\n");        
+}
+
+void print_sec_line(int width, int newline){
+    printf("\n+");
+    for(int i = 0; i<width-1; i++){
+        printf("-");
+    }
+    printf("+");
+    for(int i = 0; i<width-2; i++){
+        printf("-");
+    }
+    printf("+");
+    if(newline)
+        printf("\n");
+}
+
 void table_print(SymbolTable* table) {
-    printf("\n+--------------------------------------------------------+\n");
-    printf("| Printing table of size %04d%*c", table->size,29,'|');
-    printf("\n+-----------------------------------------+--------------+");
+    int width = 40;
+    int width_aux;
+    //HEADER
+    print_line(width,1);
+    printf("|  Printing table of size %04d%*c", table->size, 2*width-30, '|');
+    print_sec_line(width,0);
+    //BODY
+    int value_len;
     for(int i=0; i<table->size; i++){
         if(table->keys[i] != NULL){
             char* type = int_to_type(table->content[i]->node_type);
-            printf("\n| %04d: (%s) %s = %s", i, type, table->keys[i], table->content[i]->data_value);
+            if(table->content[i]->data_value != NULL)
+                value_len = strlen(table->content[i]->data_value);
+            else
+                value_len = 6;            
+            printf("\n| %04d: (%s) %s = %s %*c", i, type, table->keys[i], table->content[i]->data_value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+14)),'|');
             if(table->content[i]->args == NULL)
-                if(table->content[i]->data_value == NULL)
-                    printf("%*c args is null |", (int)(29-(strlen(type)+strlen(table->keys[i])+6)),'|');
-                else
-                    printf("%*c args is null |", (int)(29-(strlen(type)+strlen(table->keys[i])+strlen(table->content[i]->data_value))),'|');
+                printf(" args is null %*c", width-15,'|');
             else{
-                printf("\n\targs: ");
+                printf(" args: %*c", width-8,'|');
                 ContentList *current = table->content[i]->args;
                 while(current!=NULL){
-                    printf("%s", current->key);
-                    if(current->next != NULL)
-                        printf(", ");
+                    printf("\n| %*c  %s%*c", width-1, '|', current->key, width-(int)strlen(current->key)-3, '|');
                     current = current->next;
                 }
             }
             if(table->content[i]->dimensions != NULL){
-                printf("\n\tdims: ");
+                // printf("\n| %*c dims: %*c", width-1, '|', width-8,'|');
+                printf("\n| %*c  dims: [", width-1, '|');
+                width_aux = width - 13;
                 IntList *current = table->content[i]->dimensions;
                 while(current!=NULL){
-                    printf("%d", current->value);
+                    if(width_aux-count_digits(current->value)-3 > 0)
+                        width_aux -= count_digits(current->value)+3;
+                    else{
+                        printf("%*c", width_aux+3, '|');
+                        width_aux = width-count_digits(current->value)-8;
+                        printf("\n|  %*c ", width-2, '|');
+                    }
+                    // printf("\n| %*c [%d]%*c", width-1, '|', current->value, width-count_digits(current->value)-4, '|');
+                    printf(" %d ", current->value);
                     if(current->next != NULL)
-                        printf(", ");
+                        printf("^");
                     current = current->next;
                 }
+                printf("]%*c", width_aux+3, '|');
             }
         }
     }
-    printf("\n+-----------------------------------------+--------------+\n");
+    print_sec_line(width,1);
 }
 
 void _table_print_contexts(SymbolTable* table, int i) {

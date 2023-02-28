@@ -17,10 +17,10 @@ ASTree* ast_new_node(lexValue value, int node_type)
     ASTree *ret = NULL;
     ret = calloc(1, sizeof(ASTree));
     if (ret != NULL){
-    ret->value = value;
-    ret->number_of_children = 0;
-    ret->children = NULL;
-    ret->node_type = node_type;
+        ret->value = value;
+        ret->number_of_children = 0;
+        ret->children = NULL;
+        ret->node_type = node_type;
     }
     return ret;
 }
