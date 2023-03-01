@@ -42,7 +42,7 @@ graph: run_input
 	dot saida.dot -Tpng -o grafo.png
 
 valgrind: debug
-	valgrind -s ./etapa$(etapa) < input --leak-check=full
+	valgrind -s ./etapa$(etapa) < input
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(etapa).tgz .

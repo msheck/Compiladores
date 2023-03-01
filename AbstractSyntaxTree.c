@@ -17,7 +17,7 @@ ASTree* ast_new_node(lexValue value, int node_type)
     ASTree *ret = NULL;
     ret = calloc(1, sizeof(ASTree));
     if (ret != NULL){
-        ret->value = value;
+        ret->data = value;
         ret->number_of_children = 0;
         ret->children = NULL;
         ret->node_type = node_type;
@@ -29,26 +29,26 @@ char* resolve_unary_expr(char operator, ASTree *expr, int node_type){
     int expr_intValue;
     float expr_floatValue;
     char expr_charValue;
-    char* buffer= malloc(sizeof(char*)*(strlen(expr->value.value)+1));
+    char* buffer= malloc(sizeof(char*)*(strlen(expr->data.value)+1));
     switch (node_type){
         case 1: //bool
         case 3: //int
-            expr_intValue = atoi(expr->value.value);
+            expr_intValue = atoi(expr->data.value);
             break;
         case 4: //float
-            expr_floatValue = atof(expr->value.value);
+            expr_floatValue = atof(expr->data.value);
             break;
         case 2: // char
-            expr_charValue = expr->value.value[0];
+            expr_charValue = expr->data.value[0];
             break;
         default:
-            printf("\n\033[1;4;31mINVALID PARAMETER IN UNARY EXPRESSION IN LINE %d!\033[0;31m Couldn't convert %s to appropriate type!\033[0m\n", expr->value.line_number, expr->value.label);
+            printf("\n\033[1;4;31mINVALID PARAMETER IN UNARY EXPRESSION IN LINE %d!\033[0;31m Couldn't convert %s to appropriate type!\033[0m\n", expr->data.line_number, expr->data.label);
             return NULL;
     }
     switch (operator)
     {
     case 33: //'!'
-        if(expr->value.value == 0){ //false
+        if(expr->data.value == 0){ //false
             return strdup("1");
         }
         else{ //true
@@ -86,19 +86,19 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
     switch (node_type){
         case 1: //bool
         case 3: //int
-            expr1_intValue = atoi(expr1->value.value);
-            expr2_intValue = atoi(expr2->value.value);
+            expr1_intValue = atoi(expr1->data.value);
+            expr2_intValue = atoi(expr2->data.value);
             break;
         case 4: //float
-            expr1_floatValue = atof(expr1->value.value);
-            expr2_floatValue = atof(expr2->value.value);
+            expr1_floatValue = atof(expr1->data.value);
+            expr2_floatValue = atof(expr2->data.value);
             break;
         case 2: // char
-            expr1_charValue = expr1->value.value[0];
-            expr2_charValue = expr2->value.value[0];
+            expr1_charValue = expr1->data.value[0];
+            expr2_charValue = expr2->data.value[0];
             break;
         default:
-            printf("\n\033[1;4;31mINVALID PARAMETER IN BINARY EXPRESSION!\033[0;31m Couldn't convert %s %s %s to appropriate type!\033[0m\n", expr1->value.label, operator, expr2->value.label);
+            printf("\n\033[1;4;31mINVALID PARAMETER IN BINARY EXPRESSION!\033[0;31m Couldn't convert %s %s %s to appropriate type!\033[0m\n", expr1->data.label, operator, expr2->data.label);
             return NULL;
     }
     switch (operator[0]+operator[1])
@@ -107,7 +107,7 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         switch (node_type){
             case 1:
             case 3: //int or bool
-                buffer = malloc(sizeof(char*)*abs((strlen(expr2->value.value)+1)));
+                buffer = malloc(sizeof(char*)*abs((strlen(expr2->data.value)+1)));
                 value_i = expr1_intValue % expr2_intValue;
                 sprintf(buffer, "%d", value_i);
                 return buffer;                                        
@@ -119,12 +119,12 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         switch (node_type){
             case 1: //bool
             case 3: //int
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->value.value)-strlen(expr2->value.value))));
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
                 value_i = expr1_intValue / expr2_intValue;
                 sprintf(buffer, "%d", value_i);
                 return buffer;
             case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->value.value)-strlen(expr2->value.value))));
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
                 value_f = expr1_floatValue / expr2_floatValue;
                 sprintf(buffer, "%f", value_f);
                 return buffer;
@@ -136,12 +136,12 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         switch (node_type){
             case 1: //bool
             case 3: //int
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->value.value)+strlen(expr2->value.value))));
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
                 value_i = expr1_intValue * expr2_intValue;
                 sprintf(buffer, "%d", value_i);
                 return buffer;
             case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->value.value)+strlen(expr2->value.value))));
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
                 value_f = expr1_floatValue * expr2_floatValue;
                 sprintf(buffer, "%f", value_f);
                 return buffer;
@@ -153,18 +153,18 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         switch (node_type){
             case 1: //bool
             case 3: //int
-                if(strlen(expr1->value.value)>strlen(expr2->value.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->value.value)));
+                if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
                 else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->value.value)));
+                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
                 value_i = expr1_intValue - expr2_intValue;
                 sprintf(buffer, "%d", value_i);
                 return buffer;
             case 4: //float
-                if(strlen(expr1->value.value)>strlen(expr2->value.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->value.value)));
+                if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
                 else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->value.value)));
+                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
                 value_f = expr1_floatValue - expr2_floatValue;
                 sprintf(buffer, "%f", value_f);
                 return buffer;
@@ -176,18 +176,18 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         switch (node_type){
             case 1: //bool
             case 3: //int
-                if(strlen(expr1->value.value)>strlen(expr2->value.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->value.value)+1));
+                if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
                 else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->value.value)+1));
+                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
                 value_i = expr1_intValue + expr2_intValue;
                 sprintf(buffer, "%d", value_i);
                 return buffer;
             case 4: //float
-                if(strlen(expr1->value.value)>strlen(expr2->value.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->value.value)+1));
+                if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
                 else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->value.value)+1));
+                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
                 value_f = expr1_floatValue + expr2_floatValue;
                 sprintf(buffer, "%f", value_f);
                 return buffer;
@@ -238,7 +238,7 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
                 sprintf(buffer, "%d", value_i);
                 return buffer;
             case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->value.value)-strlen(expr2->value.value))));
+                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
                 value_f = expr1_floatValue > expr2_floatValue;
                 sprintf(buffer, "%f", value_f);
                 return buffer;
@@ -336,23 +336,23 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
         return NULL;
     }
 }
-//TODO: pegar o label como value se value for null, e pegar o value de fato depois
+
 ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
     int node_type = expr2->node_type;
     char* expr_result;
-    if(expr1->value.label != NULL){
+    if(expr1->data.label != NULL){
         if(expr1->node_type != expr2->node_type){
             if(expr1->node_type != 2 && node_type != 2){
                 if(((expr1->node_type == 1) && (expr2->node_type == 3))
-                ||((expr1->node_type == 3) && (expr2->node_type == 1)))
+                || ((expr1->node_type == 3) && (expr2->node_type == 1)))
                     node_type = 3;
                 else 
                 if(((expr1->node_type == 1) && (expr2->node_type == 4))
-                ||((expr1->node_type == 4) && (expr2->node_type == 1)))
+                || ((expr1->node_type == 4) && (expr2->node_type == 1)))
                     node_type = 4;
                 else 
                 if(((expr1->node_type == 3) && (expr2->node_type == 4))
-                ||((expr1->node_type == 4) && (expr2->node_type == 3)))
+                || ((expr1->node_type == 4) && (expr2->node_type == 3)))
                     node_type = 4;
             }        
             else if((expr1->node_type == 2) || (expr2->node_type == 2)){
@@ -369,7 +369,7 @@ ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
     else
         expr_result = resolve_unary_expr(operator.label[0], expr2, node_type);
     ASTree* expr_node = ast_new_node(operator, node_type); //TODO: tirar um dos node_types //sera q da?
-    expr_node->value.value = strdup(expr_result);
+    expr_node->data.value = strdup(expr_result);
     return expr_node;
 }
 
@@ -387,8 +387,8 @@ void ast_free(ASTree *tree)
             ast_free(tree->children[i]);
         }
         free(tree->children);
-        free(tree->value.label);
-        free(tree->value.value);
+        free(tree->data.label);
+        free(tree->data.value);
         free(tree);
     }
 }
@@ -406,8 +406,8 @@ void ast_add_child(ASTree *tree, ASTree *child)
 static void ast_print_label (FILE *foutput, ASTree *tree)
 {
     if (tree != NULL){
-        fprintf(foutput, "\t%ld [ label=\"%s\" ]\n", (long)tree, tree->value.label);
-        printf("\t%p [ label=\"%s\" ]\n", tree, tree->value.label);
+        fprintf(foutput, "\t%ld [ label=\"%s\" ]\n", (long)tree, tree->data.label);
+        printf("\t%p [ label=\"%s\" ]\n", tree, tree->data.label);
         if (tree->number_of_children != 0){
             for (int i = 0; i < tree->number_of_children; i++){                
                 ast_print_label(foutput, tree->children[i]);
@@ -450,38 +450,38 @@ void ast_check_type(ASTree* node1, ASTree* node2) {
     if(node2->node_type == NODE_TYPE_CHAR) {
         if(node1->node_type == NODE_TYPE_INT){
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para INT.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
             exit(ERR_CHAR_TO_INT);
         }
         if(node1->node_type == NODE_TYPE_FLOAT){
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para FLOAT.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
             exit(ERR_CHAR_TO_FLOAT);
         }
         if(node1->node_type == NODE_TYPE_BOOL){
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para BOOL.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
             exit(ERR_CHAR_TO_BOOL);
         }
         else {
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
-            node1->value.line_number, node1->value.value);
+            node1->data.line_number, node1->data.value);
             exit(-1);
         }
     }
     if(node2->node_type == NODE_TYPE_CHAR){
         if(node1->node_type == NODE_TYPE_BOOL)
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de BOOL para CHAR.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
         if(node1->node_type == NODE_TYPE_FLOAT)
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de FLOAT para CHAR.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
         if(node1->node_type == NODE_TYPE_INT)
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de INT para CHAR.\033[0m",
-            node1->value.line_number);
+            node1->data.line_number);
         else
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
-            node1->value.line_number, node1->value.value);
+            node1->data.line_number, node1->data.value);
         exit(ERR_X_TO_CHAR);
   }
 }

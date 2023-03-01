@@ -61,9 +61,14 @@ int table_get_type(SymbolTable* table, char* key) {
         return 0;
 }
 
+Content* table_get_content(SymbolTable* table, lexValue key){
+    int hash = table_check_undeclared(table, key.label, key.line_number);
+    return table->content[hash];
+}
+
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
-    // printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_value.label, table);
-    table_check_declared(table, key, content->lex_value.line_number);
+    // printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
+    table_check_declared(table, key, content->lex_data.line_number);
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
@@ -153,55 +158,56 @@ int table_has_declared(SymbolTable* table, char* key) {
 void table_check_declared(SymbolTable* table, char* key, int line) {
     int line_declared = table_has_declared(table, key);
     if(line_declared) {
-        printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s previamente declarado na linha %d.\033[0m", line, key, line_declared);
+        printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s previamente declarado na linha %d.\033[0m", line, key, table->content[line_declared]->lex_data.line_number);
         //table_abort(table);
         exit(ERR_DECLARED);
     }
 }
 
-void table_check_undeclared(SymbolTable* table, char* key, int line) {
+int table_check_undeclared(SymbolTable* table, char* key, int line) {
     int line_declared = table_has_declared(table, key);
     if(line_declared == 0) {
         //table_abort(table);
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s nao declarado.\033[0m", line, key);
         exit(ERR_UNDECLARED);
     }
+    return line_declared;
 }
 
 void table_check_use(SymbolTable* table, Content* content, int line) {
     if(content->nature == NAT_VAR) {
         if(content->dimensions != NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_data.label);
             exit(ERR_VARIABLE);
         }
         if(content->args != NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_data.label);
             exit(ERR_VARIABLE);
         }
     }
     if(content->nature == NAT_ARR) {
         if(content->args != NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_data.label);
             exit(ERR_ARRAY);
         }
         if(content->dimensions == NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_data.label);
             exit(ERR_ARRAY);
         }
     }
     if(content->nature == NAT_FUN) {
         if(content->dimensions != NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_data.label);
             exit(ERR_FUNCTION);
         }
         if(content->args == NULL) {
             //table_abort(table);
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_value.label);
+            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_data.label);
             exit(ERR_FUNCTION);
         }
     }
@@ -246,17 +252,16 @@ void table_update_type(SymbolTable* table, int type){
     table->typeless = intList_new();
 }
 
-void table_update_data_value(SymbolTable* table, char* key, ASTree* data_value){    
-    table_check_undeclared(table, key, data_value->value.line_number);
-    int hash = table_get_index(table, key);
-    if(data_value->value.value == NULL)
-        table->content[hash]->data_value = strdup(data_value->value.label); 
+void table_update_data_value(SymbolTable* table, char* key, ASTree* node_value){    
+    int hash = table_check_undeclared(table, key, node_value->data.line_number);
+    if(node_value->data.value == NULL)
+        table->content[hash]->lex_data.value = strdup(node_value->data.label); 
     else
-        table->content[hash]->data_value = strdup(data_value->value.value);
+        table->content[hash]->lex_data.value = strdup(node_value->data.value);
 }
 
 void table_add_to_buffer(Content* content, char* key){
-    // printf("\nAdding \"%s\":\"%s\" to the buffer", key, content->lex_value.label);
+    // printf("\nAdding \"%s\":\"%s\" to the buffer", key, content->lex_data.label);
     content_buffer = contentList_pushLeft(content_buffer, content);
     content_buffer->key = strdup(key);
 }
@@ -264,7 +269,7 @@ void table_add_to_buffer(Content* content, char* key){
 void table_flush_buffer(SymbolTable* table){
     ContentList* current = content_buffer;
     while(current!=NULL){
-        // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_value.label);
+        // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_data.label);
         table_add_entry(table, current->key, current->value);
         current = current->next;
     }
@@ -275,18 +280,18 @@ ContentList* table_dup_buffer(){
     ContentList* ret = contentList_new();
     ContentList* current = content_buffer;
     while(current!=NULL){
-        lexValue new_val = current->value->lex_value;
-        if(current->value->lex_value.label != NULL)
-            new_val.label = strdup(current->value->lex_value.label);
+        lexValue new_val = current->value->lex_data;
+        if(current->value->lex_data.label != NULL)
+            new_val.label = strdup(current->value->lex_data.label);
         else
             new_val.label = NULL;
-        if(current->value->lex_value.value != NULL)
-            new_val.value = strdup(current->value->lex_value.value);
+        if(current->value->lex_data.value != NULL)
+            new_val.value = strdup(current->value->lex_data.value);
         else
             new_val.value = NULL;
         char* data_value = NULL;
-        if(current->value->data_value != NULL)
-            data_value = strdup(current->value->data_value);
+        if(current->value->lex_data.value != NULL)
+            data_value = strdup(current->value->lex_data.value);
         ret = contentList_pushLeft(ret, content_new(new_val, current->value->nature, current->value->node_type, data_value, NULL, NULL));
         if(current->key != NULL)
             ret->key = strdup(current->key);
@@ -298,7 +303,7 @@ ContentList* table_dup_buffer(){
     printf("\n----DUPLICATE----");
     int i = 0;
     while(current!=NULL){
-        printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_value.label, current->value->lex_value.value, current->value->data_value);
+        printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_data.label, current->value->lex_data.value, current->value->data_value);
         current = current->next;
         i++;
     }
@@ -311,7 +316,7 @@ void table_print_buffer(){
     // printf("\n----BUFFER----");
     int i = 0;
     while(current!=NULL){
-        // printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_value.label, current->value->lex_value.value, current->value->data_value);
+        // printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_data.label, current->value->lex_data.value, current->value->data_value);
         current = current->next;
         i++;
     }
@@ -380,11 +385,11 @@ void table_print(SymbolTable* table) {
     for(int i=0; i<table->size; i++){
         if(table->keys[i] != NULL){
             char* type = int_to_type(table->content[i]->node_type);
-            if(table->content[i]->data_value != NULL)
-                value_len = strlen(table->content[i]->data_value);
+            if(table->content[i]->lex_data.value != NULL)
+                value_len = strlen(table->content[i]->lex_data.value);
             else
                 value_len = 6;
-            printf("\n| %04d: (%s) %s = %s %*c", i, type, table->keys[i], table->content[i]->data_value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+13)),'|');
+            printf("\n| %04d: (%s) %s = %s %*c", i, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+13)),'|');
             if(table->content[i]->args == NULL)
                 printf(" args is null %*c", width-13,'|');
             else{
@@ -442,13 +447,11 @@ void table_print_contexts(SymbolTable* table) {
 Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value, IntList *dimensions, ContentList *args) {
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
-    content->lex_value = lex_val;
+    content->lex_data = lex_val;
     content->nature = nat;
     content->node_type = node_type;
     if(data_value != NULL)
-        content->data_value = strdup(data_value);
-    else
-        content->data_value = NULL;
+        content->lex_data.value = strdup(data_value);
     content->dimensions = dimensions;
     content->total_size = calculate_total_size(node_type, dimensions);
     content->args = args;
@@ -464,9 +467,8 @@ void content_free(Content *content) {
         contentList_free(content->args);
         // printf("\n\tArguments freed.");
     }
-    free(content->lex_value.label);
-    free(content->lex_value.value);
-    free(content->data_value);
+    free(content->lex_data.label);
+    free(content->lex_data.value);
     free(content);
 }
 
@@ -523,11 +525,11 @@ IntList* intList_pushRight(IntList* list, int value) {
 IntList* intList_convert_tree(ASTree* ast) {
     ASTree* current = ast;
     IntList* ret = intList_new();
-    while(strcmp(current->value.label, "^")==0){
-        ret = intList_pushLeft(ret, atoi(current->children[current->number_of_children-1]->value.label));
+    while(strcmp(current->data.label, "^")==0){
+        ret = intList_pushLeft(ret, atoi(current->children[current->number_of_children-1]->data.label));
         current = current->children[0];
     }
-    ret = intList_pushLeft(ret, atoi(current->value.label));
+    ret = intList_pushLeft(ret, atoi(current->data.label));
     return ret;
 }
 
@@ -583,7 +585,7 @@ ContentList*  contentList_pushLeft(ContentList* list, Content* value) {
         new_node->next = list;
     }
     new_node->value = value;
-    //printf("\n%s: Pushing %ld before %ld", new_node->value->lex_value.label, (long)new_node, (long)new_node->next);
+    //printf("\n%s: Pushing %ld before %ld", new_node->value->lex_data.label, (long)new_node, (long)new_node->next);
     return new_node;
 }
 
@@ -594,7 +596,7 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         list = malloc(sizeof(ContentList*)+sizeof(NULL));
         list->value = value;
         list->next = NULL;
-        //printf("\n%s: Pushing %ld after %ld", list->value->lex_value.label, (long)list, (long)last_node);
+        //printf("\n%s: Pushing %ld after %ld", list->value->lex_data.label, (long)list, (long)last_node);
         return list;
     }
     else {
@@ -603,7 +605,7 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         new_node->next = NULL;
     }
     new_node->value = value;
-    //printf("\n%s: Pushing %ld after %ld", new_node->value->lex_value.label, (long)new_node, (long)last_node);
+    //printf("\n%s: Pushing %ld after %ld", new_node->value->lex_data.label, (long)new_node, (long)last_node);
     return list;
 }
 
@@ -611,7 +613,7 @@ void contentList_free(ContentList* list) {
     if(list != NULL) {
         if(list->next != NULL)
             contentList_free(list->next);
-        // printf("\nFreeing %s: %ld...", list->value->lex_value.label, (long)list );
+        // printf("\nFreeing %s: %ld...", list->value->lex_data.label, (long)list );
         content_free(list->value);
         free(list->key);
         free(list);
@@ -620,7 +622,7 @@ void contentList_free(ContentList* list) {
 }
 
 void _contentList_print(ContentList* list) {
-    printf("%s", list->value->lex_value.label);
+    printf("%s", list->value->lex_data.label);
     if(list->next != NULL){
         printf(", ");
         _contentList_print(list->next);

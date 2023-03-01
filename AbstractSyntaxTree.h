@@ -47,7 +47,7 @@ typedef struct lexical_value{
 } lexValue;
 
 typedef struct AbstractSyntaxTree {
-    lexValue value;
+    lexValue data;
     int number_of_children;
     struct AbstractSyntaxTree **children;
     int node_type;

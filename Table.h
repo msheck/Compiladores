@@ -43,10 +43,10 @@ struct content_list{
 };
 
 struct content_{
-    lexValue lex_value;
+    lexValue lex_data;
     int nature;
     int node_type;
-    char* data_value;
+    //char* data_value;
     IntList *dimensions;
     int total_size;
     ContentList *args;
@@ -71,6 +71,8 @@ int table_get_index(SymbolTable* table, char* key);
 
 int table_get_type(SymbolTable* table, char* key);
 
+Content* table_get_content(SymbolTable* table, lexValue key);
+
 void table_add_entry(SymbolTable *table, char* key, Content* content);
 
 void table_free(SymbolTable* table);
@@ -79,7 +81,7 @@ void table_abort(SymbolTable* root);
 
 void table_check_declared(SymbolTable* table, char* key, int line);
 
-void table_check_undeclared(SymbolTable* table, char* key, int line);
+int table_check_undeclared(SymbolTable* table, char* key, int line);
 
 void table_check_use(SymbolTable* table, Content* content, int line);
 
