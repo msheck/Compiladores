@@ -145,7 +145,7 @@ dec_ident_multidim:   TK_IDENTIFICADOR '[' list_int ']'   { table_add_entry(esco
 ident_multidim:       TK_IDENTIFICADOR '[' list_expr ']'  { table_check_undeclared(escopo, $1.label, $1.line_number);
                                                             free($2.label); $2.label=strdup("[]"); $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, $1.label))); ast_add_child($$, $3); };
 
-ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, strdup($3->data.label), NULL, NULL)); 
+ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, $3->data.value, NULL, NULL)); 
                                                             $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, $3->node_type)); ast_add_child($$, $3); };
 
 dec_var_glob:         tipo_var var_glob ';'               { table_update_type(escopo, $1->node_type); ast_free($1); };

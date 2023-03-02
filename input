@@ -13,6 +13,8 @@ int bar(float param, bool outroParam){
 
     a = (100+10)/10+1;
 
+    b = c+1;
+
     y = bar(x,outroParam);
 
     x=y;

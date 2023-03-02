@@ -236,6 +236,7 @@ void table_pop_nest(SymbolTable* root) {
         }
         if(last->next != NULL) {
             table_free(last->next);
+            contentList_free(content_buffer);
             last->next = NULL;
         }
     }
@@ -273,7 +274,7 @@ void table_flush_buffer(SymbolTable* table){
         table_add_entry(table, current->key, current->value);
         current = current->next;
     }
-    contentList_free(content_buffer);
+    // contentList_free(content_buffer);
 }
 
 ContentList* table_dup_buffer(){
@@ -285,14 +286,7 @@ ContentList* table_dup_buffer(){
             new_val.label = strdup(current->value->lex_data.label);
         else
             new_val.label = NULL;
-        if(current->value->lex_data.value != NULL)
-            new_val.value = strdup(current->value->lex_data.value);
-        else
-            new_val.value = NULL;
-        char* data_value = NULL;
-        if(current->value->lex_data.value != NULL)
-            data_value = strdup(current->value->lex_data.value);
-        ret = contentList_pushLeft(ret, content_new(new_val, current->value->nature, current->value->node_type, data_value, NULL, NULL));
+        ret = contentList_pushLeft(ret, content_new(new_val, current->value->nature, current->value->node_type, current->value->lex_data.value, NULL, NULL));
         if(current->key != NULL)
             ret->key = strdup(current->key);
         else
@@ -448,14 +442,16 @@ Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value,
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
     content->lex_data = lex_val;
-    //if(lex_val.label != NULL)
-    //    content->lex_data.label = strdup(lex_val.label);
-    if(data_value != NULL)
-        content->lex_data.value = strdup(data_value);
-    //else
-    //    content->lex_data.value = NULL;
+    if(lex_val.label != NULL)
+        content->lex_data.label = strdup(lex_val.label);
+    else
+        content->lex_data.label = NULL;
     content->nature = nat;
     content->node_type = node_type;
+    if(data_value != NULL)
+        content->lex_data.value = strdup(data_value);
+    else if(lex_val.value != NULL)
+        content->lex_data.value = strdup(lex_val.value);
     content->dimensions = dimensions;
     content->total_size = calculate_total_size(node_type, dimensions);
     content->args = args;

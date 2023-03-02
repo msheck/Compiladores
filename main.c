@@ -16,12 +16,13 @@ int main(int argc, char **argv)
 	escopo = tabela;
 	int ret = yyparse(); 
 	exporta (arvore);
-	// libera(arvore);
+    table_print_contexts(tabela);
+	libera(arvore);
 	arvore = NULL;
-	yylex_destroy();
 
 	// table_free(tabela);
-    table_print_contexts(tabela);
+	
+	yylex_destroy();
 
 	return 0;
 }

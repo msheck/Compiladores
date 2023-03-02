@@ -101,239 +101,238 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
             printf("\n\033[1;4;31mINVALID PARAMETER IN BINARY EXPRESSION!\033[0;31m Couldn't convert %s %s %s to appropriate type!\033[0m\n", expr1->data.label, operator, expr2->data.label);
             return NULL;
     }
-    switch (operator[0]+operator[1])
-    {
-    case 37: //'%'
-        switch (node_type){
-            case 1:
-            case 3: //int or bool
-                buffer = malloc(sizeof(char*)*abs((strlen(expr2->data.value)+1)));
-                value_i = expr1_intValue % expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;                                        
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"%%\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 47: //'/'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                value_i = expr1_intValue / expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                value_f = expr1_floatValue / expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"//\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }        
-    case 42: //'*'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
-                value_i = expr1_intValue * expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
-                value_f = expr1_floatValue * expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"**\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 45: //'-'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
-                else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
-                value_i = expr1_intValue - expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
-                else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
-                value_f = expr1_floatValue - expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"-\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 43: //'+'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
-                else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
-                value_i = expr1_intValue + expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                    buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
-                else
-                    buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
-                value_f = expr1_floatValue + expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"+\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 123: //'>='
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue >= expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue >= expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">=\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 121: //'<='
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue <= expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue <= expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<=\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 62: //'>'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue > expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                value_f = expr1_floatValue > expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 60: //'<'
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue < expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue < expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 94: //'!='
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue != expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue != expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"!=\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 122: //'=='
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue == expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue == expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"==\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 76: //"&&"
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue && expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue && expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"&&\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    case 248: //"||"
-        switch (node_type){
-            case 1: //bool
-            case 3: //int
-                buffer= malloc(sizeof(char*)*2);
-                value_i = expr1_intValue || expr2_intValue;
-                sprintf(buffer, "%d", value_i);
-                return buffer;
-            case 4: //float
-                buffer= malloc(sizeof(char*)*2);
-                value_f = expr1_floatValue || expr2_floatValue;
-                sprintf(buffer, "%f", value_f);
-                return buffer;
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"||\" couldn't complete the operation!\033[0m\n");
-                return NULL;
-        }
-    default:
-        printf("\n\033[1;4;31mINVALID CONVERTION!\033[0;31m Binary operator unidentified!\033[0m\n");
-        return NULL;
+    switch (operator[0]+operator[1]){
+        case 37: //'%'
+            switch (node_type){
+                case 1:
+                case 3: //int or bool
+                    buffer = malloc(sizeof(char*)*abs((strlen(expr2->data.value)+1)));
+                    value_i = expr1_intValue % expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;                                        
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"%%\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 47: //'/'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
+                    value_i = expr1_intValue / expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
+                    value_f = expr1_floatValue / expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"//\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }        
+        case 42: //'*'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
+                    value_i = expr1_intValue * expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
+                    value_f = expr1_floatValue * expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"**\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 45: //'-'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
+                    else
+                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
+                    value_i = expr1_intValue - expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
+                    else
+                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
+                    value_f = expr1_floatValue - expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"-\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 43: //'+'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
+                    else
+                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
+                    value_i = expr1_intValue + expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
+                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
+                    else
+                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
+                    value_f = expr1_floatValue + expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"+\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 123: //'>='
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue >= expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue >= expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">=\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 121: //'<='
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue <= expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue <= expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<=\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 62: //'>'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue > expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
+                    value_f = expr1_floatValue > expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 60: //'<'
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue < expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue < expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 94: //'!='
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue != expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue != expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"!=\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 122: //'=='
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue == expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue == expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"==\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 76: //"&&"
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue && expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue && expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"&&\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        case 248: //"||"
+            switch (node_type){
+                case 1: //bool
+                case 3: //int
+                    buffer= malloc(sizeof(char*)*2);
+                    value_i = expr1_intValue || expr2_intValue;
+                    sprintf(buffer, "%d", value_i);
+                    return buffer;
+                case 4: //float
+                    buffer= malloc(sizeof(char*)*2);
+                    value_f = expr1_floatValue || expr2_floatValue;
+                    sprintf(buffer, "%f", value_f);
+                    return buffer;
+                default:
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"||\" couldn't complete the operation!\033[0m\n");
+                    return NULL;
+            }
+        default:
+            printf("\n\033[1;4;31mINVALID CONVERTION!\033[0;31m Binary operator unidentified!\033[0m\n");
+            return NULL;
     }
 }
 
