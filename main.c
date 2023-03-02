@@ -1,6 +1,7 @@
 #include "src/Structures.h"
 #include "src/AbstractSyntaxTree.h"
 #include "src/ASTExpressions.h"
+#include "src/Content.h"
 #include "src/Table.h"
 #include "src/TablePrint.h"
 

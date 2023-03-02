@@ -7,12 +7,12 @@ Desenvolvido pelos alunos:
 	-Mateus Severgnini Heck 
 	-Vinicius Meirelles Pereira
 */
+
 #include "Structures.h"
+#include "ContentList.h"
 
 #ifndef _TABLE_H_
 #define _TABLE_H_
-
-//---------------------------- TABLE ----------------------------
 
 SymbolTable *table_new();
 
@@ -51,42 +51,5 @@ void table_flush_buffer(SymbolTable* table);
 ContentList* table_dup_buffer();
 
 char* int_to_type(int i);
-
-//---------------------------- CONTENT ----------------------------
-
-Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value, IntList *dimensions, ContentList *args);
-
-void content_free(Content *content);
-
-//---------------------------- INT LIST ----------------------------
-
-IntList* intList_new();
-
-IntList*  intList_pushLeft(IntList* list, int value);
-
-IntList*  intList_pushRight(IntList* list, int value);
-
-IntList* intList_convert_tree(ASTree* ast);
-
-void intList_free(IntList* list);
-
-void intList_print(IntList* list);
-
-//---------------------------- CONTENT LIST ----------------------------
-
-ContentList* contentList_new();
-
-ContentList*  contentList_pushLeft(ContentList* list, Content* value);
-
-ContentList*  contentList_pushRight(ContentList* list, Content* value);
-
-void contentList_free(ContentList* list);
-
-void contentList_print(ContentList* list);
-
-//---------------------------- MISC ----------------------------
-
-int calculate_total_size(int node_type, IntList* dimensions);
-
 
 #endif

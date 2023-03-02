@@ -26,6 +26,7 @@ extern void* escopo;
 
 %code requires { #include "src/AbstractSyntaxTree.h" }
 %code requires { #include "src/ASTExpressions.h" }
+%code requires { #include "src/Content.h" }
 %code requires { #include "src/Table.h" }
 %code requires { #include "src/TablePrint.h" }
 
