@@ -6,16 +6,17 @@
 #	-Mateus Severgnini Heck 
 #	-Vinicius Meirelles Pereira
 
-etapa = 4
+ETAPA = 4
+SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/ASTExpressions.c src/Table.c src/TablePrint.c
 
-.PHONY: zip unzip compile_test test clean flex etapa$(etapa)
+.PHONY: zip unzip compile_test test clean flex etapa$(ETAPA)
 
-$(etapa): flex bison compile
+$(ETAPA): flex bison compile
 
 debug: flex bison_debug compile
 
 compile:
-	gcc lex.yy.c AbstractSyntaxTree.c Table.c parser.tab.c main.c -o etapa$(etapa)
+	gcc $(SOURCES) main.c -o etapa$(ETAPA)
 
 flex: scanner.l
 	flex scanner.l
@@ -33,22 +34,22 @@ test: flex bison_debug compile_test
 	./test.o
 
 compile_test:
-	gcc lex.yy.c AbstractSyntaxTree.c Table.c parser.tab.c test.c -o test.o
+	gcc $(SOURCES) test.c -o test.o
 
 run_input: debug 
-	./etapa$(etapa) < input
+	./etapa$(ETAPA) < input
 
 graph: run_input	
 	dot saida.dot -Tpng -o grafo.png
 
 valgrind: debug
-	valgrind -s ./etapa$(etapa) < input
+	valgrind -s ./etapa$(ETAPA) < input
 
 zip: clean
-	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(etapa).tgz .
+	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(ETAPA).tgz .
 
 unzip:
-	mkdir entrega | tar xf etapa$(etapa).tgz --directory entrega
+	mkdir entrega | tar xf etapa$(ETAPA).tgz --directory entrega
 
 table:
-	gcc AbstractSyntaxTree.c Table.c main.c -o table_test
+	gcc $(SOURCES) main.c -o table_test

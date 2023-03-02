@@ -7,59 +7,10 @@ Desenvolvido pelos alunos:
 	-Mateus Severgnini Heck 
 	-Vinicius Meirelles Pereira
 */
+#include "Structures.h"
 
 #ifndef _TABLE_H_
 #define _TABLE_H_
-
-#include "AbstractSyntaxTree.h"
-
-#define NAT_LIT 1
-#define NAT_VAR 2
-#define NAT_ARR 3
-#define NAT_FUN 4
-
-#define LIT_SIZE_BOOL  1
-#define LIT_SIZE_CHAR  1
-#define LIT_SIZE_INT   4
-#define LIT_SIZE_FLOAT 8
-
-#define false 0
-#define true  1
-
-typedef struct int_list IntList;
-typedef struct content_list ContentList;
-typedef struct content_ Content;
-typedef struct symbol_table SymbolTable;
-
-struct int_list{
-    int value;
-    struct int_list* next;
-};
-
-struct content_list{
-    Content* value;
-    char* key; // Optional
-    struct content_list* next;
-};
-
-struct content_{
-    lexValue lex_data;
-    int nature;
-    int node_type;
-    //char* data_value;
-    IntList *dimensions;
-    int total_size;
-    ContentList *args;
-};
-
-struct symbol_table{
-    int size; // How many entries in the table
-    char** keys;
-    Content** content;
-    SymbolTable *next;
-    SymbolTable *parent;
-    IntList* typeless;
-};
 
 //---------------------------- TABLE ----------------------------
 
@@ -99,13 +50,7 @@ void table_flush_buffer(SymbolTable* table);
 
 ContentList* table_dup_buffer();
 
-void table_print_buffer();
-
 char* int_to_type(int i);
-
-void table_print(SymbolTable* table);
-
-void table_print_contexts(SymbolTable* table);
 
 //---------------------------- CONTENT ----------------------------
 

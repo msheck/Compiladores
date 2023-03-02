@@ -12,17 +12,22 @@ Desenvolvido pelos alunos:
 int yylex(void);
 void yyerror (char const *error_message);
 
+extern void* arvore;
 extern void* tabela;
 extern void* escopo;
-extern void* arvore;
 
-#include "Table.h"
-#include "AbstractSyntaxTree.h"
+#include "src/Structures.h"
+#include "src/AbstractSyntaxTree.h"
+#include "src/ASTExpressions.h"
+#include "src/Table.h"
+#include "src/TablePrint.h"
 
 %}
 
-%code requires { #include "Table.h" }
-%code requires { #include "AbstractSyntaxTree.h" }
+%code requires { #include "src/AbstractSyntaxTree.h" }
+%code requires { #include "src/ASTExpressions.h" }
+%code requires { #include "src/Table.h" }
+%code requires { #include "src/TablePrint.h" }
 
 %define parse.error verbose
 

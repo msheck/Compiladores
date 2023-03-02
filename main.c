@@ -1,5 +1,8 @@
-#include "AbstractSyntaxTree.h"
-#include "Table.h"
+#include "src/Structures.h"
+#include "src/AbstractSyntaxTree.h"
+#include "src/ASTExpressions.h"
+#include "src/Table.h"
+#include "src/TablePrint.h"
 
 extern int yyparse(void);
 extern int yylex_destroy(void);
