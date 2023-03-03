@@ -1,11 +1,15 @@
 int i;
 float h[1^2^3];
+char ch;
 bool isFalse, isTrue;
 
 int bar(float param, bool outroParam){
     float x, y;
     int a, b, c<=1, d;
     char teste;
+
+    // Não funciona!!!
+    bool aaa <= 'a';
 
     /*if(isFalse == false) then {
         c = c + 1;

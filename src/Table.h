@@ -20,7 +20,7 @@ int table_get_hash(char* key);
 
 int table_get_index(SymbolTable* table, char* key);
 
-int table_get_type(SymbolTable* table, char* key);
+int table_get_type(SymbolTable* table, char* key, int line_number);
 
 Content* table_get_content(SymbolTable* table, lexValue key);
 
@@ -32,9 +32,9 @@ void table_abort(SymbolTable* root);
 
 void table_check_declared(SymbolTable* table, char* key, int line);
 
-int table_check_undeclared(SymbolTable* table, char* key, int line);
+Content* table_check_undeclared(SymbolTable* table, char* key, int line);
 
-void table_check_use(SymbolTable* table, Content* content, int line);
+void table_check_use(Content* content, int line);
 
 SymbolTable* table_nest(SymbolTable* root);
 
