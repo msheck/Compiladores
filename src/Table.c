@@ -9,6 +9,7 @@ Desenvolvido pelos alunos:
 */
 
 #include "Table.h"
+#include "TablePrint.h"
 
 ContentList *content_buffer = NULL;
 
@@ -79,7 +80,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->content[i] = NULL;
         }
         table->keys[table->size-1] = strdup(key);
-        table->content[table->size-1] = content;
+        table->content[table->size-1] = content_dup(content);
         if(content->node_type==NODE_TYPE_UNDECLARED){
             // printf("TYPELESS!");
             table->typeless = intList_pushLeft(table->typeless, table->size-1);
@@ -93,7 +94,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
         for(i=hash; i<table->size; i++) {
             if(table->keys[i] == NULL) {
                 table->keys[i] = strdup(key);
-                table->content[i] = content;
+                table->content[i] = content_dup(content);
                 if(content->node_type == NODE_TYPE_UNDECLARED){
                     // printf("TYPELESS!");
                     table->typeless = intList_pushLeft(table->typeless, i);
@@ -107,7 +108,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->keys = realloc(table->keys, table->size * sizeof(char**));
             table->content = realloc(table->content, table->size * sizeof(Content**));
             table->keys[table->size-1] = strdup(key);
-            table->content[table->size-1] = content;
+            table->content[table->size-1] = content_dup(content);
             if(content->node_type == NODE_TYPE_UNDECLARED){
                 // printf("TYPELESS!");
                 table->typeless = intList_pushLeft(table->typeless, table->size-1);
@@ -122,6 +123,7 @@ void table_free(SymbolTable* table) {
     for(int i=0; i<table->size; i++) {
         if(table->content[i] != NULL) {
             content_free(table->content[i]);
+            table->content[i] = NULL;
             free(table->keys[i]);
         }
     }
@@ -216,19 +218,15 @@ SymbolTable* table_nest(SymbolTable* root) {
     return new_table;
 }
 
-void table_pop_nest(SymbolTable* root) {
-    if(root != NULL){
-        SymbolTable* current = root;
-        SymbolTable* last = root;
-        while(current->next != NULL) {
-            last = current;
-            current = current->next;
-        }
-        if(last->next != NULL) {
-            table_free(last->next);
-            contentList_free(content_buffer);
-            last->next = NULL;
-        }
+SymbolTable* table_pop_nest(SymbolTable* root) {
+    if(root->parent != NULL){
+        while(root->next != NULL)
+            root = root->next;
+        root = root->parent;
+        table_print(root->next);
+        table_free(root->next);
+        root->next = NULL;
+        return root;
     }
 }
 
@@ -258,13 +256,15 @@ void table_add_to_buffer(Content* content, char* key){
 }
 
 void table_flush_buffer(SymbolTable* table){
-    ContentList* current = content_buffer;
+    ContentList* current = contentList_new();
+    current = table_dup_buffer();
     while(current!=NULL){
         // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_data.label);
         table_add_entry(table, current->key, current->value);
         current = current->next;
     }
-    // contentList_free(content_buffer);
+    contentList_free(content_buffer);
+    content_buffer = contentList_new();
 }
 
 ContentList* table_dup_buffer(){
@@ -276,6 +276,10 @@ ContentList* table_dup_buffer(){
             new_val.label = strdup(current->value->lex_data.label);
         else
             new_val.label = NULL;
+        if(current->value->lex_data.value != NULL)
+            new_val.value = strdup(current->value->lex_data.value);
+        else
+            new_val.value = NULL;
         ret = contentList_pushLeft(ret, content_new(new_val, current->value->nature, current->value->node_type, current->value->lex_data.value, NULL, NULL));
         if(current->key != NULL)
             ret->key = strdup(current->key);
@@ -283,6 +287,7 @@ ContentList* table_dup_buffer(){
             ret->key = NULL;
         current = current->next;
     }
+    return ret;
 /*  current = ret;
     printf("\n----DUPLICATE----");
     int i = 0;
@@ -292,7 +297,6 @@ ContentList* table_dup_buffer(){
         i++;
     }
     printf("\n-----------------");*/
-    return ret;
 }
 
 char* int_to_type(int i){

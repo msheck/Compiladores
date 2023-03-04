@@ -113,7 +113,7 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
                     sprintf(buffer, "%f", value_f);
                     return buffer;
                 default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"//\" couldn't complete the operation!\033[0m\n");
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"/\" couldn't complete the operation!\033[0m\n");
                     return NULL;
             }        
         case 42: //'*'
@@ -130,7 +130,7 @@ char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node
                     sprintf(buffer, "%f", value_f);
                     return buffer;
                 default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"**\" couldn't complete the operation!\033[0m\n");
+                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"*\" couldn't complete the operation!\033[0m\n");
                     return NULL;
             }
         case 45: //'-'

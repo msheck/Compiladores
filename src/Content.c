@@ -15,19 +15,54 @@ Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value,
     content = calloc(1, sizeof(Content));
     content->lex_data = lex_val;
     if(lex_val.label != NULL)
-        content->lex_data.label = strdup(lex_val.label);
+        content->lex_data.label = lex_val.label;
     else
         content->lex_data.label = NULL;
     content->nature = nat;
     content->node_type = node_type;
     if(data_value != NULL)
-        content->lex_data.value = strdup(data_value);
+        content->lex_data.value = data_value;
     else if(lex_val.value != NULL)
-        content->lex_data.value = strdup(lex_val.value);
+        content->lex_data.value = lex_val.value;
     content->dimensions = dimensions;
     content->total_size = calculate_total_size(node_type, dimensions);
     content->args = args;
     return content;
+}
+
+Content* content_dup(Content* original) {
+    Content* duplicate = NULL;
+    duplicate = calloc(1, sizeof(Content));
+    lexValue duplicate_data;
+    duplicate_data.line_number = original->lex_data.line_number;
+    duplicate_data.type = original->lex_data.type;
+    if(original->lex_data.label != NULL)
+        duplicate_data.label = strdup(original->lex_data.label);
+    else
+        duplicate_data.label = NULL;
+    if(original->lex_data.value != NULL)
+        duplicate_data.value = strdup(original->lex_data.value);
+    else
+        duplicate_data.value = NULL;
+    duplicate->lex_data = duplicate_data;
+    duplicate->nature = original->nature;
+    duplicate->node_type = original->node_type;
+    duplicate->total_size = original->total_size;
+    if(original->args != NULL)
+        duplicate->args = contentList_dup(original->args);
+    else
+        duplicate->args = NULL;
+    if(original->dimensions != NULL)
+        duplicate->dimensions = intList_dup(original->dimensions);
+    else
+        duplicate->dimensions = NULL;
+    return duplicate;
+}
+
+Content* content_dup_del(Content* original){
+    Content* duplicate = NULL;
+    duplicate = content_dup(original);
+    content_free(original);
 }
 
 void content_free(Content *content) {

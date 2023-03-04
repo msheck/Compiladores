@@ -97,17 +97,17 @@ void ast_print(ASTree *tree)
 }
 
 void ast_check_type(ASTree* node1, ASTree* node2) {
-    printf("\nChecking!");
-    printf("\nNode1:");
-    printf("\n  node_type: %d", node1->node_type);
-    printf("\n  data_type: %d", node1->data.type);
-    printf("\n  data_label: %s", node1->data.label);
-    printf("\n  data_value: %s", node1->data.value);
-    printf("\nNode2:");
-    printf("\n  node_type: %d", node2->node_type);
-    printf("\n  data_type: %d", node2->data.type);
-    printf("\n  data_label: %s", node2->data.label);
-    printf("\n  data_value: %s", node2->data.value);
+    // printf("\nChecking!");
+    // printf("\nNode1:");
+    // printf("\n  node_type: %d", node1->node_type);
+    // printf("\n  data_type: %d", node1->data.type);
+    // printf("\n  data_label: %s", node1->data.label);
+    // printf("\n  data_value: %s", node1->data.value);
+    // printf("\nNode2:");
+    // printf("\n  node_type: %d", node2->node_type);
+    // printf("\n  data_type: %d", node2->data.type);
+    // printf("\n  data_label: %s", node2->data.label);
+    // printf("\n  data_value: %s", node2->data.value);
     if(node1->node_type == node2->node_type)
         return;
     if(node2->node_type == NODE_TYPE_CHAR) {

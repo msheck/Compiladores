@@ -15,6 +15,8 @@ Desenvolvido pelos alunos:
 
 ContentList* contentList_new();
 
+ContentList* contentList_dup(ContentList* original);
+
 ContentList*  contentList_pushLeft(ContentList* list, Content* value);
 
 ContentList*  contentList_pushRight(ContentList* list, Content* value);

@@ -1,3 +1,15 @@
+// int mock(){
+//     int b, a<=1;
+//     b = 1+a;
+//     if (b == 2) then {
+//         int result;
+//         result = b * (a+3);
+//         b = result;
+//     };
+//     a = b*8;
+// }
+
+
 int i;
 float h[1^2^3];
 char ch;
@@ -11,13 +23,15 @@ int bar(float param, bool outroParam){
     // Não funciona!!!
     bool aaa <= 'a';
 
-    /*if(isFalse == false) then {
+    if(c == 1) then {
+        int result;
         c = c + 1;
-    };*/
+        result = c;
+    };
 
     a = (100+10)/10+1;
 
-    b = c+1;
+    b = c+a;
 
     y = bar(x,outroParam);
 

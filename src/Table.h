@@ -38,7 +38,7 @@ void table_check_use(Content* content, int line);
 
 SymbolTable* table_nest(SymbolTable* root);
 
-void table_pop_nest(SymbolTable* root);
+SymbolTable* table_pop_nest(SymbolTable* root);
 
 void table_update_type(SymbolTable* table, int type);
 

@@ -16,6 +16,10 @@ Desenvolvido pelos alunos:
 
 Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value, IntList *dimensions, ContentList *args);
 
+Content* content_dup(Content* original);
+
+Content* content_dup_del(Content* original);
+
 void content_free(Content *content);
 
 int calculate_total_size(int node_type, IntList* dimensions);

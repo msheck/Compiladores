@@ -15,6 +15,8 @@ Desenvolvido pelos alunos:
 
 IntList* intList_new();
 
+IntList* intList_dup(IntList* original);
+
 IntList*  intList_pushLeft(IntList* list, int value);
 
 IntList*  intList_pushRight(IntList* list, int value);

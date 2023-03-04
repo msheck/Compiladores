@@ -14,6 +14,15 @@ ContentList* contentList_new() {
     return NULL;
 }
 
+ContentList* contentList_dup(ContentList* original) {
+    ContentList* duplicate = contentList_new();
+    while (original != NULL) {
+        duplicate = contentList_pushRight(duplicate, content_dup(original->value));
+        original = original->next;
+    }
+    return duplicate;
+}
+
 ContentList* contentList_goToEnd(ContentList* list) {
     if(list != NULL) {
         if(list->next != NULL)

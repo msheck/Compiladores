@@ -82,7 +82,7 @@ void table_print(SymbolTable* table) {
                 printf(" args: %*c", width-6,'|');
                 ContentList *current = table->content[i]->args;
                 while(current!=NULL){
-                    printf("\n| %*c  %s%*c", width, '|', current->key, width-(int)strlen(current->key)-1, '|');
+                    printf("\n| %*c  %s%*c", width, '|', current->value->lex_data.label, width-(int)strlen(current->value->lex_data.label)-1, '|');
                     current = current->next;
                 }
             }

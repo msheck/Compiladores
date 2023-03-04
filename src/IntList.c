@@ -14,6 +14,15 @@ IntList* intList_new() {
     return NULL;
 }
 
+IntList* intList_dup(IntList* original) {
+    IntList* duplicate = intList_new();
+    while (original != NULL){
+        duplicate = intList_pushRight(duplicate, original->value);
+        original = original->next;
+    }
+    return duplicate;
+}
+
 IntList* intList_goToEnd(IntList* list) {
     if(list != NULL) {
         if(list->next != NULL)

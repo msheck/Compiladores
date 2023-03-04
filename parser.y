@@ -104,6 +104,7 @@ extern void* escopo;
 %type<astree> expr_tier3
 %type<astree> expr_tier2
 %type<astree> expr_tier1
+%type<astree> if_then_expr
 %type<astree> if_then
 %type<astree> if_then_else
 %type<astree> while
@@ -207,13 +208,14 @@ comando_simples:      tipo_var var_loc              { $$ = $2; table_update_type
 comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; }
                     | comando_simples ';'           { $$ = $1; };
 
-bloc_com_dec:         '{'                           {escopo = table_nest(escopo);};
+bloc_com_dec:         '{'                           { escopo = table_nest(escopo);};
 
-bloc_com:             bloc_com_dec comandos '}'     { $$ = $2; }
+bloc_com:             bloc_com_dec comandos '}'     { escopo = table_pop_nest(escopo); $$ = $2; }
                     | bloc_com_dec '}'              { $$ = NULL; };
 
-chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3);};
-                                                                                                                                                                   //table_get_type(escopo, $1.label, $1.line_number)
+chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { int function_type = table_get_type(escopo, $1.label, $1.line_number);
+                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3);};
+
 
 // EXPRESSOES
 
@@ -224,10 +226,10 @@ expr:                 expr_end                { $$ = $1; }
 	                  | expr_tier7              { $$ = $1; };
 
 expr_end:             '(' expr ')'            { $$ = $2; }
-                    | TK_IDENTIFICADOR        { Content* identifier = table_get_content(escopo, $1); $$ = ast_new_node(identifier->lex_data, identifier->node_type); }
+                    | chamada_func            { $$ = $1; }
                     | ident_multidim          { $$ = $1; }
                     | lits                    { $$ = $1; }
-                    | chamada_func            { $$ = $1; };
+                    | TK_IDENTIFICADOR        { Content* identifier = content_dup(table_get_content(escopo, $1)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); };
 
 expr_tier7:           expr TK_OC_OR expr      { $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier6              { $$ = $1; };
@@ -260,7 +262,9 @@ expr_tier1:           '-' expr                { lexValue lv; lv.label = NULL; $$
 
 // CONTROLE DE FLUXO
 
-if_then:              TK_PR_IF '(' expr ')' TK_PR_THEN bloc_com { $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); ast_add_child($$, $6); };
+if_then_expr:         TK_PR_IF '(' expr ')' TK_PR_THEN        { $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); };
+
+if_then:              if_then_expr bloc_com                   { $$ = $1; ast_add_child($$, $2); };
 
 if_then_else:         if_then                                 { $$ = $1; }
                     | if_then TK_PR_ELSE bloc_com             { $$ = $1; ast_add_child($$, $3); };
