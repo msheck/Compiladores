@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	libera(arvore);
 	arvore = NULL;
 
-	// table_free(tabela);
+	table_free(tabela);
 	
 	yylex_destroy();
 

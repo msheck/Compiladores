@@ -13,8 +13,6 @@ Desenvolvido pelos alunos:
 
 ContentList *content_buffer = NULL;
 
-//---------------------------- TABLE ----------------------------
-
 SymbolTable *table_new() {
     SymbolTable* ret = NULL;
     ret = calloc(1, sizeof(SymbolTable));
@@ -249,10 +247,9 @@ void table_update_data_value(SymbolTable* table, char* key, ASTree* node_value){
         declared_content->lex_data.value = strdup(node_value->data.value);
 }
 
-void table_add_to_buffer(Content* content, char* key){
+void table_add_to_buffer(Content* content){
     // printf("\nAdding \"%s\":\"%s\" to the buffer", key, content->lex_data.label);
     content_buffer = contentList_pushLeft(content_buffer, content);
-    content_buffer->key = strdup(key);
 }
 
 void table_flush_buffer(SymbolTable* table){
@@ -260,7 +257,7 @@ void table_flush_buffer(SymbolTable* table){
     current = table_dup_buffer();
     while(current!=NULL){
         // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_data.label);
-        table_add_entry(table, current->key, current->value);
+        table_add_entry(table, current->value->lex_data.label, current->value);
         current = current->next;
     }
     contentList_free(content_buffer);
@@ -268,35 +265,7 @@ void table_flush_buffer(SymbolTable* table){
 }
 
 ContentList* table_dup_buffer(){
-    ContentList* ret = contentList_new();
-    ContentList* current = content_buffer;
-    while(current!=NULL){
-        lexValue new_val = current->value->lex_data;
-        if(current->value->lex_data.label != NULL)
-            new_val.label = strdup(current->value->lex_data.label);
-        else
-            new_val.label = NULL;
-        if(current->value->lex_data.value != NULL)
-            new_val.value = strdup(current->value->lex_data.value);
-        else
-            new_val.value = NULL;
-        ret = contentList_pushLeft(ret, content_new(new_val, current->value->nature, current->value->node_type, current->value->lex_data.value, NULL, NULL));
-        if(current->key != NULL)
-            ret->key = strdup(current->key);
-        else
-            ret->key = NULL;
-        current = current->next;
-    }
-    return ret;
-/*  current = ret;
-    printf("\n----DUPLICATE----");
-    int i = 0;
-    while(current!=NULL){
-        printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_data.label, current->value->lex_data.value, current->value->data_value);
-        current = current->next;
-        i++;
-    }
-    printf("\n-----------------");*/
+    return contentList_dup(content_buffer);
 }
 
 char* int_to_type(int i){

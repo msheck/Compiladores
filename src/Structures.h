@@ -79,7 +79,6 @@ struct int_list{
 
 struct content_list{
     Content* value;
-    char* key; // Optional
     struct content_list* next;
 };
 

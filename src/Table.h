@@ -44,7 +44,7 @@ void table_update_type(SymbolTable* table, int type);
 
 void table_update_data_value(SymbolTable* table, char* key, ASTree* data_value);
 
-void table_add_to_buffer(Content* content, char* key);
+void table_add_to_buffer(Content* content);
 
 void table_flush_buffer(SymbolTable* table);
 

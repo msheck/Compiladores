@@ -73,7 +73,6 @@ void contentList_free(ContentList* list) {
             contentList_free(list->next);
         // printf("\nFreeing %s: %ld...", list->value->lex_data.label, (long)list );
         content_free(list->value);
-        free(list->key);
         free(list);
         list = NULL;
     }
