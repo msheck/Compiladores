@@ -229,7 +229,7 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | chamada_func            { $$ = $1; }
                     | ident_multidim          { $$ = $1; }
                     | lits                    { $$ = $1; }
-                    | TK_IDENTIFICADOR        { Content* identifier = content_dup(table_get_content(escopo, $1)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); };
+                    | TK_IDENTIFICADOR        { Content* identifier = content_dup(table_get_content(escopo, $1)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); free(identifier); };
 
 expr_tier7:           expr TK_OC_OR expr      { $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
                     | expr_tier6              { $$ = $1; };

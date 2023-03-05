@@ -15,15 +15,15 @@ Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value,
     content = calloc(1, sizeof(Content));
     content->lex_data = lex_val;
     if(lex_val.label != NULL)
-        content->lex_data.label = lex_val.label;
+        content->lex_data.label = strdup(lex_val.label);
     else
         content->lex_data.label = NULL;
     content->nature = nat;
     content->node_type = node_type;
     if(data_value != NULL)
-        content->lex_data.value = data_value;
+        content->lex_data.value = strdup(data_value);
     else if(lex_val.value != NULL)
-        content->lex_data.value = lex_val.value;
+        content->lex_data.value = strdup(lex_val.value);
     content->dimensions = dimensions;
     content->total_size = calculate_total_size(node_type, dimensions);
     content->args = args;
