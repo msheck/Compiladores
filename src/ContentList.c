@@ -79,6 +79,10 @@ void contentList_free(ContentList* list) {
 }
 
 void _contentList_print(ContentList* list) {
+    if(list == NULL) {
+        printf("\nLIST EMPTY");
+        return;
+    }
     printf("%s", list->value->lex_data.label);
     if(list->next != NULL){
         printf(", ");

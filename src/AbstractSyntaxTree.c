@@ -96,62 +96,100 @@ void ast_print(ASTree *tree)
     }
 }
 
+void ast_check_node_type(ASTree* node1, int type) {
+    // Caso checagem de undeclared seja permitida, ocorrerá segfault quando ast_check_type tentar acessar a label de node2
+    if (type == NODE_TYPE_UNDECLARED) {
+        printf("\n\033[1;4;31mUso incorreto da funcao ast_check_type (AbstractSyntaxTree.c: %d)\033[0m", __LINE__);
+        exit(-1);
+    }
+    lexValue val;
+    val.line_number = node1->data.line_number;
+    val.label = NULL;
+    val.value = NULL;
+    ASTree* node2 = ast_new_node(val, type);
+    ast_check_type(node1, node2);
+    ast_free(node2);
+}
+
+void ast_check_type_node(int type, ASTree *node2) {
+    // Caso checagem de undeclared seja permitida, ocorrerá segfault quando ast_check_type tentar acessar a label de node1
+    if (type == NODE_TYPE_UNDECLARED) {
+        printf("\n\033[1;4;31mUso incorreto da funcao ast_check_type (AbstractSyntaxTree.c: %d)\033[0m", __LINE__);
+        exit(-1);
+    }
+    lexValue val;
+    val.line_number = node2->data.line_number;
+    val.label = NULL;
+    val.value = NULL;
+    ASTree* node1 = ast_new_node(val, type);
+    ast_check_type(node1, node2);
+    ast_free(node1);
+}
+
 void ast_check_type(ASTree* node1, ASTree* node2) {
-    // printf("\nChecking!");
-    // printf("\nNode1:");
-    // printf("\n  node_type: %d", node1->node_type);
-    // printf("\n  data_type: %d", node1->data.type);
-    // printf("\n  data_label: %s", node1->data.label);
-    // printf("\n  data_value: %s", node1->data.value);
-    // printf("\nNode2:");
-    // printf("\n  node_type: %d", node2->node_type);
-    // printf("\n  data_type: %d", node2->data.type);
-    // printf("\n  data_label: %s", node2->data.label);
-    // printf("\n  data_value: %s", node2->data.value);
+    if (node1 == NULL || node2 == NULL)
+        return;
+    /*printf("\nChecking!");
+    printf("\nline: %d", node1->data.line_number);
+    printf("\nline: %d", node2->data.line_number);
+    printf("\nNode1:");
+    printf("\n  node_type: %d", node1->node_type);
+    printf("\n  data_type: %d", node1->data.type);
+    printf("\n  data_label: %s", node1->data.label);
+    printf("\n  data_value: %s", node1->data.value);
+    printf("\nNode2:");
+    printf("\n  node_type: %d", node2->node_type);
+    printf("\n  data_type: %d", node2->data.type);
+    printf("\n  data_label: %s", node2->data.label);
+    printf("\n  data_value: %s", node2->data.value);*/
     if(node1->node_type == node2->node_type)
         return;
     if(node2->node_type == NODE_TYPE_CHAR) {
         if(node1->node_type == NODE_TYPE_INT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para INT.\033[0m",
-            node1->data.line_number);
-            exit(ERR_CHAR_TO_INT);
+            emit_error(ERR_CHAR_TO_INT, node1->data.line_number, NULL, NULL);
         }
         if(node1->node_type == NODE_TYPE_FLOAT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para FLOAT.\033[0m",
-            node1->data.line_number);
-            exit(ERR_CHAR_TO_FLOAT);
+            emit_error(ERR_CHAR_TO_FLOAT, node1->data.line_number, NULL, NULL);
         }
         if(node1->node_type == NODE_TYPE_BOOL){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de CHAR para BOOL.\033[0m",
-            node1->data.line_number);
-            exit(ERR_CHAR_TO_BOOL);
+            emit_error(ERR_CHAR_TO_BOOL, node1->data.line_number, NULL, NULL);
         }
         if(node1->node_type <= NODE_TYPE_UNDECLARED || node1->node_type > NODE_TYPE_FLOAT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
-            node1->data.line_number, node1->data.value);
-            exit(-1);
+            emit_error(ERR_UNDECLARED, node1->data.line_number, node1->data.label, NULL);
         }
     }
     if(node1->node_type == NODE_TYPE_CHAR){
         if(node2->node_type == NODE_TYPE_BOOL){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de BOOL para CHAR.\033[0m",
-            node2->data.line_number);
-            exit(ERR_X_TO_CHAR);
+            emit_error(ERR_X_TO_CHAR, node2->data.line_number, NULL, "BOOL");
         }
         if(node2->node_type == NODE_TYPE_FLOAT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de FLOAT para CHAR.\033[0m",
-            node2->data.line_number);
-            exit(ERR_X_TO_CHAR);
+            emit_error(ERR_X_TO_CHAR, node2->data.line_number, NULL, "FLOAT");
         }
         if(node2->node_type == NODE_TYPE_INT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Conversao implicita de INT para CHAR.\033[0m",
-            node2->data.line_number);
-            exit(ERR_X_TO_CHAR);
+            emit_error(ERR_X_TO_CHAR, node2->data.line_number, NULL, "INT");
         }
         if(node1->node_type <= NODE_TYPE_UNDECLARED || node1->node_type > NODE_TYPE_FLOAT){
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Nodo %s sem tipo atribuido.\033[0m",
-            node2->data.line_number, node2->data.value);
-            exit(ERR_X_TO_CHAR);
+            emit_error(ERR_UNDECLARED, node2->data.line_number, node2->data.label, NULL);
         }
   }
+}
+
+void ast_check_not_char(ASTree *node, int expected_type) {
+    if (expected_type == NODE_TYPE_CHAR)
+        expected_type = NODE_TYPE_INT;
+    if(node->node_type == NODE_TYPE_CHAR){
+        switch (expected_type) {
+            case NODE_TYPE_BOOL:
+                emit_error(ERR_CHAR_TO_BOOL, node->data.line_number, node->data.label, NULL);
+                break;
+            case NODE_TYPE_FLOAT:
+                emit_error(ERR_CHAR_TO_FLOAT, node->data.line_number, node->data.label, NULL);
+                break;
+            case NODE_TYPE_INT:
+                emit_error(ERR_CHAR_TO_INT, node->data.line_number, node->data.label, NULL);
+                break;
+            default:
+                break;
+        }
+    }
 }

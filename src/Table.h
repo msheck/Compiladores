@@ -9,6 +9,7 @@ Desenvolvido pelos alunos:
 */
 
 #include "Structures.h"
+#include "Errors.h"
 #include "ContentList.h"
 
 #ifndef _TABLE_H_
@@ -22,7 +23,7 @@ int table_get_index(SymbolTable* table, char* key);
 
 int table_get_type(SymbolTable* table, char* key, int line_number);
 
-Content* table_get_content(SymbolTable* table, lexValue key);
+Content* table_get_content(SymbolTable* table, char* key, int line_number);
 
 void table_add_entry(SymbolTable *table, char* key, Content* content);
 
@@ -34,7 +35,7 @@ void table_check_declared(SymbolTable* table, char* key, int line);
 
 Content* table_check_undeclared(SymbolTable* table, char* key, int line);
 
-void table_check_use(Content* content, int line);
+void table_check_use(Content* content, int expected_nature, int line_number);
 
 SymbolTable* table_nest(SymbolTable* root);
 

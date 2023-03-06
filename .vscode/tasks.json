@@ -17,6 +17,7 @@
                 "-g",
                 "lex.yy.c",
                 "src/Structures.h",
+                "src/Errors.c",
                 "src/TablePrint.c",
                 "src/AbstractSyntaxTree.c",
                 "src/IntList.c",

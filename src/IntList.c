@@ -99,6 +99,10 @@ void _intList_print(IntList* list) {
 }
 
 void intList_print(IntList* list) {
+    if(list == NULL) {
+        printf("\nLIST EMPTY");
+        return;
+    }
     printf("\n");
     _intList_print(list);
     printf("\n");

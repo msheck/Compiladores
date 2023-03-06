@@ -64,7 +64,14 @@ void table_print(SymbolTable* table) {
     int width_aux;
     //HEADER
     print_line(width,1);
-    printf("|  Printing table of size %04d%*c", table->size, 2*width-27, '|');
+    char* type = int_to_type(table->return_type);
+    int i = 0;
+    char current = type[0];
+    while(current != '\0'){
+        i += 1;
+        current = type[i];
+    }
+    printf("|  Printing table of size %04d (%s)%*c", table->size, int_to_type(table->return_type), 2*width-27-i-3, '|');
     print_sec_line(width,0);
     //BODY
     int value_len;

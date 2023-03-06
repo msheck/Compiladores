@@ -1,4 +1,5 @@
 #include "src/Structures.h"
+#include "src/Errors.h"
 #include "src/AbstractSyntaxTree.h"
 #include "src/ASTExpressions.h"
 #include "src/Content.h"
@@ -19,8 +20,8 @@ int main(int argc, char **argv)
     tabela = table_new();
 	escopo = tabela;
 	int ret = yyparse(); 
-    table_print(tabela);
-	exporta (arvore);
+    table_print_contexts(tabela);
+	//exporta (arvore);
 	libera(arvore);
 	arvore = NULL;
 

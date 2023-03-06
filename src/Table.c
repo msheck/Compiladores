@@ -12,6 +12,7 @@ Desenvolvido pelos alunos:
 #include "TablePrint.h"
 
 ContentList *content_buffer = NULL;
+int function_type_buffer = NODE_TYPE_UNDECLARED;
 
 SymbolTable *table_new() {
     SymbolTable* ret = NULL;
@@ -23,6 +24,7 @@ SymbolTable *table_new() {
         ret->next = NULL;
         ret->parent = NULL;
         ret->typeless = intList_new();
+        ret->return_type = NODE_TYPE_UNDECLARED;
     }
     return ret;
 }
@@ -57,12 +59,12 @@ int table_get_type(SymbolTable* table, char* key, int line_number) {
     return table_check_undeclared(table, key, line_number)->node_type;
 }
 
-Content* table_get_content(SymbolTable* table, lexValue key){
-    return table_check_undeclared(table, key.label, key.line_number);
+Content* table_get_content(SymbolTable* table, char* key, int line_number){
+    return table_check_undeclared(table, key, line_number);
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
-    // printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
+    //printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
     table_check_declared(table, key, content->lex_data.line_number);
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
@@ -160,52 +162,52 @@ void table_check_declared(SymbolTable* table, char* key, int line) {
     }
 }
 
+extern void* tabela;
 Content* table_check_undeclared(SymbolTable* table, char* key, int line) {
     Content* declared_content = table_has_declared(table, key);
     if(declared_content == NULL) {
         //table_abort(table);
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s nao declarado.\033[0m", line, key);
+        table_print(table);
         exit(ERR_UNDECLARED);
     }
     return declared_content;
 }
 
-void table_check_use(Content* content, int line) {
-    if(content->nature == NAT_VAR) {
-        if(content->dimensions != NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como array.\033[0m", line, content->lex_data.label);
-            exit(ERR_VARIABLE);
-        }
-        if(content->args != NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Variavel %s sendo usada como funcao.\033[0m", line, content->lex_data.label);
-            exit(ERR_VARIABLE);
-        }
-    }
-    if(content->nature == NAT_ARR) {
-        if(content->args != NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como funcao.\033[0m", line, content->lex_data.label);
-            exit(ERR_ARRAY);
-        }
-        if(content->dimensions == NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s sendo usada como variavel.\033[0m", line, content->lex_data.label);
-            exit(ERR_ARRAY);
-        }
-    }
-    if(content->nature == NAT_FUN) {
-        if(content->dimensions != NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como arranjo.\033[0m", line, content->lex_data.label);
-            exit(ERR_FUNCTION);
-        }
-        if(content->args == NULL) {
-            printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Funcao %s sendo usada como variavel.\033[0m", line, content->lex_data.label);
-            exit(ERR_FUNCTION);
-        }
+void table_check_use(Content* content, int expected_nature, int line_number) {
+    if(expected_nature == content->nature) // No error, return
+        return;
+    switch (content->nature)
+    {
+        case NAT_ARR:
+            if (expected_nature == NAT_VAR)
+                emit_error(ERR_ARRAY, line_number, content->lex_data.label, "variavel");
+            if (expected_nature == NAT_FUN)
+                emit_error(ERR_ARRAY, line_number, content->lex_data.label, "funcao");
+            break;
+        case NAT_FUN:
+            if(expected_nature == NAT_ARR)
+                emit_error(ERR_FUNCTION, line_number, content->lex_data.label, "arranjo");
+            if(expected_nature == NAT_VAR)
+                emit_error(ERR_FUNCTION, line_number, content->lex_data.label, "variavel");
+            break;
+        case NAT_VAR:
+            if(expected_nature == NAT_ARR)
+                emit_error(ERR_VARIABLE, line_number, content->lex_data.label, "arranjo");
+            if (expected_nature == NAT_FUN)
+                emit_error(ERR_VARIABLE, line_number, content->lex_data.label, "funcao");
+            break;
+        
+        default:
+            break;
     }
 }
 
 SymbolTable* table_nest(SymbolTable* root) {
-    // printf("\n---------------NEW SCOPE---------------");
+    //printf("\n---------------NEW SCOPE---------------");
     SymbolTable* new_table = table_new();
+    new_table->return_type = function_type_buffer; // This is set by the parser
+    function_type_buffer = NODE_TYPE_UNDECLARED;
     SymbolTable* current = root;
     while(current->next != NULL) {
         current = current->next;
@@ -221,9 +223,12 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
         while(root->next != NULL)
             root = root->next;
         root = root->parent;
+        printf("\nREMOVING TABLE:");
         table_print(root->next);
         table_free(root->next);
         root->next = NULL;
+        //printf("\nNEW SCOPE:");
+        //table_print(root);
         return root;
     }
 }
@@ -231,7 +236,6 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
 void table_update_type(SymbolTable* table, int type){
     IntList* typeless_idx = table->typeless;
     while(typeless_idx!=NULL){
-        // printf("\nUPDATING TABLE[%d]:\"%s\" to %s\n", typeless_idx->value, table->keys[typeless_idx->value], int_to_type(type));
         table->content[typeless_idx->value]->node_type = type;
         typeless_idx = typeless_idx->next;
     }
@@ -279,6 +283,6 @@ char* int_to_type(int i){
         case NODE_TYPE_INT:
             return "int";
         default:
-            return "TYPE_ERROR";
+            return "typeless";
     }
 }

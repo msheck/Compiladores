@@ -23,17 +23,6 @@ Desenvolvido pelos alunos:
 #define NODE_TYPE_INT   3
 #define NODE_TYPE_FLOAT 4
 
-#define ERR_UNDECLARED 10
-#define ERR_DECLARED 11
-#define ERR_VARIABLE 20
-#define ERR_ARRAY 21
-#define ERR_FUNCTION 22
-#define ERR_CHAR_TO_INT 31
-#define ERR_CHAR_TO_FLOAT 32
-#define ERR_CHAR_TO_BOOL 33
-#define ERR_CHAR_VECTOR 34
-#define ERR_X_TO_CHAR 35
-
 #define NAT_LIT 1
 #define NAT_VAR 2
 #define NAT_ARR 3
@@ -99,6 +88,7 @@ struct symbol_table{
     SymbolTable *next;
     SymbolTable *parent;
     IntList* typeless;
+    int return_type;
 };
 
 #endif
