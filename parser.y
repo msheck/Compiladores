@@ -143,7 +143,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1, NODE_TYPE_BOOL); }
                     | TK_LIT_TRUE   { $$ = ast_new_node($1, NODE_TYPE_BOOL); }
                     | TK_LIT_INT    { $$ = ast_new_node($1, NODE_TYPE_INT); }
                     | TK_LIT_FLOAT  { $$ = ast_new_node($1, NODE_TYPE_FLOAT); }
-                    | TK_LIT_CHAR   { $1.label[0]=$1.label[1]; $1.label[1] = '\0'; $1.label = realloc($1.label, sizeof(char)*2); $1.value = strdup($1.label); $$ = ast_new_node($1, NODE_TYPE_CHAR); };
+                    | TK_LIT_CHAR   { $1.label[0]=$1.label[1]; $1.label[1] = '\0'; $1.label = realloc($1.label, sizeof(char)*2); free($1.value); $1.value = strdup($1.label); $$ = ast_new_node($1, NODE_TYPE_CHAR); };
 
 list_int:             TK_LIT_INT              { $$ = ast_new_node($1, NODE_TYPE_INT); }
                     | list_int '^' TK_LIT_INT { $$ = ast_new_node($2, NODE_TYPE_INT); ast_add_child($$, $1); ast_add_child($$, ast_new_node($3, NODE_TYPE_INT)); };
@@ -293,7 +293,7 @@ expr_tier1:           '-' expr                { ast_check_not_char($2, NODE_TYPE
 // CONTROLE DE FLUXO
 
 if_then_expr:         TK_PR_IF '(' expr ')' TK_PR_THEN        { ast_check_type_node(NODE_TYPE_BOOL, $3);
-                                                                $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); };
+                                                                $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); free($5.label); };
 
 if_then:              if_then_expr bloc_com                   { $$ = $1; ast_add_child($$, $2); };
 

@@ -46,7 +46,7 @@ valgrind: debug
 	valgrind -s ./etapa$(ETAPA) < input
 
 valgrind_details: debug
-	valgrind -s --leak-check=full ./etapa$(ETAPA) < input
+	valgrind -s --leak-check=full --show-leak-kinds=all ./etapa$(ETAPA) < input
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' -cvzf etapa$(ETAPA).tgz .

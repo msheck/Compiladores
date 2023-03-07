@@ -261,11 +261,13 @@ void table_add_to_buffer(Content* content){
 void table_flush_buffer(SymbolTable* table){
     ContentList* current = contentList_new();
     current = table_dup_buffer();
+    ContentList* current_root = current;
     while(current!=NULL){
         // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_data.label);
-        table_add_entry(table, current->value->lex_data.label, current->value);
+        table_add_entry(table, current->value->lex_data.label, content_dup(current->value));
         current = current->next;
     }
+    contentList_free(current_root);
     contentList_free(content_buffer);
     content_buffer = contentList_new();
 }
