@@ -245,6 +245,8 @@ void table_update_type(SymbolTable* table, int type){
 
 void table_update_data_value(SymbolTable* table, char* key, ASTree* node_value){
     Content* declared_content = table_check_undeclared(table, key, node_value->data.line_number);
+    if(declared_content->lex_data.value != NULL)
+        free(declared_content->lex_data.value);
     if(node_value->data.value == NULL)
         declared_content->lex_data.value = strdup(node_value->data.label); 
     else

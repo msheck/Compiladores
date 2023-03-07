@@ -75,7 +75,6 @@ struct content_{
     lexValue lex_data;
     int nature;
     int node_type;
-    //char* data_value;
     IntList *dimensions;
     int total_size;
     ContentList *args;

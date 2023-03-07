@@ -57,12 +57,10 @@ IntList* intList_pushRight(IntList* list, int value) {
         //printf("\n%d: Pushing %ld after %ld", list->value, (long)list, (long)last_node);
         return list;
     }
-    else {
-        new_node = malloc(sizeof(IntList*)+sizeof(list));
-        last_node->next = new_node;
-        new_node->next = NULL;
-    }
+    new_node = malloc(sizeof(IntList*)+sizeof(NULL));
     new_node->value = value;
+    new_node->next = NULL;
+    last_node->next = new_node;
     //printf("\n%d: Pushing %ld after %ld", new_node->value, (long)new_node, (long)last_node);
     return list;
 }

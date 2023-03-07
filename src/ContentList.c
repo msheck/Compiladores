@@ -57,12 +57,10 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         //printf("\n%s: Pushing %ld after %ld", list->value->lex_data.label, (long)list, (long)last_node);
         return list;
     }
-    else {
-        new_node = malloc(sizeof(ContentList*)+sizeof(list));
-        last_node->next = new_node;
-        new_node->next = NULL;
-    }
+    new_node = malloc(sizeof(ContentList*)+sizeof(NULL));
     new_node->value = value;
+    new_node->next = NULL;
+    last_node->next = new_node;
     //printf("\n%s: Pushing %ld after %ld", new_node->value->lex_data.label, (long)new_node, (long)last_node);
     return list;
 }

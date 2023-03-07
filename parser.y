@@ -161,7 +161,7 @@ dec_var_glob:         tipo_var var_glob ';'               { table_update_type(es
 
 var_glob:             TK_IDENTIFICADOR                    { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                             free($1.label); $$ = NULL; }
-                    | dec_ident_multidim                  { $$ = NULL; }
+                    | dec_ident_multidim                  { $$ = NULL; ast_free($1); }
                     | var_glob ',' TK_IDENTIFICADOR       { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
                                                             free($3.label); $$ = NULL; }
                     | var_glob ',' dec_ident_multidim     { $$ = NULL; };
@@ -235,7 +235,8 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | ident_multidim          { $$ = $1; }
                     | lits                    { $$ = $1; }
                     | TK_IDENTIFICADOR        { table_check_use(table_get_content(escopo, $1.label, $1.line_number), NAT_VAR, $1.line_number);
-                                                Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); free(identifier); };
+                                                Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); 
+                                                free(identifier); free($1.label); if($1.value!=NULL) free($1.value); };
 
 expr_tier7:           expr TK_OC_OR expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
                                                 $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
