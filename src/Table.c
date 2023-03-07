@@ -157,18 +157,17 @@ void table_check_declared(SymbolTable* table, char* key, int line) {
     Content* declared_content = table_has_declared(table, key);
     if(declared_content != NULL) {
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s previamente declarado na linha %d.\033[0m", line, key, declared_content->lex_data.line_number);
-        //table_abort(table);
+        table_abort(table);
         exit(ERR_DECLARED);
     }
 }
 
-extern void* tabela;
 Content* table_check_undeclared(SymbolTable* table, char* key, int line) {
     Content* declared_content = table_has_declared(table, key);
     if(declared_content == NULL) {
-        //table_abort(table);
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s nao declarado.\033[0m", line, key);
         table_print(table);
+        table_abort(table);
         exit(ERR_UNDECLARED);
     }
     return declared_content;

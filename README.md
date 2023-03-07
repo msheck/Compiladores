@@ -1,7 +1,9 @@
 # Trabalho de Compiladores - INF01147 - UFRGS
 _Desenvolvido por Mateus Severgnini Heck e Vinicius Meirelles Pereira_
 
-[Repositório do Projeto](https://github.com/msheck/Compiladores)
+#### [Repositório do Projeto](https://github.com/msheck/Compiladores)
+---
+
 
 ## Etapa 1 - Análise Léxica
 
@@ -48,6 +50,13 @@ Ou, de forma similar ao grafo, usando a implementação no _**Makefile**_:
 make valgrind
 ```
 
+
+## Etapa 4 - Análise Semântica
+
+A análise semântica armazena as declarações da gramática em uma tabela, e garante que o valores e expressões associados são de tipos compatíveis. Se houver associações com tipos incompatíveis, o programa irá terminar e retornar um erro indicando o tipo de exceção atingida.
+
+Nessa etapa separamos os arquivos de acordo com suas funcionalidades e o agrupados na pasta _src/..._ para uma organização mais intuitiva.
+
 ---
 
 ## Makefile commands
@@ -60,6 +69,7 @@ make test
 make run_input
 make graph
 make valgrind
+make valgrind_details
 make zip
 make unzip
 ```

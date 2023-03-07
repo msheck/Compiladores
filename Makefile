@@ -53,6 +53,3 @@ zip: clean
 
 unzip:
 	mkdir entrega | tar xf etapa$(ETAPA).tgz --directory entrega
-
-table:
-	gcc $(SOURCES) main.c -o table_test
