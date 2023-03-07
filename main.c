@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	escopo = tabela;
 	int ret = yyparse(); 
     table_print_contexts(tabela);
-	//exporta (arvore);
+	exporta (arvore);
 	libera(arvore);
 	arvore = NULL;
 

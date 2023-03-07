@@ -81,11 +81,10 @@ void content_free(Content *content) {
 
 int calculate_total_size(int node_type, IntList* dimensions) {
     int total_size = 0;
-
     IntList *next = dimensions;
     int dims_size = 0;
     while(next != NULL) {
-        dims_size ++;
+        dims_size += dimensions->value;
         next = next->next;
     }
     

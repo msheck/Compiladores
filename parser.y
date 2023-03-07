@@ -143,7 +143,7 @@ lits:                 TK_LIT_FALSE  { $$ = ast_new_node($1, NODE_TYPE_BOOL); }
                     | TK_LIT_TRUE   { $$ = ast_new_node($1, NODE_TYPE_BOOL); }
                     | TK_LIT_INT    { $$ = ast_new_node($1, NODE_TYPE_INT); }
                     | TK_LIT_FLOAT  { $$ = ast_new_node($1, NODE_TYPE_FLOAT); }
-                    | TK_LIT_CHAR   { $1.label[0]=$1.label[1]; $1.label[1] = '\0'; $1.label = realloc($1.label, sizeof(char)*2); $$ = ast_new_node($1, NODE_TYPE_CHAR); };
+                    | TK_LIT_CHAR   { $1.label[0]=$1.label[1]; $1.label[1] = '\0'; $1.label = realloc($1.label, sizeof(char)*2); $1.value = strdup($1.label); $$ = ast_new_node($1, NODE_TYPE_CHAR); };
 
 list_int:             TK_LIT_INT              { $$ = ast_new_node($1, NODE_TYPE_INT); }
                     | list_int '^' TK_LIT_INT { $$ = ast_new_node($2, NODE_TYPE_INT); ast_add_child($$, $1); ast_add_child($$, ast_new_node($3, NODE_TYPE_INT)); };
@@ -238,27 +238,35 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                                                 Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); free(identifier); };
 
 expr_tier7:           expr TK_OC_OR expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr_tier6              { $$ = $1; };
 
 expr_tier6:           expr TK_OC_AND expr     { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr_tier5              { $$ = $1; };
 
 expr_tier5:           expr TK_OC_EQ expr      { ast_check_type($1, $3);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr TK_OC_NE expr      { ast_check_type($1, $3);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr_tier4              { $$ = $1; };
 
 expr_tier4:           expr '<' expr           { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr '>' expr           { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr TK_OC_LE expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr TK_OC_GE expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
-                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); }
+                                                $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                $$->node_type = NODE_TYPE_BOOL; }
                     | expr_tier3              { $$ = $1; };
 
 expr_tier3:           expr '+' expr           { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
