@@ -29,8 +29,6 @@ void table_add_entry(SymbolTable *table, char* key, Content* content);
 
 void table_free(SymbolTable* table);
 
-void table_abort(SymbolTable* root);
-
 void table_check_declared(SymbolTable* table, char* key, int line);
 
 Content* table_check_undeclared(SymbolTable* table, char* key, int line);

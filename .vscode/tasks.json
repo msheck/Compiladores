@@ -26,7 +26,7 @@
                 "src/ASTExpressions.c",
                 "src/Table.c",
                 "parser.tab.c",
-                "main.c",
+                "test.c",
                 "-o",
                 "${workspaceFolder}/debug"
             ],

@@ -1,3 +1,14 @@
+/*
+-abc13: variaveis de mesmo nome em escopos diferentes
+-kal14: ERR_CHAR_VECTOR não implementado
+-kal30: variaveis de mesmo nome em escopos diferentes
+-kal32: variaveis de mesmo nome em escopos diferentes
+-kal34: variaveis de mesmo nome em escopos diferentes
+-kal35: variaveis de mesmo nome em escopos diferentes
+-kal40: variaveis de mesmo nome em escopos diferentes
+*/
+
+
 /*int aa;
 int B() {
     int ba;

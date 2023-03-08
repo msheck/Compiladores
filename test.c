@@ -11,6 +11,7 @@ Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #define _(s) #s // https://gcc.gnu.org/onlinedocs/gcc-12.2.0/cpp/Stringizing.html
 #include "parser.tab.h" //arquivo gerado com bison -d parser.y
@@ -18,33 +19,23 @@ Arquivo contendo testes automatizados. Para executá-los utilize "make test".
 #define bool int
 #define true 1
 #define false 0
+char* path = "E4";
 
-typedef struct yy_buffer_state * YY_BUFFER_STATE;
+extern int yyparse(void);
+extern int yylex_destroy(void);
+extern int error_message_enabled;
 
 void *tabela = NULL;
+void *escopo = NULL;
 void *arvore = NULL;
 void exporta (void *arvore);
 void libera (void *arvore);
 
-extern int yyparse(void);
-extern int yylex(void);
-extern YY_BUFFER_STATE yy_scan_string(char * string);
-extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
-extern int yylex_destroy(void);
-extern int yylineno;
-
-extern char *yytext;
-extern int get_line_number (void);
-extern int error_message_enabled;
-
 /* protótipos deste módulo - as implementações estão após a main */
-int print_token (int token);
-int test_token(char* string, int expected_token, bool assertion);
-int test_line_numbers(char* string, int expected_line_number);
-int test_parse (char* string, int assertion, int line_number);
+int test_file(char* relative_file_path, int line_number);
+int _test_file(char* command1, char* relative_file_path, char* command2);
+
 char failed_tests[200];
-char com_bloc_output[200];
-char* com_bloc(char* input);
 int test_number = 0;
 
 int main (int argc, char **argv)
@@ -54,275 +45,81 @@ int main (int argc, char **argv)
 
     test_result = test_result
 
-    // EMPTY PROGRAM
-	    + test_parse("", true, __LINE__)
-
-    // DEC VAR GLOBAL
-
-        //ints
-        + test_parse("int;", false, __LINE__)
-        + test_parse("int aa;", true, __LINE__)
-        + test_parse("int aa, ab, ac;", true, __LINE__)
-        + test_parse("int aa[]", false, __LINE__)
-        + test_parse("int aa[0.5]", false, __LINE__)
-        + test_parse("int aa[ba]", false, __LINE__)
-        + test_parse("int aa[1];", true, __LINE__)
-        + test_parse("int aa[13^5];", true, __LINE__)
-        + test_parse("int aa[13^5^8];", true, __LINE__)
-        + test_parse("int aa[1], ab[2^3], ac[2^3^4];", true, __LINE__)
-        + test_parse("int aa <= 0;", false, __LINE__)
-        + test_parse("int aa = 0;", false, __LINE__)
-
-        //floats
-        + test_parse("float;", false, __LINE__)
-        + test_parse("float ba;", true, __LINE__)
-        + test_parse("float ba, bb, bc;", true, __LINE__)
-        + test_parse("float ba[]", false, __LINE__)
-        + test_parse("float ba[0.5]", false, __LINE__)
-        + test_parse("float ba[bb]", false, __LINE__)
-        + test_parse("float ba[1];", true, __LINE__)
-        + test_parse("float ba[13^5];", true, __LINE__)
-        + test_parse("float ba[13^5^8];", true, __LINE__)
-        + test_parse("float ba[1], bb[2^3], bc[2^3^4];", true, __LINE__)
-        + test_parse("float ba <= 0;", false, __LINE__)
-        + test_parse("float ba = 0;", false, __LINE__)
-
-        //char
-        + test_parse("char;", false, __LINE__)
-        + test_parse("char ca;", true, __LINE__)
-        + test_parse("char ca, cb, cc;", true, __LINE__)
-        + test_parse("char ca[]", false, __LINE__)
-        + test_parse("char ca[0.5]", false, __LINE__)
-        + test_parse("char ca[cb]", false, __LINE__)
-        + test_parse("char ca[1];", true, __LINE__)
-        + test_parse("char ca[13^5];", true, __LINE__)
-        + test_parse("char ca[13^5^8];", true, __LINE__)
-        + test_parse("char ca[1], cb[2^3], cc[2^3^4];", true, __LINE__)
-        + test_parse("char ca <= 0;", false, __LINE__)
-        + test_parse("char ca = 0;", false, __LINE__)
-
-        //bool
-        + test_parse("bool;", false, __LINE__)
-        + test_parse("bool da;", true, __LINE__)
-        + test_parse("bool da, db, dc;", true, __LINE__)
-        + test_parse("bool da[]", false, __LINE__)
-        + test_parse("bool da[0.5]", false, __LINE__)
-        + test_parse("bool da[db]", false, __LINE__)
-        + test_parse("bool da[1];", true, __LINE__)
-        + test_parse("bool da[13^5];", true, __LINE__)
-        + test_parse("bool da[13^5^8];", true, __LINE__)
-        + test_parse("bool da[1], db[2^3], dc[2^3^4];", true, __LINE__)
-        + test_parse("bool da <= 0;", false, __LINE__)
-        + test_parse("bool da = 0;", false, __LINE__)
-
-    // FUNCOES
-    
-        //ints
-        + test_parse("int fA ();", false, __LINE__)
-        + test_parse("int fA () {};", false, __LINE__)
-        + test_parse("int fA (int a) {}", true, __LINE__)
-        + test_parse("int fA (int a, float b) {}", true, __LINE__)
-        + test_parse("int fA (int a, float b, char c) {}", true, __LINE__)
-
-        //floats
-        + test_parse("float fB ();", false, __LINE__)
-        + test_parse("float fB () {};", false, __LINE__)
-        + test_parse("float fB (int a) {}", true, __LINE__)
-        + test_parse("float fB (int a, float b) {}", true, __LINE__)
-        + test_parse("float fB (int a, float b, char c) {}", true, __LINE__)
-
-        //chars
-        + test_parse("char fC ();", false, __LINE__)
-        + test_parse("char fC () {};", false, __LINE__)
-        + test_parse("char fC (int a) {}", true, __LINE__)
-        + test_parse("char fC (int a, float b) {}", true, __LINE__)
-        + test_parse("char fC (int a, float b, char c) {}", true, __LINE__)
-
-        //bools
-        + test_parse("bool fD ();", false, __LINE__)
-        + test_parse("bool fD () {};", false, __LINE__)
-        + test_parse("bool fD (int a) {}", true, __LINE__)
-        + test_parse("bool fD (int a, float b) {}", true, __LINE__)
-        + test_parse("bool fD (int a, float b, char c) {}", true, __LINE__)
-
-    // BLOCO DE COMANDOS
-
-        + test_parse(com_bloc("{}"), false, __LINE__)
-        + test_parse(com_bloc("{{{{{}}}}}"), false, __LINE__)
-        + test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();}}"), false, __LINE__)
-        + test_parse(com_bloc("{};"), true, __LINE__)
-        + test_parse(com_bloc("{{{{{};};};};};"), true, __LINE__)
-        + test_parse(com_bloc("foo = bar; func(); if(a) then {foo = bar; while(1){doNothing();};};"), true, __LINE__)
-
-    // DEC VAR LOCAL
-
-        //ints
-        + test_parse(com_bloc("int a;"), true, __LINE__)
-        + test_parse(com_bloc("int a, b, c;"), true, __LINE__)
-        + test_parse(com_bloc("int a <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("int a, b, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("int a <= 2, b <= 2, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("int a[];"), false, __LINE__)
-        + test_parse(com_bloc("int a[1];"), false, __LINE__)
-        + test_parse(com_bloc("int a[1^2];"), false, __LINE__)
-        + test_parse(com_bloc("int a <= '2', b <= '2', c <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("int a <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("int a <= 2 + 3;"), false, __LINE__)
-
-        //floats
-        + test_parse(com_bloc("float b;"), true, __LINE__)
-        + test_parse(com_bloc("float b, b, c;"), true, __LINE__)
-        + test_parse(com_bloc("float b <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("float b, b, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("float b <= 2, b <= 2, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("float b[];"), false, __LINE__)
-        + test_parse(com_bloc("float b[1];"), false, __LINE__)
-        + test_parse(com_bloc("float b[1^2];"), false, __LINE__)
-        + test_parse(com_bloc("float a <= '2', b <= '2', c <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("float a <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("float a <= 2 + 3;"), false, __LINE__)
-
-        //chars
-        + test_parse(com_bloc("char c;"), true, __LINE__)
-        + test_parse(com_bloc("char c, b, c;"), true, __LINE__)
-        + test_parse(com_bloc("char c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("char c, b, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("char c <= 2, b <= 2, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("char c[];"), false, __LINE__)
-        + test_parse(com_bloc("char c[1];"), false, __LINE__)
-        + test_parse(com_bloc("char c[1^2];"), false, __LINE__)
-        + test_parse(com_bloc("char a <= '2', b <= '2', c <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("char a <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("char a <= 2 + 3;"), false, __LINE__)
-
-        //bools
-        + test_parse(com_bloc("bool d;"), true, __LINE__)
-        + test_parse(com_bloc("bool d, b, c;"), true, __LINE__)
-        + test_parse(com_bloc("bool d <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("bool d, b, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("bool d <= 2, b <= 2, c <= 2;"), true, __LINE__)
-        + test_parse(com_bloc("bool d[];"), false, __LINE__)
-        + test_parse(com_bloc("bool d[1];"), false, __LINE__)
-        + test_parse(com_bloc("bool d[1^2];"), false, __LINE__)
-        + test_parse(com_bloc("bool a <= '2', b <= '2', c <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("bool a <= '2';"), true, __LINE__)
-        + test_parse(com_bloc("bool a <= 2 + 3;"), false, __LINE__)
-
-    // ATRIBUICOES
-
-        + test_parse(com_bloc("foo = bar;"), true, __LINE__)
-        + test_parse(com_bloc("foo = 'a';"), true, __LINE__)
-        + test_parse(com_bloc("foo = 'aaa';"), false, __LINE__)
-        + test_parse(com_bloc("foo = bar"), false, __LINE__)
-        + test_parse(com_bloc("foo = 123545;"), true, __LINE__)
-        + test_parse(com_bloc("foo = 1235.45;"), true, __LINE__)
-        + test_parse(com_bloc("foo = 1235.45e12345;"), true, __LINE__)
-        + test_parse(com_bloc("foo = !(1234*abcd+47);"), true, __LINE__)
-        + test_parse(com_bloc("int vet[1];"), false, __LINE__)
-        + test_parse(com_bloc("vet[a^2^-(1234*abcd+47)] = 3;"), true, __LINE__)
-        + test_parse(com_bloc("var[var[10^20^30*2^var[20^30/2^40]]] = 5;"), true, __LINE__)
-
-    // CHAMADA DE FUNCAO
-
-        + test_parse(com_bloc("func()"), false, __LINE__)
-        + test_parse(com_bloc("func(a)"), false, __LINE__)
-        + test_parse(com_bloc("func(foo())"), false, __LINE__)
-        + test_parse(com_bloc("func(foo(123))"), false, __LINE__)
-        + test_parse(com_bloc("func();"), true, __LINE__)
-        + test_parse(com_bloc("func(a);"), true, __LINE__)
-        + test_parse(com_bloc("func(foo());"), true, __LINE__)
-        + test_parse(com_bloc("func(foo(123));"), true, __LINE__)
-        + test_parse(com_bloc("func(1, a, );"), true, __LINE__)
-        + test_parse(com_bloc("func(1, a, -(1234*abcd+47));"), true, __LINE__)
-
-    // EXPRESSOES
-
-        + test_parse(com_bloc("a = !!!!foo;"), true, __LINE__)
-        + test_parse(com_bloc("a = !!!(!foo && bar);"), true, __LINE__)
-        + test_parse(com_bloc("a = -(1234*!abcd+47);"), true, __LINE__)
-        + test_parse(com_bloc("a = !(1234*-abcd+47);"), true, __LINE__)
-        + test_parse(com_bloc("a = vet[a^2^-(1234*abcd+47)];"), true, __LINE__)
-        + test_parse(com_bloc("a = b;"), true, __LINE__)
-        + test_parse(com_bloc("a = func();"), true, __LINE__)
-        + test_parse(com_bloc("a = (1234*-abcd+47/9) \% (1234*-abcd+47/9) == var*5 != 10\%2;"), true, __LINE__)
-        + test_parse(com_bloc("a = (1234*-abcd+47/9) <= (1234*-abcd+47/9) >= var*5 != 10\%2;"), true, __LINE__)
-        + test_parse(com_bloc("a = (1234*-abcd+47/9) && (1234*-abcd+47/9) || var*5 != 10\%2;"), true, __LINE__)
-        + test_parse(com_bloc("a = (((1234*-abcd+47/9) && (1234*-abcd+47/9)) || ((var*5) != (10\%2)));"), true, __LINE__)
-
-    // CONTROLE DE FLUXO
-
-        //fluxos no global
-        + test_parse("if ()", false, __LINE__)
-        + test_parse("if () then", false, __LINE__)
-        + test_parse("if () then {}", false, __LINE__)
-        + test_parse("if () then {};", false, __LINE__)        
-        + test_parse("if (a)", false, __LINE__)
-        + test_parse("if (a) then", false, __LINE__)
-        + test_parse("if (a) then {}", false, __LINE__)
-        + test_parse("if (a) then {};", false, __LINE__)
-        + test_parse("if (!a)", false, __LINE__)
-        + test_parse("if (!a) then", false, __LINE__)
-        + test_parse("if (!a) then {}", false, __LINE__)
-        + test_parse("if (!a) then {};", false, __LINE__)
-        + test_parse("if (a) then {} else", false, __LINE__)
-        + test_parse("if (a) then {} else {}", false, __LINE__)
-        + test_parse("if (a) then {} else {};", false, __LINE__)
-        + test_parse("if (!a) then {} else", false, __LINE__)
-        + test_parse("if (!a) then {} else {}", false, __LINE__)
-        + test_parse("if (!a) then {} else {};", false, __LINE__)
-        + test_parse("while", false, __LINE__)
-        + test_parse("while ()", false, __LINE__)
-        + test_parse("while () {}", false, __LINE__)
-        + test_parse("while () {};", false, __LINE__)
-        + test_parse("while (a)", false, __LINE__)
-        + test_parse("while (a) {}", false, __LINE__)
-        + test_parse("while (a) {};", false, __LINE__)
-        + test_parse("while (!a)", false, __LINE__)
-        + test_parse("while (!a) {}", false, __LINE__)
-        + test_parse("while (!a) {};", false, __LINE__)
-        
-        //if-then
-        + test_parse(com_bloc("if ()"), false, __LINE__)
-        + test_parse(com_bloc("if () then"), false, __LINE__)
-        + test_parse(com_bloc("if () then {}"), false, __LINE__)
-        + test_parse(com_bloc("if () then {};"), false, __LINE__)
-        + test_parse(com_bloc("if (a)"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {}"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {};"), true, __LINE__)
-        + test_parse(com_bloc("if (!a)"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {}"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {};"), true, __LINE__)
-        
-        //if-then-else      
-        + test_parse(com_bloc("if (a) then {} else"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {} else {}"), false, __LINE__)
-        + test_parse(com_bloc("if (a) then {} else {};"), true, __LINE__)
-        + test_parse(com_bloc("if (!a) then {} else"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {} else {}"), false, __LINE__)
-        + test_parse(com_bloc("if (!a) then {} else {};"), true, __LINE__)
-
-        //while
-        + test_parse(com_bloc("while"), false, __LINE__)
-        + test_parse(com_bloc("while ()"), false, __LINE__)
-        + test_parse(com_bloc("while () {}"), false, __LINE__)
-        + test_parse(com_bloc("while () {};"), false, __LINE__)
-        + test_parse(com_bloc("while (a)"), false, __LINE__)
-        + test_parse(com_bloc("while (a) {}"), false, __LINE__)
-        + test_parse(com_bloc("while (a) {};"), true, __LINE__)
-        + test_parse(com_bloc("while (!a)"), false, __LINE__)
-        + test_parse(com_bloc("while (!a) {}"), false, __LINE__)
-        + test_parse(com_bloc("while (!a) {};"), true, __LINE__)
-    
-    // RETURN
-
-        + test_parse(com_bloc("return;"), false, __LINE__)
-        + test_parse(com_bloc("return 1;"), true, __LINE__)
-        + test_parse(com_bloc("return a;"), true, __LINE__)
-        + test_parse(com_bloc("return -(1234*abcd+47);"), true, __LINE__)
-
-    ;
+    + test_file("E4/abc00", __LINE__)
+    + test_file("E4/abc01", __LINE__)
+    + test_file("E4/abc02", __LINE__)
+    + test_file("E4/abc03", __LINE__)
+    + test_file("E4/abc04", __LINE__)
+    + test_file("E4/abc05", __LINE__)
+    + test_file("E4/abc06", __LINE__)
+    + test_file("E4/abc07", __LINE__)
+    + test_file("E4/abc08", __LINE__)
+    + test_file("E4/abc09", __LINE__)
+    + test_file("E4/abc10", __LINE__)
+    + test_file("E4/abc11", __LINE__)
+    + test_file("E4/abc13", __LINE__)
+    + test_file("E4/abc14", __LINE__)
+    + test_file("E4/kal01", __LINE__)
+    + test_file("E4/kal02", __LINE__)
+    + test_file("E4/kal03", __LINE__)
+    + test_file("E4/kal04", __LINE__)
+    + test_file("E4/kal06", __LINE__)
+    + test_file("E4/kal07", __LINE__)
+    + test_file("E4/kal08", __LINE__)
+    + test_file("E4/kal09", __LINE__)
+    + test_file("E4/kal11", __LINE__)
+    + test_file("E4/kal12", __LINE__)
+    + test_file("E4/kal13", __LINE__)
+    + test_file("E4/kal14", __LINE__)
+    + test_file("E4/kal15", __LINE__)
+    + test_file("E4/kal16", __LINE__)
+    + test_file("E4/kal17", __LINE__)
+    + test_file("E4/kal18", __LINE__)
+    + test_file("E4/kal19", __LINE__)
+    + test_file("E4/kal28", __LINE__)
+    + test_file("E4/kal29", __LINE__)
+    + test_file("E4/kal30", __LINE__)
+    + test_file("E4/kal31", __LINE__)
+    + test_file("E4/kal32", __LINE__)
+    + test_file("E4/kal33", __LINE__)
+    + test_file("E4/kal34", __LINE__)
+    + test_file("E4/kal35", __LINE__)
+    + test_file("E4/kal36", __LINE__)
+    + test_file("E4/kal37", __LINE__)
+    + test_file("E4/kal38", __LINE__)
+    + test_file("E4/kal39", __LINE__)
+    + test_file("E4/kal40", __LINE__)
+    + test_file("E4/kal41", __LINE__)
+    + test_file("E4/kal42", __LINE__)
+    + test_file("E4/kal43", __LINE__)
+    + test_file("E4/kal44", __LINE__)
+    + test_file("E4/kal45", __LINE__)
+    + test_file("E4/kal46", __LINE__)
+    + test_file("E4/kal47", __LINE__)
+    + test_file("E4/kal48", __LINE__)
+    + test_file("E4/kal49", __LINE__)
+    + test_file("E4/kal50", __LINE__)
+    + test_file("E4/kal51", __LINE__)
+    + test_file("E4/kal56", __LINE__)
+    + test_file("E4/kal57", __LINE__)
+    + test_file("E4/kal58", __LINE__)
+    + test_file("E4/kal59", __LINE__)
+    + test_file("E4/kal70", __LINE__)
+    + test_file("E4/kal71", __LINE__)
+    + test_file("E4/kal89", __LINE__)
+    + test_file("E4/kal90", __LINE__)
+    + test_file("E4/kal91", __LINE__)
+    + test_file("E4/kal92", __LINE__)
+    + test_file("E4/kal93", __LINE__)
+    + test_file("E4/kal94", __LINE__)
+    + test_file("E4/kal99", __LINE__)
+    + test_file("E4/mao05", __LINE__)
+    + test_file("E4/mao06", __LINE__)
+    + test_file("E4/mao07", __LINE__)
+    + test_file("E4/mao09", __LINE__)
+    + test_file("E4/mao10", __LINE__)
+    + test_file("E4/mao11", __LINE__)
+    + test_file("E4/mao12", __LINE__);
 	
     if (test_result != test_number)
         printf("\n\t\t\033[1;4;31mSOME TESTS FAILED!\n\n\033[0;31mFailed Tests:\033[0m %s\n\n", failed_tests);
@@ -332,106 +129,81 @@ int main (int argc, char **argv)
 	return 0;
 }
 
-int test_line_numbers(char* string, int expected_line_number) {
-    YY_BUFFER_STATE buffer = yy_scan_string(string);
-    while (yylex()) { }
-    yy_delete_buffer(buffer);
-    int line_number = get_line_number();
-    yylineno = 0;
-
-    printf("\nLine number is %d, expected is %d. ", line_number, expected_line_number);
-    if (expected_line_number != line_number){	 
-        printf("\033[0;31mFAILED!\033[0m");
-        return false;
+int test_file(char* relative_file_path, int line_number) {
+    // Open file
+    FILE *file_ptr;
+    file_ptr = fopen(relative_file_path, "r");
+    if(file_ptr == NULL){
+        printf("\nErro ao abrir arquivo de teste %s!", relative_file_path);
+        exit(-1);
     }
-    printf("\033[0;32mPASSED!\033[0m");
-    return true;
-}
-
-
-int test_token(char* string, int expected_token, bool assertion) {
-    YY_BUFFER_STATE buffer = yy_scan_string(string);
-    int tk = yylex();
-
-    if (yylex() != 0){
-        printf("\nTesting %s. More than one token present. ", string);
-        if (!assertion) {
-            printf("Failure expected. \033[0;32mPASSED!\033[0m");
-            return true;
-        } else {
-            printf("\033[0;31mFAILED!\033[0m");
-            return false;
-        }
+    // Get first line from file
+    char f_char[2];
+    f_char[0] = 'a';
+    f_char[1] = '\0';
+    char* line = malloc(sizeof(char*)*2);
+    line = strdup("");
+    int char_count = 0;
+    while(f_char[0] != '\n') {
+        f_char[0] = fgetc(file_ptr);
+        char_count += 1;
+        line = realloc(line, sizeof(char*) * char_count);
+        strcat(line, f_char);
     }
-
-    printf("\nTesting %s. Token is %d, expected is %d. ", string, tk, expected_token);
-
-    yy_delete_buffer(buffer);
-
-    if (expected_token == tk) {
-        if (assertion) {
-            printf("\033[0;32mPASSED!\033[0m");
-            return true;
-        } else {
-            printf("Success not expexted. \033[0;31mFAILED!\033[0m");
-            return false;
-        }
-    } else {
-        if (!assertion) {
-            printf("Failure expected. \033[0;32mPASSED!\033[0m");
-            return true;
-        } else {
-            printf("\033[0;31mFAILED!\033[0m");
-            return false;
-        }
+    fclose(file_ptr);
+    // Check if there is an expected output
+    int expected_output = 0;
+    if(line[0] == '/' && line[1] == '/') {
+        if(strcmp(line, "//ERR_UNDECLARED\n") == 0)
+            expected_output = 10;
+        else if(strcmp(line, "//ERR_DECLARED\n") == 0)
+            expected_output = 11;
+        else if(strcmp(line, "//ERR_VARIABLE\n") == 0)
+            expected_output = 20;
+        else if(strcmp(line, "//ERR_ARRAY\n") == 0)
+            expected_output = 21;
+        else if(strcmp(line, "//ERR_FUNCTION\n") == 0)
+            expected_output = 22;
+        else if(strcmp(line, "//ERR_CHAR_TO_INT\n") == 0)
+            expected_output = 31;
+        else if(strcmp(line, "//ERR_CHAR_TO_FLOAT\n") == 0)
+            expected_output = 32;
+        else if(strcmp(line, "//ERR_CHAR_TO_BOOL\n") == 0)
+            expected_output = 33;
+        else if(strcmp(line, "//ERR_CHAR_VECTOR\n") == 0)
+            expected_output = 34;
+        else if(strcmp(line, "//ERR_X_TO_CHAR\n") == 0)
+            expected_output = 35;
+        else if(strcmp(line, "//ERR_TYPELESS\n") == 0)
+            expected_output = 36;
+        else if(strcmp(line, "//ERR_INVALID_EXPR\n") == 0)
+            expected_output = 37;
     }
-}
-
-char* com_bloc (char* input)
-{
-    char output[200] = "int commBlock() {\n    ";
-
-    strcat(output, (const char*)input);
-    strcat(output,"\n}");
-
-    strcpy(com_bloc_output,output);
-
-    return com_bloc_output;
-}
-
-int test_parse (char* string, int assertion, int line_number) {
-    YY_BUFFER_STATE buffer = yy_scan_string(string);
-    test_number++;
-    printf("\n\n\033[1;3;30mln%d\033[0m\t\t\033[1;4;34mTEST NUMBER: %i\033[0m", line_number, test_number);
-    printf("\n\033[1;30m-------------------input start-------------------\033[0m\n%s\n\033[1;30m--------------------input end--------------------\033[0m\n\033[4mResult\033[0m: ", string);    
-    int ret = yyparse();
-    char converted_int[sizeof(char)*sizeof(test_number)];
-    sprintf(converted_int,"%d",test_number);
-    yy_delete_buffer(buffer);
-    yylex_destroy();
+    free(line);
     
-    if (ret==1) { // Failure
-        if(assertion) { // Success expected
-            printf("\033[0;31mFAILED!\033[0m\n");
-            strcat(converted_int," ");
-            strcat(failed_tests,(const char*)converted_int);
-            return false;
-        }
-        else { // Failure expected
-            printf("Failure expected. \033[0;32mPASSED!\033[0m\n");
-            return true;
-        }
+    int output = _test_file("./etapa4 < ", relative_file_path, " > /dev/null");
+    test_number ++;
+    printf("\n\n\033[1;3;30mln%d\033[0m\t\t\033[1;4;34mTEST NUMBER: %i\033[0m", line_number, test_number);
+    printf("\n\033[0mTesting file %s\nExpected output:\033[1;30m %d\n\033[0mActual output:\033[1;30m   %d\033[0m", relative_file_path, expected_output, output);
+    if(output != expected_output) {
+        char converted_int[sizeof(char)*sizeof(test_number)];
+        sprintf(converted_int,"%d",test_number);
+        strcat(converted_int," ");
+        strcat(failed_tests,(const char*)converted_int);
+        printf("\n\033[0;31mFAILED!\033[0m\n");
     }
-    else { // Success
-        if(assertion) { // Success expected
-            printf("\033[0;32mPASSED!\033[0m\n");
-            return true;
-        }
-        else { // Failure expected
-            printf("Success not expexted. \033[0;31mFAILED!\033[0m\n");
-            strcat(converted_int," ");
-            strcat(failed_tests,(const char*)converted_int);
-            return false;
-        }
-    }
+    else
+        printf("\n\033[0;32mPASSED!\033[0m\n");
+
+    return output==expected_output;
+}
+
+int _test_file(char* command1, char* relative_file_path, char* command2) {
+    char* buffer = malloc((strlen(command1)+1+strlen(relative_file_path)+1+strlen(command2)+1) * sizeof(char*));
+    strcpy(buffer, command1);
+    strcat(buffer, relative_file_path);
+    strcat(buffer, command2);
+    int ret = system(buffer) >> 8;
+    free(buffer);
+    return ret;
 }
