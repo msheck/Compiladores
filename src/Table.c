@@ -66,6 +66,7 @@ Content* table_get_content(SymbolTable* table, char* key, int line_number){
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
     //printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
     table_check_declared(table, key, content->lex_data.line_number);
+    content->table = table;
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
@@ -148,7 +149,7 @@ Content* table_has_declared(SymbolTable* table, char* key) {
 
 void table_check_declared(SymbolTable* table, char* key, int line) {
     Content* declared_content = table_has_declared(table, key);
-    if(declared_content != NULL) {
+    if(declared_content != NULL && declared_content->table == table) {
         printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Identificador %s previamente declarado na linha %d.\033[0m", line, key, declared_content->lex_data.line_number);
         exit(ERR_DECLARED);
     }
@@ -225,6 +226,8 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
 void table_update_type(SymbolTable* table, int type){
     IntList* typeless_idx = table->typeless;
     while(typeless_idx!=NULL){
+        if(type == NODE_TYPE_CHAR && table->content[typeless_idx->value]->nature == NAT_ARR)
+            emit_error(ERR_CHAR_VECTOR, table->content[typeless_idx->value]->lex_data.line_number,  table->content[typeless_idx->value]->lex_data.label, NULL);
         table->content[typeless_idx->value]->node_type = type;
         typeless_idx = typeless_idx->next;
     }

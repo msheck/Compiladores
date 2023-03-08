@@ -78,6 +78,7 @@ struct content_{
     IntList *dimensions;
     int total_size;
     ContentList *args;
+    SymbolTable *table;
 };
 
 struct symbol_table{
