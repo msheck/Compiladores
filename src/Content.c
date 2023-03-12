@@ -68,11 +68,9 @@ Content* content_dup_del(Content* original){
 void content_free(Content *content) {
     if (content->dimensions != NULL) {
         intList_free(content->dimensions);
-        // printf("\n\tDimensions freed.");
     }
     if (content->args != NULL) {
         contentList_free(content->args);
-        // printf("\n\tArguments freed.");
     }
     free(content->lex_data.label);
     free(content->lex_data.value);

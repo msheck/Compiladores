@@ -14,14 +14,11 @@ extern ContentList *content_buffer;
 
 void table_print_buffer(){
     ContentList* current = content_buffer;
-    // printf("\n----BUFFER----");
     int i = 0;
     while(current!=NULL){
-        // printf("\nbuffer[%d] \"%s\":\"%s\":\"%s\":\"%s\"", i, current->key, current->value->lex_data.label, current->value->lex_data.value, current->value->data_value);
         current = current->next;
         i++;
     }
-    // printf("\n--------------");
 }
 
 int count_digits(int n)  
@@ -94,7 +91,6 @@ void table_print(SymbolTable* table) {
                 }
             }
             if(table->content[i]->dimensions != NULL){
-                // printf("\n| %*c dims: %*c", width-1, '|', width-8,'|');
                 printf("\n| %*c  dims: [", width, '|');
                 width_aux = width - 13;
                 IntList *current = table->content[i]->dimensions;
@@ -106,7 +102,6 @@ void table_print(SymbolTable* table) {
                         width_aux = width-count_digits(current->value)-8;
                         printf("\n|  %*c ", width-2, '|');
                     }
-                    // printf("\n| %*c [%d]%*c", width-1, '|', current->value, width-count_digits(current->value)-4, '|');
                     printf(" %d ", current->value);
                     if(current->next != NULL)
                         printf("^");
@@ -117,20 +112,4 @@ void table_print(SymbolTable* table) {
         }
     }
     print_sec_line(width,1);
-}
-
-void _table_print_contexts(SymbolTable* table, int i) {
-    i++;
-    printf("\n=================  PRINTING CONTEXT %d!  =================\n", i);
-    table_print(table);
-    if(table->next != NULL)
-        _table_print_contexts(table->next, i);
-}
-
-void table_print_contexts(SymbolTable* table) {
-    int i = 1;
-    printf("\n=============  PRINTING CONTEXT %02d! (ROOT)  ==============\n", i);
-    table_print(table);
-    if(table->next != NULL)
-        _table_print_contexts(table->next, i);
 }

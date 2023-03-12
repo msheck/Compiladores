@@ -8,6 +8,7 @@ Adaptado pelos alunos:
 	-Vinicius Meirelles Pereira
 A partir do código fornecido pelo professor.
 */
+
 #include "Structures.h"
 #include "Errors.h"
 

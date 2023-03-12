@@ -43,7 +43,6 @@ ContentList*  contentList_pushLeft(ContentList* list, Content* value) {
         new_node->next = list;
     }
     new_node->value = value;
-    //printf("\n%s: Pushing %ld before %ld", new_node->value->lex_data.label, (long)new_node, (long)new_node->next);
     return new_node;
 }
 
@@ -54,14 +53,12 @@ ContentList* contentList_pushRight(ContentList* list, Content* value) {
         list = malloc(sizeof(ContentList*)+sizeof(NULL));
         list->value = value;
         list->next = NULL;
-        //printf("\n%s: Pushing %ld after %ld", list->value->lex_data.label, (long)list, (long)last_node);
         return list;
     }
     new_node = malloc(sizeof(ContentList*)+sizeof(NULL));
     new_node->value = value;
     new_node->next = NULL;
     last_node->next = new_node;
-    //printf("\n%s: Pushing %ld after %ld", new_node->value->lex_data.label, (long)new_node, (long)last_node);
     return list;
 }
 
@@ -69,7 +66,6 @@ void contentList_free(ContentList* list) {
     if(list != NULL) {
         if(list->next != NULL)
             contentList_free(list->next);
-        // printf("\nFreeing %s: %ld...", list->value->lex_data.label, (long)list );
         content_free(list->value);
         free(list);
         list = NULL;

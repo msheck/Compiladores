@@ -17,6 +17,4 @@ void table_print_buffer();
 
 void table_print(SymbolTable* table);
 
-void table_print_contexts(SymbolTable* table);
-
 #endif

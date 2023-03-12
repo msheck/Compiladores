@@ -82,7 +82,7 @@ struct content_{
 };
 
 struct symbol_table{
-    int size; // How many entries in the table
+    int size;
     char** keys;
     Content** content;
     SymbolTable *next;

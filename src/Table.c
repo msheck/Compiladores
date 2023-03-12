@@ -43,15 +43,12 @@ int table_get_hash(char* key) {
 
 int table_get_index(SymbolTable* table, char* key) {
     int i = table_get_hash(key);
-    // printf("\nGET INDEX ~%s~! INDEX IS %d", key, i);
     while(i<table->size) {
         if((table->keys[i] != NULL) && (strcmp(table->keys[i], key)==0)) {
-            // printf("\nKEY FOUND!");
             break;
         }
         i++;
     }
-    // printf("\nRETURNING %d", i);
 	return i;
 }
 
@@ -64,7 +61,6 @@ Content* table_get_content(SymbolTable* table, char* key, int line_number){
 }
 
 void table_add_entry(SymbolTable *table, char* key, Content* content) {
-    //printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
     table_check_declared(table, key, content->lex_data.line_number);
     content->table = table;
     if(content->node_type != NODE_TYPE_UNDECLARED)
@@ -83,7 +79,6 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
         table->keys[table->size-1] = strdup(key);
         table->content[table->size-1] = content;
         if(content->node_type==NODE_TYPE_UNDECLARED){
-            // printf("TYPELESS!");
             table->typeless = intList_pushLeft(table->typeless, table->size-1);
         }
     }
@@ -97,7 +92,6 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
                 table->keys[i] = strdup(key);
                 table->content[i] = content;
                 if(content->node_type == NODE_TYPE_UNDECLARED){
-                    // printf("TYPELESS!");
                     table->typeless = intList_pushLeft(table->typeless, i);
                 }
                 is_on_table = true;
@@ -111,7 +105,6 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
             table->keys[table->size-1] = strdup(key);
             table->content[table->size-1] = content;
             if(content->node_type == NODE_TYPE_UNDECLARED){
-                // printf("TYPELESS!");
                 table->typeless = intList_pushLeft(table->typeless, table->size-1);
             }
         }
@@ -194,7 +187,6 @@ void table_check_use(Content* content, int expected_nature, int line_number) {
 }
 
 SymbolTable* table_nest(SymbolTable* root) {
-    //printf("\n---------------NEW SCOPE---------------");
     SymbolTable* new_table = table_new();
     new_table->return_type = function_type_buffer; // This is set by the parser
     function_type_buffer = NODE_TYPE_UNDECLARED;
@@ -213,12 +205,8 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
         while(root->next != NULL)
             root = root->next;
         root = root->parent;
-        printf("\nREMOVING TABLE:");
-        table_print(root->next);
         table_free(root->next);
         root->next = NULL;
-        //printf("\nNEW SCOPE:");
-        //table_print(root);
         return root;
     }
 }
@@ -246,7 +234,6 @@ void table_update_data_value(SymbolTable* table, char* key, ASTree* node_value){
 }
 
 void table_add_to_buffer(Content* content){
-    // printf("\nAdding \"%s\":\"%s\" to the buffer", key, content->lex_data.label);
     content_buffer = contentList_pushLeft(content_buffer, content);
 }
 
@@ -255,7 +242,6 @@ void table_flush_buffer(SymbolTable* table){
     current = table_dup_buffer();
     ContentList* current_root = current;
     while(current!=NULL){
-        // printf("\nFlushing \"%s\":\"%s\" to new context", current->key, current->value->lex_data.label);
         table_add_entry(table, current->value->lex_data.label, content_dup(current->value));
         current = current->next;
     }
