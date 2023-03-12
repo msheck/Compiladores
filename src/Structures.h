@@ -46,6 +46,8 @@ typedef struct int_list IntList;
 typedef struct content_list ContentList;
 typedef struct content_ Content;
 typedef struct symbol_table SymbolTable;
+typedef struct iloc_operation Operation;
+typedef struct operation_list OpList;
 
 struct lexical_value{
     int line_number;
@@ -89,6 +91,19 @@ struct symbol_table{
     SymbolTable *parent;
     IntList* typeless;
     int return_type;
+};
+
+struct iloc_operation {
+    int operation;      // Operation code, defined on CodeGen.h.
+    int num_args;
+    char** args;        // The arguments for the operation. Can be a register, constant, label.
+    char* dest;         // The destination for the result. Can be a register or memory(register+shift).
+    char* dest_shift;   // In case destination is in the format memory(register+shift), this is the shift.
+};
+
+struct operation_list{
+    Operation* value;
+    OpList* next;
 };
 
 #endif
