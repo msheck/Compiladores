@@ -6,7 +6,7 @@
 #	-Mateus Severgnini Heck 
 #	-Vinicius Meirelles Pereira
 
-ETAPA = 4
+ETAPA = 5
 SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c
 
 .PHONY: zip unzip compile_test test clean flex etapa$(ETAPA)
@@ -30,7 +30,7 @@ bison_debug:
 clean:
 	rm -rf entrega | rm -rf etapa* debug table_test lex.yy.c test.o *.tgz parser.tab.* *.output *.dot *.png
 
-test: flex bison_debug compile_test
+test: debug flex bison_debug compile_test
 	./test.o
 
 compile_test:
