@@ -30,7 +30,7 @@ bison_debug:
 clean:
 	rm -rf entrega | rm -rf etapa* debug table_test lex.yy.c test.o *.tgz parser.tab.* *.output *.dot *.png
 
-test: flex bison_debug compile_test
+test: debug flex bison_debug compile_test
 	./test.o
 
 compile_test:
