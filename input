@@ -1,3 +1,10 @@
+// TODO:
+//- Botar registrador e deslocamento da variavel na tabela (endereco da variavel). P/ isso, adicionar argumento no
+//table_add_entry indicando qual eh o reg (rfp, rbss). Manter contadores globais de deslocamento desses regs durante a
+//compilacao.
+//- Na hora de chamar op_new() dentro do parser, ja saberemos onde na memoria estara cada variavel gracas ao item anterior.
+
+
 
 /*int aa;
 int B() {

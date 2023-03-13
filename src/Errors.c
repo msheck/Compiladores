@@ -49,6 +49,10 @@ void emit_error(int code, int line_number, char* label, char* str) {
             printf("\n\033[1;4;31mERRO na linha %d:\033[0;31m Arranjo %s nao pode ser do tipo CHAR.\033[0m",
             line_number, label);
             break;
+        case ERR_UNKNOWN_OPERATION:
+            printf("\n\033[1;4;31mERRO:\033[0;31m A operacao %s nao foi reconhecida.\033[0m",
+            str);
+            break;
         
         default:
             printf("\n\033[1;4;31mA compilacao terminou com erro desconhecido numero %d.\033[0m",

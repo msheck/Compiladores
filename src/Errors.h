@@ -23,6 +23,7 @@ Desenvolvido pelos alunos:
 #define ERR_X_TO_CHAR 35
 #define ERR_TYPELESS 36
 #define ERR_INVALID_EXPR 37
+#define ERR_UNKNOWN_OPERATION 37
 
 void emit_error(int code, int line_number, char* label, char* str);
 

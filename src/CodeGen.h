@@ -11,101 +11,68 @@ Desenvolvido pelos alunos:
 #ifndef _CODDEGEN_H_
 #define _CODDEGEN_H_
 
-// NOP
-#define NOP         0;
-// Aritmetica
-#define OP_ADD      1;
-#define OP_SUB      2;
-#define OP_MULT     3;
-#define OP_DIV      4;
-#define OP_ADDI     5;
-#define OP_SUBI     6;
-#define OP_RSUBI    7;
-#define OP_MULTI    8;
-#define OP_DIVI     9;
-#define OP_RDIVI    10;
-// Shifts
-#define OP_LSHIFT   11;
-#define OP_LSHIFTI  12;
-#define OP_RSHIFT   13;
-#define OP_RSHIFTI  14;
-// Load
-#define OP_LOAD     15;
-#define OP_LOADAI   16;
-#define OP_LOADA0   17;
-#define OP_CLOAD    18;
-#define OP_CLOADAI  19;
-#define OP_CLOADA0  20;
-// Store
-#define OP_STORE    21;
-#define OP_STOREAI  22;
-#define OP_STOREA0  23;
-#define OP_CSTORE   24;
-#define OP_CSTOREAI 25;
-#define OP_CSTOREA0 26;
-// Copia
-#define i2i          20;
-#define c2c          21;
-#define c2i          22;
-#define i2c          23;
-
 // Nop
-#define NOP         0;
+#define OP_NOP         0
 // Aritmetica
-#define ADD         1;
-#define SUB         2;
-#define MULT        3;
-#define DIV         4;
-#define ADDI        5;
-#define SUBI        6;
-#define RSUBI       7;
-#define MULTI       8;
-#define DIVI        9;
-#define RDIVI       10;
+#define OP_ADD         1
+#define OP_SUB         2
+#define OP_MULT        3
+#define OP_DIV         4
+#define OP_ADDI        5
+#define OP_SUBI        6
+#define OP_RSUBI       7
+#define OP_MULTI       8
+#define OP_DIVI        9
+#define OP_RDIVI       10
 // Shift
-#define LSHIFT      11;
-#define LSHIFTI     12;
-#define RSHIFT      13;
-#define RSHIFTI     14;
+#define OP_LSHIFT      11
+#define OP_LSHIFTI     12
+#define OP_RSHIFT      13
+#define OP_RSHIFTI     14
 // Logica
-#define AND         15;
-#define ANDI        16;
-#define OR          17;
-#define ORI         18;
-#define XOR         19;
-#define XORI        20;
+#define OP_AND         15
+#define OP_ANDI        16
+#define OP_OR          17
+#define OP_ORI         18
+#define OP_XOR         19
+#define OP_XORI        20
 // Memoria
-#define LOADI       21;
-#define LOAD        22;
-#define LOADAI      23;
-#define LOADA0      24;
-#define CLOAD       25;
-#define CLOADAI     26;
-#define CLOADA0     27;
-#define STORE       28;
-#define STOREAI     29;
-#define STOREAO     30;
-#define CSTORE      31;
-#define CSTOREAI    32;
-#define CSTOREAO    33;
+#define OP_LOADI       21
+#define OP_LOAD        22
+#define OP_LOADAI      23
+#define OP_LOADAO      24
+#define OP_CLOAD       25
+#define OP_CLOADAI     26
+#define OP_CLOADAO     27
+#define OP_STORE       28
+#define OP_STOREAI     29
+#define OP_STOREAO     30
+#define OP_CSTORE      31
+#define OP_CSTOREAI    32
+#define OP_CSTOREAO    33
 // Copia
-#define I2I         34;
-#define C2C         35;
-#define C2I         36;
-#define I2C         37;
+#define OP_I2I         34
+#define OP_C2C         35
+#define OP_C2I         36
+#define OP_I2C         37
 // Fluxo de controle
-#define JUMPI       38;
-#define JUMP        39;
-#define CBR         40;
-#define CMP_LT      41;
-#define CMP_LE      42;
-#define CMP_EQ      43;
-#define CMP_GE      44;
-#define CMP_GT      45;
-#define CMP_NE      46;
+#define OP_JUMPI       38
+#define OP_JUMP        39
+#define OP_CBR         40
+#define OP_CMP_LT      41
+#define OP_CMP_LE      42
+#define OP_CMP_EQ      43
+#define OP_CMP_GE      44
+#define OP_CMP_GT      45
+#define OP_CMP_NE      46
+
+#include "Structures.h"
 
 char* get_label();
 char* get_temp();
 
+Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_shift);
+
+char* generate_code(Operation* op);
 
 #endif

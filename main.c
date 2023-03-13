@@ -12,6 +12,7 @@ extern int yylex_destroy(void);
 void *tabela = NULL;
 void *escopo = NULL;
 void *arvore = NULL;
+void *operacoes = NULL;
 void exporta (void *arvore);
 void libera (void *arvore);
 

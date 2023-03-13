@@ -23,6 +23,8 @@ extern int function_type_buffer;
 #include "src/ASTExpressions.h"
 #include "src/Table.h"
 #include "src/TablePrint.h"
+#include "src/OpList.h"
+#include "src/CodeGen.h"
 
 %}
 
@@ -160,6 +162,7 @@ ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(esco
 dec_var_glob:         tipo_var var_glob ';'               { table_update_type(escopo, $1->node_type); ast_free($1); };
 
 var_glob:             TK_IDENTIFICADOR                    { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
+
                                                             free($1.label); $$ = NULL; }
                     | dec_ident_multidim                  { $$ = NULL; ast_free($1); }
                     | var_glob ',' TK_IDENTIFICADOR       { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL)); 
