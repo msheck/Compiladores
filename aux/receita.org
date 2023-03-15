@@ -1,0 +1,404 @@
+# -*- coding: utf-8 -*-
+# -*- mode: org -*-
+
+#+Title: Receitas E5
+#+Author: Lucas Mello Schnorr
+#+Date: schnorr@inf.ufrgs.br
+#+Language: pt-br
+
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [11pt, twocolumn, a4paper]
+#+LATEX_HEADER: \input{org-babel.tex}
+#+LATEX_HEADER: \usepackage{enumitem}
+#+LATEX_HEADER: \setlist{nolistsep}
+
+#+OPTIONS: toc:nil title:nil
+#+STARTUP: overview indent
+#+TAGS: Lucas(L) noexport(n) deprecated(d)
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+* Funcionalidades Necessárias
+** Estrutura de Dados para ILOC
+
+Implementar duas estruturas de dados: uma para representar uma
+operação ILOC e os argumentos necessários para ela; outra para manter
+uma lista de operações ILOC. Leve em conta que os argumentos das
+operações podem ser nomes de temporários, valores constantes, ou nomes
+de rótulos.
+
+** Rótulos e Temporários
+
+Implementar uma função para fornecer nomes de rótulos a serem
+utilizados na geração de código. Os rótulos são utilizados para marcar
+os pontos de desvio no fluxo de execução. Implementar uma função para
+gerar nomes de temporários. Deve-se seguir a convenção de nomes
+especificada na descrição da Linguagem ILOC.
+
+#+begin_src C
+int gera_rotulo (void){
+  static int contador = 0;
+  return contador++;
+}
+
+char *gera_temporario(){
+  char *retorno = malloc(200);
+  static int contador = 0;
+  snprintf(retorno, 200, "r%d", contador++);
+  return retorno;
+}
+
+#+end_src
+
+** Endereçamento de variáveis
+
+Deve-se calcular o endereço na declaração de variáveis locais, como um
+deslocamento à =rfp=, e de globais, como um deslocamento à =rbss=. Tais
+endereços devem ser usados nas operações subsequentes ao realizar a
+tradução das construções listadas acima. Por exemplo, antes de usar a
+variável, deve-se emitir a operação de carga (=load=) para um
+temporário; para escrever na variável, obtém-se um valor em um
+temporário e se emite a operação de escrita (=store=) para o endereço da
+variável.
+
+- Cálculo de endereços é feito na declaração
+
+** Geração de Código
+
+Os programas a serem compilados devem conter pelo menos a função
+=main=. Ela deverá ser a primeira a ser executada.  Existem pelo menos
+duas possibilidades de implementação válidas. *Em uma passagem*:
+realizar eventuais alterações gramaticais para realizar a geração de
+código em uma única passagem (juntamente com a análise léxica,
+sintática e semântica).  *Em duas passagens*: Outra é optar por fazer o
+processo de geração de código em uma segunda passagem sobre a AST,
+através da implementação de uma função que faça o
+percorrimento. Informe o professor da sua escolha. Em ambos os casos,
+ao final da execução, o compilador deve ter na raiz da árvore AST um
+ponteiro para todo o código intermediário ILOC do programa de entrada.
+A geração de código consiste na criação de uma ou mais operações ILOC
+juntamente com a união de trechos das sub-árvores. Nesta etapa,
+deve-se traduzir as seguintes construções da linguagem, considerando
+que existe apenas o tipo =int=:
+
+- Expressões aritméticas, com operações binárias
+  - soma, subtração, divisão e multiplicação
+- Expressões lógicas por controle de fluxo
+  - os operadores relacionais
+  - os operadores lógicos (=&&= e =||=)
+- O comando de atribuição
+- Os seguintes comandos de fluxo de controle
+  - if com else opcional
+  - laço de repetição while
+- Chamada de função (com ~jumpI~ para um label)
+
+* Receitas
+** Cálculo do endereço
+*** Global
+#+begin_src C
+var_global: tipo_primitivo lista_id_var_global ';' {
+  $$ = nullptr; 
+  // adiciona todas as variaveis de uma vez na tabela
+  for (auto pair : var_global_list) {
+    Symbol& s = pair.second;
+    s.type = $1->get_node_type();
+    if (s.type == Type::CHARACTER && s.kind == Kind::ARRAY) {
+      send_error_message($1, ERR_CHAR_VECTOR);
+      exit(ERR_CHAR_VECTOR);
+    }
+    s.size *= get_size_from_type($1->get_node_type());
+    symbol_table_stack.emplace_top(pair);
+  }
+  delete $1;
+};
+#+end_src
+
+
+#+begin_src C
+loc_var_init: TK_IDENTIFICADOR {
+		newSymbolVar(line_number, $1.token_value, DT_NULL, $1); 
+		freeValorLexico($1);
+		$$ = NULL;
+	      } | TK_IDENTIFICADOR TK_OC_LE literal {
+		newSymbolVar(line_number, $1.token_value, DT_NULL, $1); 
+	      	ast* node = newNode($2, DT_NULL);
+	      	addChild(node, newNode($1, DT_NULL));
+	      	addChild(node, $3);
+	      	$$ = node;
+	      };
+#+end_src
+
+*** Local
+
+#+begin_src C
+declaracao_var_local: tipo lista_var_local {
+    $$ = declara_variaveis_locais($2, $1);
+    define_tipo_inits($$, $1);
+};
+#+end_src
+
+** Carga de variáveis para um temporário
+
+#+begin_example
+loadI    c1       =>  r2     // r2 = c1
+load     r1       =>  r2     // r2 = Memoria(r1)
+loadAI   r1, c2   =>  r3     // r3 = Memoria(r1 + c2)
+loadA0   r1, r2   =>  r3     // r3 = Memoria(r1 + r2)
+#+end_example
+
+#+begin_src C
+expression_grade_one: TK_IDENTIFICADOR { 
+    SymbolTableValue symbol = getByLexicalValueOnSymbolTableStack(symbolTableStack, $1);
+    validateVariableUse(symbol, $1);
+
+    // obter o endereço da tabela de simbolos
+    // em qual tabela/escopo foi declarado
+    // gera um temporario
+    // if tabela global
+    //   gera loadAI rbss, endereco_desloca => temporario
+    // else
+    //   gera loadAI rfp, endereco_desloca => temporario
+    // coloca essa instrucao na AST em $$
+    
+    $$ = createNodeWithType($1, symbol.dataType);
+    
+};
+#+end_src
+
+** Carga de um literal inteiro para um temporário
+** Expressões aritméticas
+
+#+begin_example
+add      r1, r2   =>  r3     // r3 = r1 + r2
+sub      r1, r2   =>  r3     // r3 = r1 - r2
+mult     r1, r2   =>  r3     // r3 = r1 * r2
+div      r1, r2   =>  r3     // r3 = r1 / r2
+#+end_example
+
+#+begin_src C
+expression_grade_four: expression_grade_four '+' expression_grade_three {
+
+    // gerar um temporario para guardar o valor da soma
+    // gera add $1.temp, $3.temp => temporario
+    // salvar o nome desse temporario gerado em $$.temp
+    // gerar codigo
+    //   concatena $1.code, $3.code, a instrução que geramos
+    // atribuimos a concatenação em $$.code
+  
+    $$ = createNodeFromBinaryOperator($2, $1, $3, ___);
+    addChild($$, $1);
+    addChild($$, $3);
+};
+#+end_src
+
+** Operadores relacionais
+
+#+begin_example
+cmp_LT r1, r2  ->  r3        // r3 = true se r1 < r2, senão r3 = false
+cmp_LE r1, r2  ->  r3        // r3 = true se r1 \leq r2, senão r3 = false
+cmp_EQ r1, r2  ->  r3        // r3 = true se r1 = r2, senão r3 = false
+cmp_GE r1, r2  ->  r3        // r3 = true se r1 \geq r2, senão r3 = false
+cmp_GT r1, r2  ->  r3        // r3 = true se r1 > r2, senão r3 = false
+cmp_NE r1, r2  ->  r3        // r3 = true se r1 \ne r2, senão r3 = false
+cbr    r1      ->  l2, l3    // PC = endereço(l2) se r1 = true, senão PC = endereço(l3)
+#+end_example
+
+#+begin_src C
+expression_grade_five: expression_grade_five TK_OC_LE expression_grade_four {
+
+    // gerar um temporario
+    // gerar label_verdade
+    // gerar label_falso
+    // gerar label_depois
+    // gerar codigo daqui
+      // gerar iloc cmp_LE $1.temp, $3.temp -> temporario
+      // gerar iloc cbr temporario -> label_verdade, label_falso
+      // gerar iloc com label label_verdade: loadI 1 => temporario
+      // gerar iloc jumpI label_depois
+      // gerar iloc com label label_falso: loadI 0 => temporario
+      // gerar iloc com label label_depois: nop
+    // concatenacao: $1.code, $3.code, codigo gerado agora
+    // $$.code = concatenacao
+    // $$.tempo = temporario
+    
+  
+    $$ = createNodeFromBinaryOperator($2, $1, $3);
+    addChild($$, $1);
+    addChild($$, $3);
+};
+#+end_src
+
+** Operadores lógicos
+
+#+begin_src C
+expression_grade_eight: expression_grade_eight TK_OC_OR expression_grade_seven {
+
+    // gerar um temporario para guardar o valor da soma
+    // gera or $1.temp, $3.temp => temporario
+    // salvar o nome desse temporario gerado em $$.temp
+    // gerar codigo
+    //   concatena $1.code, $3.code, a instrução que geramos
+    // atribuimos a concatenação em $$.code
+
+  
+    $$ = createNodeFromBinaryOperator($2, $1, $3);
+    addChild($$, $1);
+    addChild($$, $3);
+};
+#+end_src
+
+** Comando de atribuição
+
+#+begin_example
+store    r1       =>  r2     // Memoria(r2) = r1
+storeAI  r1       =>  r2, c3 // Memoria(r2 + c3) = r1
+storeAO  r1       =>  r2, r3 // Memoria(r2 + r3) = r1
+#+end_example
+
+#+begin_src C
+attribution: TK_IDENTIFICADOR '=' expression {
+    SymbolTableValue symbol = getByLexicalValueOnSymbolTableStack(symbolTableStack, $1);
+    validateVariableUse(symbol, $1);
+    Node* variable = createNodeWithType($1, symbol.dataType);
+
+    // obter o endereço da tabela de simbolos
+    // em qual tabela/escopo foi declarado
+    // precisamos saber o temporario onde encontra-se o resultado da exp
+    //   isso encontra-se em um campo de $3
+    // if tabela global
+    //   gera storeAI temporario => rbss, endereco_desloca
+    // else
+    //   gera storeAI temporario => rfp, endereco_desloca
+    // concatenar o codigo da expressao ($3.code) com o storeAI gerado
+    // coloca o resultado da concatenacao na AST em $$
+    
+    $$ = createNodeFromAttribution($2, variable, $3); 
+    addChild($$, variable);
+    addChild($$, $3);
+};
+#+end_src
+
+** Comando if/else
+
+#+begin_example
+jumpI          ->  l1        // rpc = endereço(l1)
+#+end_example
+
+#+begin_src C
+con_fluxo: TK_PR_IF '(' expressao_7 ')' TK_PR_THEN
+                  bloco_comandos
+           TK_PR_ELSE
+                  bloco_comandos 
+         {
+	   
+	   // gerar label_verdade
+	   // gerar label_falso
+	   // gerar label_depois
+	   // gerar codigo daqui
+
+	   // gerar um temporario
+	   // gerar tempoopaco
+	   // gerar iloc loadI 0 => temporario
+	   // gerar iloc cmp_NE $3.temp temporario  =>  tempoopaco
+	   // gerar iloc cbr tempoopaco => label_verdade, label_falso
+	   // gerar iloc com label label_verdade: nop
+	   // coloca o codigo de $6.code
+	   // gerar iloc jumpI label_depois
+	   // gerar iloc com label label_falso: nop
+	   // coloca o codigo de $8.code
+	   // gerar uloc com label label_depois: nop
+	   
+            $$ = $1;
+            $$->add_child($3);
+            $$->add_child($6);
+            $$->add_child($8);
+            $$->set_node_type($3->get_node_type());
+            if ($3->get_node_type() == Type::CHARACTER) {
+            	send_error_message($3, ERR_CHAR_TO_BOOL);
+            	exit(ERR_CHAR_TO_BOOL);
+            }
+         }
+#+end_src
+
+** Comando while (Incompleto)
+
+#+begin_example
+jumpI          ->  l1        // rpc = endereço(l1)
+#+end_example
+
+#+begin_src C
+flow_control_commands: TK_PR_WHILE '(' expression start_flow_control_block command_block { 
+    $$ = createNodeFromUnaryOperator($1, $3);
+    addChild($$, $3);
+    addChild($$, $5);
+    freeLexicalValue($2);
+};
+#+end_src
+
+** Chamada de função (Incompleto)
+*** Na implementação da função
+
+- Gerar um label e registrá-lo na tabela de símbolos
+
+#+begin_src C
+function: header body {
+
+     // obter o rotulo dessa funcao
+     // gerar iloc com label rotulo: nop
+     // concatena com o codigo $2.body
+     // jogar para $$.code a concatenacao
+  
+    $$ = $1;
+    addChild($$, $2);
+};
+
+header: type TK_IDENTIFICADOR arguments {
+    // Then create a new internal context
+    symbolTableStack = createNewTableOnSymbolTableStack(symbolTableStack);
+
+    // First create function symbol on external context
+    SymbolTableValue symbol = createSymbolTableValueWithTypeAndArguments(SYMBOL_TYPE_FUNCTION, $2, $1, $3);
+    addValueToSecondSymbolTableOnStack(symbolTableStack, symbol);
+
+    $$ = createNodeFromSymbol($2, symbol);
+};
+
+body: command_block { 
+    $$ = $1;
+};
+#+end_src
+
+*** Na chamada da função
+
+#+begin_example
+jumpI          ->  l1        // rpc = endereço(l1)
+#+end_example
+
+#+begin_src C
+function_call: TK_IDENTIFICADOR '(' ')' {
+    SymbolTableValue symbol = getByLexicalValueOnSymbolTableStack(symbolTableStack, $1);
+
+    validateFunctionCall(symbol, $1, NULL);
+
+    // consulta tabela TK_IDENTIFICADOR para obter o rotulo da funcao
+    // gerar iloc jumpI rotulo
+    // $$.code eh igual a esse codigo
+    
+    $$ = createNodeForFunctionCallFromSymbol($1, symbol);
+    freeLexicalValue($2);
+    freeLexicalValue($3);
+};
+#+end_src
+
+*** No comando de retorno
+
+#+begin_example
+jump           ->  r1        // PC = r1
+#+end_example
+
+#+begin_src C
+return_command: TK_PR_RETURN expression { 
+    $$ = createNodeFromUnaryOperator($1, $2);
+    addChild($$, $2);
+};
+#+end_src

@@ -81,9 +81,11 @@ struct content_{
     int total_size;
     ContentList *args;
     SymbolTable *table;
+    int mem_shift;
 };
 
 struct symbol_table{
+    int scope_level; // 0 = global, >0 = local
     int size;
     char** keys;
     Content** content;

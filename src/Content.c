@@ -14,6 +14,7 @@ Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value,
     Content* content = NULL;
     content = calloc(1, sizeof(Content));
     content->lex_data = lex_val;
+    content->mem_shift = 0;
     if(lex_val.label != NULL)
         content->lex_data.label = strdup(lex_val.label);
     else

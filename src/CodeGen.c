@@ -146,7 +146,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->arg1);
+            buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_STOREAO:
@@ -155,7 +155,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->arg1);
+            buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTORE:
@@ -167,7 +167,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->arg1);
+            buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTOREAO:
@@ -176,7 +176,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->arg1);
+            buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_I2I:

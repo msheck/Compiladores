@@ -10,6 +10,8 @@ Desenvolvido pelos alunos:
 
 #include "Table.h"
 #include "TablePrint.h"
+extern int rbss_shift;
+extern int rfp_shift;
 
 ContentList *content_buffer = NULL;
 int function_type_buffer = NODE_TYPE_UNDECLARED;
@@ -18,6 +20,7 @@ SymbolTable *table_new() {
     SymbolTable* ret = NULL;
     ret = calloc(1, sizeof(SymbolTable));
     if(ret != NULL) {
+        ret->scope_level = 0;
         ret->size = 0;
         ret->keys = NULL;
         ret->content = NULL;
@@ -67,6 +70,14 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
     //printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
     table_check_declared(table, key, content->lex_data.line_number);
     content->table = table;
+    if (table->scope_level == 0) {
+        content->mem_shift = rbss_shift;
+        rbss_shift += content->total_size;
+    }
+    else {
+        content->mem_shift = rfp_shift;
+        rfp_shift += content->total_size;
+    }
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
@@ -197,6 +208,7 @@ SymbolTable* table_nest(SymbolTable* root) {
     //printf("\n---------------NEW SCOPE---------------");
     SymbolTable* new_table = table_new();
     new_table->return_type = function_type_buffer; // This is set by the parser
+    new_table->scope_level = root->scope_level + 1;
     function_type_buffer = NODE_TYPE_UNDECLARED;
     SymbolTable* current = root;
     while(current->next != NULL) {
