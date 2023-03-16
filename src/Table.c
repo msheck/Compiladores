@@ -70,14 +70,6 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
     //printf("\nADDING \"%s\": \"%s\" to the table %p\n", key, content->lex_data.label, table);
     table_check_declared(table, key, content->lex_data.line_number);
     content->table = table;
-    if (table->scope_level == 0) {
-        content->mem_shift = rbss_shift;
-        rbss_shift += content->total_size;
-    }
-    else {
-        content->mem_shift = rfp_shift;
-        rfp_shift += content->total_size;
-    }
     if(content->node_type != NODE_TYPE_UNDECLARED)
         table_update_type(table, content->node_type);
     int hash = table_get_hash(key);
@@ -95,7 +87,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
         table->content[table->size-1] = content;
         if(content->node_type==NODE_TYPE_UNDECLARED){
             // printf("TYPELESS!");
-            table->typeless = intList_pushLeft(table->typeless, table->size-1);
+            table->typeless = intList_pushRight(table->typeless, table->size-1);
         }
     }
     // Se hash < table->size, encontra a primeira pos vazia e coloca.
@@ -241,6 +233,16 @@ void table_update_type(SymbolTable* table, int type){
         if(type == NODE_TYPE_CHAR && table->content[typeless_idx->value]->nature == NAT_ARR)
             emit_error(ERR_CHAR_VECTOR, table->content[typeless_idx->value]->lex_data.line_number,  table->content[typeless_idx->value]->lex_data.label, NULL);
         table->content[typeless_idx->value]->node_type = type;
+        table->content[typeless_idx->value]->total_size = calculate_total_size(type, table->content[typeless_idx->value]->dimensions);
+        if (table->scope_level == 0) {
+            table->content[typeless_idx->value]->mem_shift = rbss_shift;
+            table->content[typeless_idx->value]->scope = table->scope_level;
+            rbss_shift += table->content[typeless_idx->value]->total_size;
+        }
+        else {
+            table->content[typeless_idx->value]->mem_shift = rfp_shift;
+            rfp_shift += table->content[typeless_idx->value]->total_size;
+        }
         typeless_idx = typeless_idx->next;
     }
     intList_free(table->typeless);

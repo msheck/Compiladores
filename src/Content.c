@@ -15,6 +15,7 @@ Content* content_new(lexValue lex_val, int nat, int node_type, char* data_value,
     content = calloc(1, sizeof(Content));
     content->lex_data = lex_val;
     content->mem_shift = 0;
+    content->scope = 0;
     if(lex_val.label != NULL)
         content->lex_data.label = strdup(lex_val.label);
     else
@@ -88,6 +89,8 @@ int calculate_total_size(int node_type, IntList* dimensions) {
         dims_size += dimensions->value;
         next = next->next;
     }
+    if(dims_size == 0)
+        dims_size = 1;
     
     switch (node_type) {
         case NODE_TYPE_INT:

@@ -82,6 +82,7 @@ struct content_{
     ContentList *args;
     SymbolTable *table;
     int mem_shift;
+    int scope;
 };
 
 struct symbol_table{

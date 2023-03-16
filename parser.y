@@ -197,6 +197,7 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { table_update_data_value(es
                                                       Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
                                                       $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
                                                       ast_check_type($$->children[0], $$->children[1]); }
+                                                      // TODO: char mem_shift_buff[20], scope_buff[20]; sprintf(mem_shift_buff, "%d", content->mem_shift);  sprintf(scope_buff, "%d", content->mem_shift); $$.code = op_new(OP_STOREAI, $3.register, NULL, scope_buff, mem_shift_buff); }
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
                                                       ast_check_type($1, $3); };
 

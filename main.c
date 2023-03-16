@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     tabela = table_new();
 	escopo = tabela;
 	int ret = yyparse(); 
-    table_print_contexts(tabela);
+    table_print(tabela);
 	exporta (arvore);
 	libera(arvore);
 	arvore = NULL;

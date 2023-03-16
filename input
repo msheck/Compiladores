@@ -6,6 +6,15 @@
 
 
 
+int x, y, z;
+
+int main() {
+    x = 2;
+    y = 4;
+}
+// storeAI 2 => rbss, 0
+// storeAI 4 => rbss, 4
+
 /*int aa;
 int B() {
     int ba;
@@ -31,7 +40,7 @@ int B() {
 // }
 
 
-int i;
+/*int i;
 float h[1^2^3];
 char ch;
 bool isFalse, isTrue;
@@ -106,7 +115,7 @@ int bar(float param, bool outroParam){
     x=y;
 
     // h[i+2^b^c] = d;
-}
+}*/
 
 
 // int b[1^2];

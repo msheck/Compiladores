@@ -82,7 +82,7 @@ void table_print(SymbolTable* table) {
                 value_len = strlen(table->content[i]->lex_data.value);
             else
                 value_len = 6;
-            printf("\n| %04d: (%s) %s = %s %*c", i, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+13)),'|');
+            printf("\n| %04d [%03d]: (%s) %s = %s %*c", i, table->content[i]->mem_shift, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+19)),'|');
             if(table->content[i]->args == NULL)
                 printf(" args is null %*c", width-13,'|');
             else{
@@ -117,20 +117,4 @@ void table_print(SymbolTable* table) {
         }
     }
     print_sec_line(width,1);
-}
-
-void _table_print_contexts(SymbolTable* table, int i) {
-    i++;
-    printf("\n=================  PRINTING CONTEXT %d!  =================\n", i);
-    table_print(table);
-    if(table->next != NULL)
-        _table_print_contexts(table->next, i);
-}
-
-void table_print_contexts(SymbolTable* table) {
-    int i = 1;
-    printf("\n=============  PRINTING CONTEXT %02d! (ROOT)  ==============\n", i);
-    table_print(table);
-    if(table->next != NULL)
-        _table_print_contexts(table->next, i);
 }

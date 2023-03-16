@@ -46,8 +46,15 @@ Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_
     op_new->operation = operation;
     op_new->arg0 = strdup(arg0);
     op_new->arg1 = strdup(arg1);
-    op_new->dest = strdup(dest);
-    op_new->dest_shift = strdup(dest_shift);
+    if (strcmp(dest, "0") == 0) {
+        op_new->dest = strdup("rbss");
+        op_new->dest_shift = strdup(dest_shift);
+    }
+    else {
+        op_new->dest = strdup("rfp");
+        op_new->dest_shift = strdup("-");
+        op_new->dest_shift = strcat(op_new->dest_shift, dest_shift);
+    }
     return op_new;
 }
 
