@@ -61,6 +61,8 @@ struct AbstractSyntaxTree {
     int number_of_children;
     struct AbstractSyntaxTree **children;
     int node_type;
+    char* temp;
+    OpList* code;
 };
 
 struct int_list{

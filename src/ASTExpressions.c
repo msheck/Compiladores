@@ -9,366 +9,73 @@ Desenvolvido pelos alunos:
 */
 
 #include "ASTExpressions.h"
-#include "Errors.h"
 
-char* resolve_unary_expr(char operator, ASTree *expr, int node_type){
-    int expr_intValue;
-    float expr_floatValue;
-    char expr_charValue;
-    char* buffer= malloc(sizeof(char*)*(strlen(expr->data.value)+1));
-    switch (node_type){
-        case 1: //bool
-        case 3: //int
-            expr_intValue = atoi(expr->data.value);
-            if((expr_intValue == 0)&&(expr->data.value[0] != '0')){
-                buffer = malloc(sizeof(char*)*2);
-                buffer[0] = operator;
-                buffer[1] = '\0';
-                buffer = strcat(buffer, expr->data.value);
-            }
-            break;
-        case 4: //float
-            expr_floatValue = atof(expr->data.value);
-            break;
-        case 2: // char
-            expr_charValue = expr->data.value[0];
-            break;
-        default:
-            printf("\n\033[1;4;31mINVALID PARAMETER IN UNARY EXPRESSION IN LINE %d!\033[0;31m Couldn't convert %s to appropriate type!\033[0m\n", expr->data.line_number, expr->data.label);
-            exit(ERR_INVALID_EXPR);
-    }
-    switch (operator)
+ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr, int node_type){
+    switch (operator_node->data.label[0])
     {
     case 33: //'!'
-        if(expr->data.value == 0){ //false
-            return strdup("1");
-        }
-        else{ //true
-            return strdup("0");
-        }
-        printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator \"!\" couldn't complete the operation!\033[0m\n");
-        exit(ERR_INVALID_EXPR);
+
     case 45: //'-'
-        switch (node_type){
-            case 1: //bool
-                return resolve_unary_expr('!', expr, node_type);
-            case 3: //int
-                sprintf(buffer, "%d", -expr_intValue);
-                return strdup(buffer);              
-            case 4: //float
-                sprintf(buffer, "%f", -expr_floatValue);
-                return strdup(buffer);
-            default:
-                printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator \"-\" couldn't complete the operation!\033[0m\n");
-                exit(ERR_INVALID_EXPR);
-        }        
+
     default:
         printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator unidentified!\033[0m\n");
         exit(ERR_INVALID_EXPR);
     }
 }
 
-char* resolve_binary_expr(ASTree *expr1, char* operator, ASTree *expr2, int node_type){
-    int expr1_intValue, expr2_intValue;
-    float expr1_floatValue, expr2_floatValue;
-    char expr1_charValue, expr2_charValue;
-    char* buffer = NULL;
-    int value_i;
-    float value_f;
-    switch (node_type){
-        case 1: //bool
-        case 3: //int
-            expr1_intValue = atoi(expr1->data.value);
-            if((expr1_intValue == 0)&&(expr1->data.value[0] != '0')){
-                buffer = strdup(expr1->data.value);
-                buffer = strcat(buffer, operator);
-            }
-            expr2_intValue = atoi(expr2->data.value);
-            if(buffer != NULL){
-                buffer = strcat(buffer, expr2->data.value);
-                return buffer;
-            }
-            if((expr2_intValue == 0)&&(expr2->data.value[0] != '0')){
-                buffer = strdup(expr2->data.value);
-                buffer = strcat(buffer, operator);
-                buffer = strcat(buffer, expr1->data.value);
-                return buffer;
-            }
-            break;
-        case 4: //float
-            expr1_floatValue = atof(expr1->data.value);
-            if((expr1_floatValue == 0)&&(expr1->data.value[0] != '0')){
-                buffer = strdup(expr1->data.value);
-                buffer = strcat(buffer, operator);
-            }
-            expr2_floatValue = atof(expr2->data.value);
-            if(buffer != NULL){
-                buffer = strcat(buffer, expr2->data.value);
-                return buffer;
-            }
-            if((expr2_floatValue == 0)&&(expr2->data.value[0] != '0')){
-                buffer = strdup(expr2->data.value);
-                buffer = strcat(buffer, operator);
-                buffer = strcat(buffer, expr1->data.value);
-                return buffer;
-            }
-            break;
-        case 2: // char
-            expr1_charValue = expr1->data.value[0];
-            expr2_charValue = expr2->data.value[0];
-            break;
-        default:
-            printf("\n\033[1;4;31mINVALID PARAMETER IN BINARY EXPRESSION!\033[0;31m Couldn't convert %s %s %s to appropriate type!\033[0m\n", expr1->data.label, operator, expr2->data.label);
-            exit(ERR_INVALID_EXPR);
-    }
-    switch (operator[0]+operator[1]){
+ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2, int node_type){
+    operator_node->temp = get_temp();
+    switch (operator_node->data.label[0]+operator_node->data.label[1]){
         case 37: //'%'
-            switch (node_type){
-                case 1:
-                case 3: //int or bool
-                    buffer = malloc(sizeof(char*)*abs((strlen(expr2->data.value)+1)));
-                    value_i = expr1_intValue % expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;                                        
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"%%\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            break;
         case 47: //'/'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                    value_i = expr1_intValue / expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                    value_f = expr1_floatValue / expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"/\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }        
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_DIV, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;     
         case 42: //'*'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
-                    value_i = expr1_intValue * expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)+strlen(expr2->data.value))));
-                    value_f = expr1_floatValue * expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"*\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_MULT, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 45: //'-'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
-                    else
-                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
-                    value_i = expr1_intValue - expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)));
-                    else
-                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)));
-                    value_f = expr1_floatValue - expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"-\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_SUB, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 43: //'+'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
-                    else
-                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
-                    value_i = expr1_intValue + expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    if(strlen(expr1->data.value)>strlen(expr2->data.value))
-                        buffer= malloc(sizeof(char*)*(strlen(expr1->data.value)+1));
-                    else
-                        buffer= malloc(sizeof(char*)*(strlen(expr2->data.value)+1));
-                    value_f = expr1_floatValue + expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"+\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_ADD, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 123: //'>='
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue >= expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue >= expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">=\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_GE, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 121: //'<='
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue <= expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue <= expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<=\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_LE, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 62: //'>'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue > expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*abs((strlen(expr1->data.value)-strlen(expr2->data.value))));
-                    value_f = expr1_floatValue > expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \">\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_GT, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 60: //'<'
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue < expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue < expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"<\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_LT, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 94: //'!='
-            switch (node_type){
-                case 2: //char
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_charValue != expr2_charValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue != expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue != expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"!=\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_NE, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 122: //'=='
-            switch (node_type){
-                case 2: //char
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_charValue == expr2_charValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue == expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue == expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"==\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_EQ, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 76: //"&&"
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue && expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue && expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"&&\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_AND, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         case 248: //"||"
-            switch (node_type){
-                case 1: //bool
-                case 3: //int
-                    buffer= malloc(sizeof(char*)*2);
-                    value_i = expr1_intValue || expr2_intValue;
-                    sprintf(buffer, "%d", value_i);
-                    return buffer;
-                case 4: //float
-                    buffer= malloc(sizeof(char*)*2);
-                    value_f = expr1_floatValue || expr2_floatValue;
-                    sprintf(buffer, "%f", value_f);
-                    return buffer;
-                default:
-                    printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Binary operator \"||\" couldn't complete the operation!\033[0m\n");
-                    exit(ERR_INVALID_EXPR);
-            }
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_OR, expr1->temp, expr2->temp, operator_node->temp, NULL));
+            break;
         default:
             printf("\n\033[1;4;31mINVALID CONVERTION!\033[0;31m Binary operator unidentified!\033[0m\n");
             exit(ERR_INVALID_EXPR);
     }
+    operator_node->code = opList_concatLeft(operator_node->code, expr2->code);
+    operator_node->code = opList_concatLeft(operator_node->code, expr1->code);
+    return operator_node;
 }
 
 ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
     int node_type = expr2->node_type;
-    char* expr_result;
+    ASTree* operator_node = ast_new_node(operator, node_type);
     if(expr1->data.label != NULL){
         if(expr1->node_type != expr2->node_type){
             if(expr1->node_type != 2 && node_type != 2){
@@ -393,36 +100,9 @@ ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
                 exit(ERR_INVALID_EXPR);
             }
         }
-        if((expr1->data.value == NULL)||(expr2->data.value == NULL)){
-            if((expr1->data.value == NULL)&&(expr2->data.value != NULL)){
-                expr_result = strdup(expr1->data.label);
-                expr_result = strcat(expr_result, operator.label);
-                expr_result = strcat(expr_result, expr2->data.value);
-            }
-            else if((expr1->data.value != NULL)&&(expr2->data.value == NULL)){
-                expr_result = strdup(expr2->data.label);
-                expr_result = strcat(expr_result, operator.label);
-                expr_result = strcat(expr_result, expr1->data.value);
-            }
-            else{
-                expr_result = strdup(expr1->data.label);
-                expr_result = strcat(expr_result, operator.label);
-                expr_result = strcat(expr_result, expr2->data.label);
-            }
-        }
-        else
-            expr_result = resolve_binary_expr(expr1, operator.label, expr2, node_type);
+        operator_node = resolve_binary_expr(expr1, operator_node, expr2, node_type);
     }
-    else{
-        if(expr2->data.value == NULL){
-            expr_result = strdup(operator.label);
-            expr_result = strcat(expr_result, expr2->data.label);
-        }
-        else
-            expr_result = resolve_unary_expr(operator.label[0], expr2, node_type);
-    }
-    ASTree* expr_node = ast_new_node(operator, node_type);
-    expr_node->data.value = strdup(expr_result);
-    free(expr_result);
-    return expr_node;
+    else
+        operator_node = resolve_unary_expr(operator_node, expr2, node_type);
+    return operator_node;
 }

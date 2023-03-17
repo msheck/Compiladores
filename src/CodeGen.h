@@ -11,6 +11,8 @@ Desenvolvido pelos alunos:
 #ifndef _CODDEGEN_H_
 #define _CODDEGEN_H_
 
+// Label
+#define OP_LABEL       -1
 // Nop
 #define OP_NOP         0
 // Aritmetica

@@ -17,6 +17,8 @@ OpList* opList_new();
 
 OpList*  opList_pushLeft(OpList* list, Operation* value);
 
+OpList* opList_concatLeft(OpList* list, OpList* source);
+
 void op_free(Operation* op);
 
 void opList_free(OpList* list);

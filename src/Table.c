@@ -217,8 +217,8 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
         while(root->next != NULL)
             root = root->next;
         root = root->parent;
-        printf("\nREMOVING TABLE:");
-        table_print(root->next);
+        //printf("\nREMOVING TABLE:");
+        //table_print(root->next);
         table_free(root->next);
         root->next = NULL;
         //printf("\nNEW SCOPE:");

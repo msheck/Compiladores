@@ -28,6 +28,23 @@ OpList*  opList_pushLeft(OpList* list, Operation* value) {
     return new_node;
 }
 
+OpList* opList_goToEnd(OpList* list) {
+    if(list != NULL) {
+        if(list->next != NULL)
+            return opList_goToEnd(list->next);
+        else
+            return list;
+    }
+}
+
+OpList* opList_concatLeft(OpList* list, OpList* source) {
+    if(list != NULL){
+        OpList* rightmost_source = opList_goToEnd(source);
+        rightmost_source->next = list;
+    }
+    return source;
+}
+
 void opList_free(OpList* list) {
     if(list != NULL) {
         if(list->next != NULL)

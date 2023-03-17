@@ -45,15 +45,21 @@ Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_
     Operation* op_new = malloc(sizeof(Operation*));
     op_new->operation = operation;
     op_new->arg0 = strdup(arg0);
-    op_new->arg1 = strdup(arg1);
-    if (strcmp(dest, "0") == 0) {
-        op_new->dest = strdup("rbss");
-        op_new->dest_shift = strdup(dest_shift);
-    }
-    else {
-        op_new->dest = strdup("rfp");
-        op_new->dest_shift = strdup("-");
-        op_new->dest_shift = strcat(op_new->dest_shift, dest_shift);
+    if(arg1 != NULL)
+        op_new->arg1 = strdup(arg1);
+    if (dest != NULL) {
+        if (strcmp(dest, "0") == 0) {
+            op_new->dest = strdup("rbss");
+            if(dest_shift != NULL)
+                op_new->dest_shift = strdup(dest_shift);
+        }
+        else {
+            op_new->dest = strdup("rfp");
+            if(dest_shift != NULL) {
+                op_new->dest_shift = strdup("-");
+                op_new->dest_shift = strcat(op_new->dest_shift, dest_shift);
+            }
+        }
     }
     return op_new;
 }
@@ -61,6 +67,10 @@ Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_
 char* generate_code(Operation* op) {
     char* buffer = NULL;
     switch (op->operation) {
+        case OP_LABEL:
+            buffer = strdup(op->arg0);
+            buffer = strcat(buffer, ":");
+            return buffer;
         case OP_NOP:
             return (strdup("nop\n"));
         case OP_ADD:

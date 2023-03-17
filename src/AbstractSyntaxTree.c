@@ -21,6 +21,8 @@ ASTree* ast_new_node(lexValue value, int node_type)
         ret->number_of_children = 0;
         ret->children = NULL;
         ret->node_type = node_type;
+        ret->temp = NULL;
+        ret->code = NULL;
     }
     return ret;
 }

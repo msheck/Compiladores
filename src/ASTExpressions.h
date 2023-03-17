@@ -9,6 +9,9 @@ Desenvolvido pelos alunos:
 */
 
 #include "AbstractSyntaxTree.h"
+#include "Errors.h"
+#include "CodeGen.h"
+#include "OpList.h"
 
 #ifndef _ASTEXPRESSIONS_H_
 #define _ASTEXPRESSIONS_H_

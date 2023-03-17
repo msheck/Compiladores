@@ -23,8 +23,8 @@ int main(int argc, char **argv)
     tabela = table_new();
 	escopo = tabela;
 	int ret = yyparse(); 
-    table_print(tabela);
-	exporta (arvore);
+    //table_print(tabela);
+	//exporta(arvore);
 	libera(arvore);
 	arvore = NULL;
 
@@ -34,9 +34,3 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
-/* Comentário:
-	Não tivemos tempo o suficiente para fazer o trabalho. Faltou organização? Não. Começamos o trabalho logo depois do
-	laboratório. Em conjunto, gastamos por volta de 30h nesta etapa. Ambos estudamos e trabalhamos, não podíamos dedicar
-	mais tempo.
-*/
