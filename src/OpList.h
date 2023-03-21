@@ -12,6 +12,7 @@ Desenvolvido pelos alunos:
 #define _OPLIST_H_
 
 #include "Structures.h"
+#include "CodeGen.h"
 
 OpList* opList_new();
 

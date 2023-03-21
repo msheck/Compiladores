@@ -219,7 +219,7 @@ comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$
                     | while                         { $$ = $1; }
                     | bloc_com                      { $$ = $1; };
 
-comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; } // TODO: concatenar code
+comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; $$->code = opList_concatLeft($$->code, $3->code); } // TODO: concatenar code
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com_dec:         '{'                           { escopo = table_nest(escopo); };
@@ -246,8 +246,8 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | lits                    { $$ = $1; }
                     | TK_IDENTIFICADOR        { table_check_use(table_get_content(escopo, $1.label, $1.line_number), NAT_VAR, $1.line_number);
                                                 Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); 
-                                                free(identifier); free($1.label); if($1.value!=NULL) free($1.value);
-                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADI, $1.label, NULL, $$->temp, NULL)); };
+                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADI, identifier->lex_data.label, NULL, $$->temp, NULL));
+                                                free(identifier); free($1.label); if($1.value!=NULL) free($1.value); };
 
 expr_tier7:           expr TK_OC_OR expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
                                                 $$ = ast_expr_node($1, $2, $3); ast_add_child($$, $1); ast_add_child($$, $3); 

@@ -69,13 +69,10 @@ void _opList_print(OpList* list) {
         printf("\nLIST EMPTY");
         return;
     }
-    printf("Operation %d", list->value->operation);
+    printf("%s", generate_code(list->value));
     if(list->next != NULL){
-        printf(", ");
+        // printf("\n");
         _opList_print(list->next);
-    }
-    else{
-        printf(".");
     }
 }
 

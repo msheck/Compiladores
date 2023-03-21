@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 	int ret = yyparse(); 
     //table_print(tabela);
 	//exporta(arvore);
+	opList_print(operacoes);
 	libera(arvore);
 	arvore = NULL;
 

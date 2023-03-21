@@ -69,7 +69,7 @@ char* generate_code(Operation* op) {
     switch (op->operation) {
         case OP_LABEL:
             buffer = strdup(op->arg0);
-            buffer = strcat(buffer, ":");
+            buffer = strcat(buffer, ":\t");
             return buffer;
         case OP_NOP:
             return (strdup("nop\n"));
