@@ -42,7 +42,7 @@ char* get_temp() {
 }
 
 Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_shift) {
-    Operation* op_new = malloc(sizeof(Operation*));
+    Operation* op_new = calloc(1,sizeof(Operation));
     op_new->operation = operation;
     op_new->arg0 = strdup(arg0);
     if(arg1 != NULL)
@@ -69,215 +69,215 @@ char* generate_code(Operation* op) {
     switch (op->operation) {
         case OP_LABEL:
             buffer = strdup(op->arg0);
-            buffer = strcat(buffer, ":\t");
+            buffer = strcat(buffer, ":");
             return buffer;
         case OP_NOP:
-            return (strdup("nop\n"));
+            return (strdup("\tnop\n"));
         case OP_ADD:
-            buffer = strdup("add\t");
+            buffer = strdup("\tadd\t\t");
             break;
         case OP_SUB:
-            buffer = strdup("sub\t");
+            buffer = strdup("\tsub\t\t");
             break;
         case OP_MULT:
-            buffer = strdup("mult\t");
+            buffer = strdup("\tmult\t\t");
             break;
         case OP_DIV:
-            buffer = strdup("div\t");
+            buffer = strdup("\tdiv\t\t");
             break;
         case OP_ADDI:
-            buffer = strdup("addI\t");
+            buffer = strdup("\taddI\t\t");
             break;
         case OP_SUBI:
-            buffer = strdup("subI\t");
+            buffer = strdup("\tsubI\t\t");
             break;
         case OP_RSUBI:
-            buffer = strdup("rsubI\t");
+            buffer = strdup("\trsubI\t\t");
             break;
         case OP_MULTI:
-            buffer = strdup("multI\t");
+            buffer = strdup("\tmultI\t\t");
             break;
         case OP_DIVI:
-            buffer = strdup("divI\t");
+            buffer = strdup("\tdivI\t\t");
             break;
         case OP_RDIVI:
-            buffer = strdup("rdivI\t");
+            buffer = strdup("\trdivI\t\t");
             break;
         case OP_LSHIFT:
-            buffer = strdup("lshift\t");
+            buffer = strdup("\tlshift\t\t");
             break;
         case OP_LSHIFTI:
-            buffer = strdup("lshiftI\t");
+            buffer = strdup("\tlshiftI\t\t");
             break;
         case OP_RSHIFT:
-            buffer = strdup("rshift\t");
+            buffer = strdup("\trshift\t\t");
             break;
         case OP_RSHIFTI:
-            buffer = strdup("rshiftI\t");
+            buffer = strdup("\trshiftI\t\t");
             break;
         case OP_AND:
-            buffer = strdup("and\t");
+            buffer = strdup("\tand\t\t");
             break;
         case OP_ANDI:
-            buffer = strdup("andI\t");
+            buffer = strdup("\tandI\t\t");
             break;
         case OP_OR:
-            buffer = strdup("or\t");
+            buffer = strdup("\tor\t\t");
             break;
         case OP_ORI:
-            buffer = strdup("orI\t");
+            buffer = strdup("\torI\t\t");
             break;
         case OP_XOR:
-            buffer = strdup("xor\t");
+            buffer = strdup("\txor\t\t");
             break;
         case OP_XORI:
-            buffer = strdup("xorI\t");
+            buffer = strdup("\txorI\t\t");
             break;
         case OP_LOADI:
-            buffer = strdup("loadI\t");
+            buffer = strdup("\tloadI\t\t");
             break;
         case OP_LOAD:
-            buffer = strdup("load\t");
+            buffer = strdup("\tload\t\t");
             break;
         case OP_LOADAI:
-            buffer = strdup("loadAI\t");
+            buffer = strdup("\tloadAI\t\t");
             break;
         case OP_LOADAO:
-            buffer = strdup("loadAO\t");
+            buffer = strdup("\tloadAO\t\t");
             break;
         case OP_CLOAD:
-            buffer = strdup("cload\t");
+            buffer = strdup("\tcload\t\t");
             break;
         case OP_CLOADAI:
-            buffer = strdup("cloadAI\t");
+            buffer = strdup("\tcloadAI\t\t");
             break;
         case OP_CLOADAO:
-            buffer = strdup("cloadAO\t");
+            buffer = strdup("\tcloadAO\t\t");
             break;
         case OP_STORE:
-            buffer = strdup("store\t");
+            buffer = strdup("\tstore\t\t");
             break;
         case OP_STOREAI:
-            buffer = strdup("storeAI\t");
+            buffer = strdup("\tstoreAI\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_STOREAO:
-            buffer = strdup("storeAO\t");
+            buffer = strdup("\tstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTORE:
-            buffer = strdup("cstore\t");
+            buffer = strdup("\tcstore\t\t");
             break;
         case OP_CSTOREAI:
-            buffer = strdup("cstoreI\t");
+            buffer = strdup("\tcstoreI\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTOREAO:
-            buffer = strdup("cstoreAO\t");
+            buffer = strdup("\tcstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->dest_shift);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_I2I:
-            buffer = strdup("i2i\t");
+            buffer = strdup("\ti2i\t\t");
             break;
         case OP_C2C:
-            buffer = strdup("c2c\t");
+            buffer = strdup("\tc2c\t\t");
             break;
         case OP_C2I:
-            buffer = strdup("c2i\t");
+            buffer = strdup("\tc2i\t\t");
             break;
         case OP_I2C:
-            buffer = strdup("i2c\t");
+            buffer = strdup("\ti2c\t\t");
             break;
         case OP_JUMPI:
-            buffer = strdup("jumpI\t");
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strdup("\tjumpI\t\t");
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_JUMP:
-            buffer = strdup("jump\t");
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strdup("\tjump\t\t");
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CBR:
-            buffer = strdup("cbr\t");
+            buffer = strdup("\tcbr\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CMP_LT:
-            buffer = strdup("cmp_LT\t");
+            buffer = strdup("\tcmp_LT\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_LE:
-            buffer = strdup("cmp_LE\t");
+            buffer = strdup("\tcmp_LE\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_EQ:
-            buffer = strdup("cmp_EQ\t");
+            buffer = strdup("\tcmp_EQ\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_GE:
-            buffer = strdup("cmp_GE\t");
+            buffer = strdup("\tcmp_GE\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_GT:
-            buffer = strdup("cmp_GT\t");
+            buffer = strdup("\tcmp_GT\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_NE:
-            buffer = strdup("cmp_NE\t");
+            buffer = strdup("\tcmp_NE\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t->\t"));
+            buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer); 
@@ -288,7 +288,7 @@ char* generate_code(Operation* op) {
 
         if(op->arg1 == NULL){
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -297,7 +297,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t\t=>\t"));
+            buffer = strcat(buffer, strdup("\t=>\t"));
             buffer = strcat(buffer, op->dest);
             buffer = strcat(buffer, "\n");
             return (buffer);
