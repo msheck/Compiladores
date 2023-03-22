@@ -12,6 +12,7 @@ Desenvolvido pelos alunos:
 #define _TABLEPRINT_H_
 
 #include "Table.h"
+#include "Misc.h"
 
 void table_print_buffer();
 

@@ -49,7 +49,6 @@ void opList_free(OpList* list) {
     if(list != NULL) {
         if(list->next != NULL)
             opList_free(list->next);
-        // printf("\nFreeing %s: %ld...", list->value->lex_data.label, (long)list );
         op_free(list->value);
         free(list);
         list = NULL;
@@ -71,7 +70,6 @@ void _opList_print(OpList* list) {
     }
     printf("%s", generate_code(list->value));
     if(list->next != NULL){
-        // printf("\n");
         _opList_print(list->next);
     }
 }

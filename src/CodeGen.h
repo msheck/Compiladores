@@ -69,8 +69,10 @@ Desenvolvido pelos alunos:
 #define OP_CMP_NE      46
 
 #include "Structures.h"
+#include "Misc.h"
 
 char* get_label();
+
 char* get_temp();
 
 Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3);

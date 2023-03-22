@@ -7,7 +7,7 @@
 #	-Vinicius Meirelles Pereira
 
 ETAPA = 5
-SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c
+SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c src/Misc.c
 
 .PHONY: zip unzip compile_test test clean flex etapa$(ETAPA)
 
