@@ -234,9 +234,9 @@ void table_update_type(SymbolTable* table, int type){
             emit_error(ERR_CHAR_VECTOR, table->content[typeless_idx->value]->lex_data.line_number,  table->content[typeless_idx->value]->lex_data.label, NULL);
         table->content[typeless_idx->value]->node_type = type;
         table->content[typeless_idx->value]->total_size = calculate_total_size(type, table->content[typeless_idx->value]->dimensions);
+        table->content[typeless_idx->value]->scope = table->scope_level;
         if (table->scope_level == 0) {
             table->content[typeless_idx->value]->mem_shift = rbss_shift;
-            table->content[typeless_idx->value]->scope = table->scope_level;
             rbss_shift += table->content[typeless_idx->value]->total_size;
         }
         else {

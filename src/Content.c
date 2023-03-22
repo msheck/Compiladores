@@ -50,6 +50,8 @@ Content* content_dup(Content* original) {
     duplicate->nature = original->nature;
     duplicate->node_type = original->node_type;
     duplicate->total_size = original->total_size;
+    duplicate->mem_shift = original->mem_shift;
+    duplicate->scope = original->scope;
     if(original->args != NULL)
         duplicate->args = contentList_dup(original->args);
     else

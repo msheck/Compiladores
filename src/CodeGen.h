@@ -73,7 +73,7 @@ Desenvolvido pelos alunos:
 char* get_label();
 char* get_temp();
 
-Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_shift);
+Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3);
 
 char* generate_code(Operation* op);
 

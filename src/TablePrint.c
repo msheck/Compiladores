@@ -82,7 +82,13 @@ void table_print(SymbolTable* table) {
                 value_len = strlen(table->content[i]->lex_data.value);
             else
                 value_len = 6;
-            printf("\n| %04d [%03d]: (%s) %s = %s %*c", i, table->content[i]->mem_shift, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+19)),'|');
+            char* scope;
+            if(table->content[i]->scope == 0)
+                scope = strdup("rbss");
+            else
+                scope = strdup("rfp ");
+            printf("\n| %04d [%s:%03d]: (%s) %s = %s %*c", i, scope, table->content[i]->mem_shift, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+24)),'|');
+            free(scope);
             if(table->content[i]->args == NULL)
                 printf(" args is null %*c", width-13,'|');
             else{

@@ -41,28 +41,85 @@ char* get_temp() {
     return ret;
 }
 
-Operation* op_new(int operation, char* arg0, char* arg1, char* dest, char* dest_shift) {
+/////////////////TODO: HARD REFACTOR ON CRACK
+Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3) {
     Operation* op_new = calloc(1,sizeof(Operation));
     op_new->operation = operation;
-    op_new->arg0 = strdup(arg0);
-    if(arg1 != NULL)
-        op_new->arg1 = strdup(arg1);
-    if (dest != NULL) {
-        if (strcmp(dest, "0") == 0) {
-            op_new->dest = strdup("rbss");
-            if(dest_shift != NULL)
-                op_new->dest_shift = strdup(dest_shift);
+    // Load operations
+    if(operation >= OP_LOAD && operation <= OP_LOADAO) {
+        // load r1 => r2 // r2 = Memoria(r1)
+        if(operation == OP_LOAD) {
+            op_new->arg1 = NULL;
         }
-        else {
-            op_new->dest = strdup("rfp");
-            if(dest_shift != NULL) {
-                op_new->dest_shift = strdup("-");
-                op_new->dest_shift = strcat(op_new->dest_shift, dest_shift);
+        // loadAI r1, c2 => r3 // r3 = Memoria(r1 + c2)
+        else if(operation == OP_LOADAI) {
+            char arg1_buff[10];
+            sprintf(arg1_buff, "%d", *(int*)arg1);
+            if (*(int*)arg0 == 0) {
+                op_new->arg0 = strdup("rbss");
+                op_new->arg1 = strdup(arg1_buff);
             }
+            else {
+                op_new->arg0 = strdup("rfp");
+                if(*(int*)arg1 != 0)
+                    op_new->arg1 = strdup("-");
+                else
+                    op_new->arg1 = strdup("");
+                op_new->arg1 = strcat(op_new->arg1, arg1_buff);
+            }
+        }
+        // loadA0 r1, r2 => r3 // r3 = Memoria(r1 + r2)
+        else if(operation == OP_LOADAO) {
+            op_new->arg0 = strdup((char*)arg0);
+            op_new->arg1 = strdup((char*)arg1);
+        }
+        op_new->arg2 = strdup((char*)arg2);
+    }
+    else {
+        op_new->arg0 = strdup(arg0);
+        if(arg1 != NULL)
+            op_new->arg1 = strdup(arg1);
+        if (arg2 != NULL) {
+            if (strcmp(arg2, "0") == 0) {
+                op_new->arg2 = strdup("rbss");
+                if(arg3 != NULL)
+                    op_new->arg3 = strdup("");
+            }
+            else {
+                op_new->arg2 = strdup("rfp");
+                if(arg3 != NULL) {
+                    if(*(int*)arg3 != 0)
+                        op_new->arg3 = strdup("-");
+                    else
+                        op_new->arg3 = strdup("");
+                }
+            }
+            if (operation == OP_STOREAI || operation == OP_CSTOREAI){
+            // storeAI r1 => r2, c3 // Memoria(r2 + c3) = r1
+            // cstoreAI r1 => r2, c3 // caractere storeAI
+                char arg3_buff[10];
+                sprintf(arg3_buff, "%d", *(int*)arg3);
+                op_new->arg3 = strcat(op_new->arg3, arg3_buff);
+            }
+            else if(arg3 != NULL)
+                op_new->arg3 = strcat(op_new->arg3, arg3);
         }
     }
     return op_new;
 }
+
+// Operation* op_new_i(int operation, char* arg0, char* arg1, int arg2, int arg3) {
+//     if(operation >= OP_LOADI && operation <= OP_CLOADAO) {
+//         char mem_shift_buff[10], scope_buff[10];
+//         sprintf(scope_buff, "%d", arg2);
+//         sprintf(mem_shift_buff, "%d", arg3);
+//         return op_new(operation, scope_buff, mem_shift_buff, arg0, arg1);
+//     }
+//     char mem_shift_buff[10], scope_buff[10];
+//     sprintf(scope_buff, "%d", arg2);
+//     sprintf(mem_shift_buff, "%d", arg3);
+//     return op_new(operation, arg0, arg1, scope_buff, mem_shift_buff);
+// }
 
 char* generate_code(Operation* op) {
     char* buffer = NULL;
@@ -161,18 +218,18 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tstoreAI\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->dest_shift);
+            buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_STOREAO:
             buffer = strdup("\tstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->dest_shift);
+            buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTORE:
@@ -182,18 +239,18 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcstoreI\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->dest_shift);
+            buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTOREAO:
             buffer = strdup("\tcstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->dest_shift);
+            buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_I2I:
@@ -211,20 +268,20 @@ char* generate_code(Operation* op) {
         case OP_JUMPI:
             buffer = strdup("\tjumpI\t\t");
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_JUMP:
             buffer = strdup("\tjump\t\t");
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CBR:
             buffer = strdup("\tcbr\t\t");
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CMP_LT:
@@ -233,7 +290,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_LE:
@@ -242,7 +299,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_EQ:
@@ -251,7 +308,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_GE:
@@ -260,7 +317,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_GT:
@@ -269,7 +326,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         case OP_CMP_NE:
@@ -278,29 +335,28 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, ", ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
-            buffer = strcat(buffer, op->dest);
+            buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer); 
         default:
             buffer = malloc(sizeof(char*)*4); // Free not necessary, will always call exit if the program gets here.
             sprintf(buffer,"%d",op->operation);
             emit_error(ERR_UNKNOWN_OPERATION, 0, NULL, buffer);
-
-        if(op->arg1 == NULL){
-            buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
-            buffer = strcat(buffer, "\n");
-            return (buffer);
-        }
-        else{
-            buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
-            buffer = strcat(buffer, op->arg1);
-            buffer = strcat(buffer, strdup("\t=>\t"));
-            buffer = strcat(buffer, op->dest);
-            buffer = strcat(buffer, "\n");
-            return (buffer);
-        }
+    }
+    if(op->arg1 == NULL){
+        buffer = strcat(buffer, op->arg0);
+        buffer = strcat(buffer, strdup("\t=>\t"));
+        buffer = strcat(buffer, op->arg2);
+        buffer = strcat(buffer, "\n");
+        return (buffer);
+    }
+    else{
+        buffer = strcat(buffer, op->arg0);
+        buffer = strcat(buffer, ", ");
+        buffer = strcat(buffer, op->arg1);
+        buffer = strcat(buffer, strdup("\t=>\t"));
+        buffer = strcat(buffer, op->arg2);
+        buffer = strcat(buffer, "\n");
+        return (buffer);
     }
 }

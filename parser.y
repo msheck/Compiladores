@@ -199,8 +199,7 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                                                       Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
                                                       $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
                                                       ast_check_type($$->children[0], $$->children[1]);
-                                                      char mem_shift_buff[10], scope_buff[10]; sprintf(mem_shift_buff, "%d", content->mem_shift);  sprintf(scope_buff, "%d", content->mem_shift); Operation* op_buffer = op_new(OP_STOREAI, $3->temp, NULL, scope_buff, mem_shift_buff);
-                                                      $$->code = opList_pushLeft($$->code, op_buffer); }
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, &content->scope, &content->mem_shift)); }
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
                                                       ast_check_type($1, $3); };
 
@@ -241,12 +240,12 @@ expr:                 expr_end                { $$ = $1; }
 	                  | expr_tier7              { $$ = $1; };
 
 expr_end:             '(' expr ')'            { $$ = $2; }
-                    | chamada_func            { $$ = $1; }
-                    | ident_multidim          { $$ = $1; }
+                    | chamada_func            { $$ = $1; } // TODO
+                    | ident_multidim          { $$ = $1; } // nope
                     | lits                    { $$ = $1; }
                     | TK_IDENTIFICADOR        { table_check_use(table_get_content(escopo, $1.label, $1.line_number), NAT_VAR, $1.line_number);
                                                 Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); 
-                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADI, identifier->lex_data.label, NULL, $$->temp, NULL));
+                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADAI, &identifier->scope, &identifier->mem_shift, $$->temp, NULL));
                                                 free(identifier); free($1.label); if($1.value!=NULL) free($1.value); };
 
 expr_tier7:           expr TK_OC_OR expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);
@@ -316,6 +315,7 @@ if_then_else:         if_then                                 { $$ = $1; }
                                                                 $$->code = opList_concatLeft($$->code, $$->children[1]->code);
                                                                 $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, t, NULL, NULL, NULL));
                                                                 $$->code = opList_pushLeft($$->code, op_new(OP_CBR, $$->children[0]->temp, NULL, t, e));
+                                                                $$->code = opList_concatLeft($$->code, $$->children[0]->code);
                                                                 opList_print($$->code); };
 
 while:                TK_PR_WHILE '(' expr ')' bloc_com       { ast_check_type_node(NODE_TYPE_BOOL, $3);

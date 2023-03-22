@@ -59,8 +59,8 @@ void opList_free(OpList* list) {
 void op_free(Operation* op) {
     free(op->arg0);
     free(op->arg1);
-    free(op->dest);
-    free(op->dest_shift);
+    free(op->arg2);
+    free(op->arg3);
     free(op);
 }
 
