@@ -39,7 +39,7 @@ SymbolTable* table_nest(SymbolTable* root);
 
 SymbolTable* table_pop_nest(SymbolTable* root);
 
-void table_update_type(SymbolTable* table, int type);
+void table_update_type(SymbolTable* table, int type, OpList* operations);
 
 void table_update_data_value(SymbolTable* table, char* key, ASTree* data_value);
 

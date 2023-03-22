@@ -45,6 +45,15 @@ OpList* opList_concatLeft(OpList* list, OpList* source) {
     return source;
 }
 
+OpList* opList_concatRight(OpList* list, OpList* source) {
+    if(list != NULL){
+        OpList* rightmost_list = opList_goToEnd(list);
+        rightmost_list->next = source;
+        return list;
+    }
+    return source;
+}
+
 void opList_free(OpList* list) {
     if(list != NULL) {
         if(list->next != NULL)

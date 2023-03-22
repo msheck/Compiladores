@@ -67,7 +67,7 @@ void table_add_entry(SymbolTable *table, char* key, Content* content) {
     table_check_declared(table, key, content->lex_data.line_number);
     content->table = table;
     if(content->node_type != NODE_TYPE_UNDECLARED)
-        table_update_type(table, content->node_type);
+        table_update_type(table, content->node_type, NULL);
     int hash = table_get_hash(key);
     // Se hash >= table->size, aumenta a tabela até hash+1 populando com null. Coloca na última pos.
     if(hash >= table->size) {
@@ -215,23 +215,36 @@ SymbolTable* table_pop_nest(SymbolTable* root) {
     }
 }
 
-void table_update_type(SymbolTable* table, int type){
+void table_update_type(SymbolTable* table, int type, OpList* operations){
     IntList* typeless_idx = table->typeless;
+    OpList* current = operations;
+    int shift = 0;
     while(typeless_idx!=NULL){
         if(type == NODE_TYPE_CHAR && table->content[typeless_idx->value]->nature == NAT_ARR)
             emit_error(ERR_CHAR_VECTOR, table->content[typeless_idx->value]->lex_data.line_number,  table->content[typeless_idx->value]->lex_data.label, NULL);
         table->content[typeless_idx->value]->node_type = type;
         table->content[typeless_idx->value]->total_size = calculate_total_size(type, table->content[typeless_idx->value]->dimensions);
-        table->content[typeless_idx->value]->scope = table->scope_level;
+        table->content[typeless_idx->value]->scope = table->scope_level;        
         if (table->scope_level == 0) {
             table->content[typeless_idx->value]->mem_shift = rbss_shift;
+            shift = rbss_shift;
             rbss_shift += table->content[typeless_idx->value]->total_size;
         }
         else {
             table->content[typeless_idx->value]->mem_shift = rfp_shift;
+            shift = rfp_shift;
             rfp_shift += table->content[typeless_idx->value]->total_size;
         }
         typeless_idx = typeless_idx->next;
+        while(current != NULL) {
+            if(current->value->arg3 != NULL && strcmp(current->value->arg3, "placeholder") == 0){
+                free(current->value->arg3);
+                current->value->arg3 = get_memShift(table->scope_level, shift);
+                current = current->next;
+                break;
+            }
+            current = current->next;
+        }
     }
     intList_free(table->typeless);
     table->typeless = intList_new();
