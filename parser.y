@@ -199,7 +199,7 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                                                       Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
                                                       $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
                                                       ast_check_type($$->children[0], $$->children[1]);
-                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, getAddr_dataRegister(content->scope), getAddr_memShift(content->scope, content->mem_shift))); }
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, get_dataRegister(content->scope), get_memShift(content->scope, content->mem_shift))); }
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
                                                       ast_check_type($1, $3); };
 
@@ -245,7 +245,7 @@ expr_end:             '(' expr ')'            { $$ = $2; }
                     | lits                    { $$ = $1; }
                     | TK_IDENTIFICADOR        { table_check_use(table_get_content(escopo, $1.label, $1.line_number), NAT_VAR, $1.line_number);
                                                 Content* identifier = content_dup(table_get_content(escopo, $1.label, $1.line_number)); $$ = ast_new_node(identifier->lex_data, identifier->node_type); 
-                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADAI, getAddr_dataRegister(identifier->scope), getAddr_memShift(identifier->scope, identifier->mem_shift), $$->temp, NULL));
+                                                $$->temp = get_temp(); $$->code = opList_pushLeft(NULL, op_new(OP_LOADAI, get_dataRegister(identifier->scope), get_memShift(identifier->scope, identifier->mem_shift), $$->temp, NULL));
                                                 free(identifier); free($1.label); if($1.value!=NULL) free($1.value); };
 
 expr_tier7:           expr TK_OC_OR expr      { ast_check_not_char($1, $3->node_type); ast_check_not_char($3, $1->node_type);

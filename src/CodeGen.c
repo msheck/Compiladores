@@ -31,7 +31,7 @@ char* get_temp() {
     return ret;
 }
 
-Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3) {
+Operation* op_new(int operation, char* arg0, char* arg1, char* arg2, char* arg3) {
     Operation* op_new = calloc(1,sizeof(Operation));
     op_new->operation = operation;
     op_new->arg0 = NULL;
@@ -40,47 +40,9 @@ Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3)
     op_new->arg3 = NULL;
     switch (operation) {
         case -1:
-            op_new->arg0 = strdup((char*)arg0);
+            op_new->arg0 = strdup(arg0);
             return op_new;
         case 0:
-            return op_new;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 11:
-        case 13:
-        case 15:
-        case 17:
-        case 19:
-        case 23:
-        case 24:
-        case 27:
-        case 41:
-        case 42:
-        case 43:
-        case 44:
-        case 45:
-        case 46:
-            op_new->arg0 = strdup((char*)arg0);
-            op_new->arg1 = strdup((char*)arg1);
-            op_new->arg2 = strdup((char*)arg2);
-            return op_new;
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 12:
-        case 14:
-        case 16:
-        case 18:
-        case 20:
-        case 26:
-            op_new->arg0 = strdup((char*)arg0);
-            op_new->arg1 = int_to_string(*(int*)arg1);
-            op_new->arg2 = strdup((char*)arg2);
             return op_new;
         case 21:
         case 22:
@@ -91,28 +53,25 @@ Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3)
         case 35:
         case 36:
         case 37:
-            op_new->arg0 = strdup((char*)arg0);
-            op_new->arg2 = strdup((char*)arg2);
+            op_new->arg0 = strdup(arg0);
+        case 38:
+        case 39:
+            op_new->arg2 = strdup(arg2);
             return op_new;
         case 29:
         case 30:
         case 32:
         case 33:
         case 40:
-            op_new->arg0 = strdup((char*)arg0);
-            op_new->arg2 = strdup((char*)arg2);
-            op_new->arg3 = strdup((char*)arg3);
+            op_new->arg0 = strdup(arg0);
+            op_new->arg2 = strdup(arg2);
+            op_new->arg3 = strdup(arg3);
             return op_new;
-        case 38:
-        case 39:
-            op_new->arg2 = strdup((char*)arg2);
-            return op_new;
-
-            /* code */
-            break;
-        
         default:
-            break;
+            op_new->arg0 = strdup(arg0);
+            op_new->arg1 = strdup(arg1);
+            op_new->arg2 = strdup(arg2);
+            return op_new;
     }
 }
 
@@ -277,6 +236,8 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
+            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CMP_LT:

@@ -75,7 +75,7 @@ char* get_label();
 
 char* get_temp();
 
-Operation* op_new(int operation, void* arg0, void* arg1, void* arg2, void* arg3);
+Operation* op_new(int operation, char* arg0, char* arg1, char* arg2, char* arg3);
 
 char* generate_code(Operation* op);
 
