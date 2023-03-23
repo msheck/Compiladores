@@ -10,22 +10,25 @@ Desenvolvido pelos alunos:
 
 #include "ASTExpressions.h"
 
-ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr, int node_type){
-    switch (operator_node->data.label[0])
-    {
-    case 33: //'!'
+ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr){
+    operator_node->temp = get_temp();
+    switch (operator_node->data.label[0]) {
+        case 33: //'!'
 
-    case 45: //'-'
-
-    default:
-        printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator unidentified!\033[0m\n");
-        exit(ERR_INVALID_EXPR);
+        case 45: //'-'
+            operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_RSUBI, expr->temp, "0", operator_node->temp, NULL));
+        default:
+            printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator unidentified!\033[0m\n");
+            exit(ERR_INVALID_EXPR);
     }
+    operator_node->code = opList_concatLeft(operator_node->code, expr->code);
+    return operator_node;
 }
 
-ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2, int node_type){
+ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2){
     operator_node->temp = get_temp();
     switch (operator_node->data.label[0]+operator_node->data.label[1]){
+        //ARIT EXPR
         case 37: //'%'
             break;
         case 47: //'/'
@@ -40,6 +43,7 @@ ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2,
         case 43: //'+'
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_ADD, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
+        //LOGIC EXPR
         case 123: //'>='
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_GE, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
@@ -100,9 +104,9 @@ ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
                 exit(ERR_INVALID_EXPR);
             }
         }
-        operator_node = resolve_binary_expr(expr1, operator_node, expr2, node_type);
+        operator_node = resolve_binary_expr(expr1, operator_node, expr2);
     }
     else
-        operator_node = resolve_unary_expr(operator_node, expr2, node_type);
+        operator_node = resolve_unary_expr(operator_node, expr2);
     return operator_node;
 }

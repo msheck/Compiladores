@@ -28,7 +28,7 @@ bison_debug:
 	bison -d -v parser.y
 
 clean:
-	rm -rf entrega | rm -rf etapa* debug table_test lex.yy.c test.o *.tgz parser.tab.* *.output *.dot *.png
+	rm -rf entrega | rm -rf etapa* debug table_test lex.yy.c test.o *.tgz parser.tab.* *output *.dot *.png
 
 test: debug flex bison_debug compile_test
 	./test.o
@@ -47,6 +47,9 @@ valgrind: debug
 
 valgrind_details: debug
 	valgrind -s --leak-check=full --show-leak-kinds=all ./etapa$(ETAPA) < input
+
+iloc_output: debug
+	./etapa$(ETAPA) <input >output
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='aux' -cvzf etapa$(ETAPA).tgz .
