@@ -31,7 +31,7 @@ char* get_dataRegister(int scope){
         buffer = strdup("rbss");
     }
     else {
-        buffer = strdup("rfp");
+        buffer = strdup("rsp");
     }
     return buffer;
 }

@@ -39,16 +39,22 @@ OpList* opList_goToEnd(OpList* list) {
 
 OpList* opList_concatLeft(OpList* list, OpList* source) {
     if(list != NULL){
-        OpList* rightmost_source = opList_goToEnd(source);
-        rightmost_source->next = list;
+        if(source != NULL){
+            OpList* rightmost_source = opList_goToEnd(source);
+            rightmost_source->next = list;
+        }
+        else
+            return list;
     }
     return source;
 }
 
 OpList* opList_concatRight(OpList* list, OpList* source) {
     if(list != NULL){
-        OpList* rightmost_list = opList_goToEnd(list);
-        rightmost_list->next = source;
+        if(source != NULL){
+            OpList* rightmost_list = opList_goToEnd(list);
+            rightmost_list->next = source;
+        }
         return list;
     }
     return source;

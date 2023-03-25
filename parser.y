@@ -18,7 +18,8 @@ extern void* escopo;
 extern void* operacoes;
 extern int function_type_buffer;
 extern int rbss_shift;
-extern int rfp_shift;
+extern int rsp_shift;
+extern char* main_label;
 
 #include "src/Structures.h"
 #include "src/Errors.h"
@@ -82,8 +83,8 @@ extern int rfp_shift;
 %type<valor_lexico> '/'
 %type<valor_lexico> '%'
 
-%type<astree> programa_ou_vazio
 %type<astree> programa
+%type<astree> comm_glob
 %type<astree> tipo_var
 %type<astree> lits
 %type<astree> list_int
@@ -95,7 +96,6 @@ extern int rfp_shift;
 %type<astree> funcao_dec
 %type<astree> funcao
 %type<astree> atribuicao
-%type<astree> arg
 %type<astree> list_args
 %type<astree> comando_simples
 %type<astree> comandos
@@ -124,17 +124,17 @@ extern int rfp_shift;
 %left '*' '/' '%'
 %left '!'
 
-%start programa_ou_vazio
+%start programa
 
 %%
 
-programa_ou_vazio:    programa              { $$ = $1; arvore = $$; operacoes = $$->code; }
-                    |                       { $$ = NULL; };
+programa:             comm_glob               { $$ = $1; arvore = $$; operacoes = $$->code; }
+                    |                         { $$ = NULL; };
 
-programa:             dec_var_glob          { $$ = NULL; }
-                    | funcao                { $$ = $1; }
-                    | dec_var_glob programa { $$ = $2; }
-                    | funcao programa       { ast_add_child($1, $2); $$ = $1; };
+comm_glob:            dec_var_glob            { $$ = NULL; }
+                    | funcao                  { $$ = $1; }
+                    | dec_var_glob comm_glob  { $$ = $2; }
+                    | funcao comm_glob        { ast_add_child($1, $2); $$ = $1; $$->code = opList_concatLeft($$->code, $2->code); };
 
 
 // VARIAVEIS
@@ -162,7 +162,7 @@ ident_multidim:       TK_IDENTIFICADOR '[' list_expr ']'  { Content* content = t
 
 ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, $3->data.value, NULL, NULL)); 
                                                             $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, $3->node_type)); ast_add_child($$, $3);
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, "rfp", "placeholder")); $$->code = opList_concatLeft($$->code, $3->code); };
+                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, "rsp", "placeholder")); $$->code = opList_concatLeft($$->code, $3->code); };
 
 dec_var_glob:         tipo_var var_glob ';'               { table_update_type(escopo, $1->node_type, NULL); ast_free($1); };
 
@@ -189,10 +189,14 @@ parametros:           tipo_var TK_IDENTIFICADOR                     { table_add_
                     | ;
 
 funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_type_buffer = $1->node_type; table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1->node_type, NULL, NULL, table_dup_buffer()));
-                                                                      $$ = ast_new_node($2, $1->node_type); ast_free($1); 
-                                                                      rfp_shift = 0; };
+                                                                      $$ = ast_new_node($2, $1->node_type); ast_free($1);
+                                                                      rsp_shift = 0; };
 
-funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, $2->code); };
+funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, $2->code); char* label;
+                                                                      if(strcmp($$->data.label, "main") == 0){label = main_label;}
+                                                                      else{label = get_label();}
+                                                                      $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, label, NULL, NULL, NULL));
+                                                                      free(label); };
 
 
 // BLOCO COMANDOS
@@ -206,11 +210,11 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
                                                       ast_check_type($1, $3); };
 
-arg:                  expr                          { $$ = $1; }
+list_args:            expr                          { $$ = $1;
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rsp", "1", "rsp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rsp", NULL)); }
+                    | expr ',' list_args            { ast_add_child($1, $3); $$ = $1;
+                                                      $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rsp", "1", "rsp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rsp", NULL)); }
                     |                               { $$ = NULL; };
-
-list_args:            arg                           { $$ = $1; }
-                    | arg ',' list_args             { ast_add_child($1, $3); $$ = $1; };
 
 comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, $2->code); ast_free($1);}
                     | atribuicao                    { $$ = $1; }
@@ -231,7 +235,7 @@ bloc_com:             bloc_com_dec comandos '}'     { escopo = table_pop_nest(es
 
 chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
                                                             int function_type = content->node_type;
-                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3);};
+                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3); };
 
 
 // EXPRESSOES
@@ -312,12 +316,14 @@ if_then:              if_then_expr bloc_com                   { $$ = $1; ast_add
 
 if_then_else:         if_then                                 { $$ = $1; }
                     | if_then TK_PR_ELSE bloc_com             { $$ = $1; ast_add_child($$, $3);
-                                                                char* t = get_label(); char* e = get_label();
+                                                                char* then_bloc = get_label(); char* else_bloc = get_label(); char* next_command = get_label();
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, next_command, NULL, NULL, NULL));
                                                                 $$->code = opList_concatLeft($$->code, $$->children[2]->code);
-                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, e, NULL, NULL, NULL));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, else_bloc, NULL, NULL, NULL));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, next_command, NULL));
                                                                 $$->code = opList_concatLeft($$->code, $$->children[1]->code);
-                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, t, NULL, NULL, NULL));
-                                                                $$->code = opList_pushLeft($$->code, op_new(OP_CBR, $$->children[0]->temp, NULL, t, e));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, then_bloc, NULL, NULL, NULL));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_CBR, $$->children[0]->temp, NULL, then_bloc, else_bloc));
                                                                 $$->code = opList_concatLeft($$->code, $$->children[0]->code); };
 
 while:                TK_PR_WHILE '(' expr ')' bloc_com       { ast_check_type_node(NODE_TYPE_BOOL, $3);

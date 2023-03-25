@@ -1,18 +1,26 @@
-
+// TODO:
+// Toda declaração de variável não inicializada dá segfault
 
 // int x, y, z;
+int foo(int x) {
+    int a <= 15;
+    a = a;
+    a = x;
+}
 
-int main() {
+int main(int arrrg) {
+    foo(1);
     int x <= 2, y <= 4;
 
     x = x*y+57/2;
 
-    if( y>x ) then {
+    if( (y>x!=y<x) ) then {
         x=0;
     }
     else{
         y=0;
     };
+    x = 2;
 }
 // storeAI 2 => rbss, 0
 // storeAI 4 => rbss, 4
