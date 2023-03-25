@@ -49,7 +49,10 @@ valgrind_details: debug
 	valgrind -s --leak-check=full --show-leak-kinds=all ./etapa$(ETAPA) < input
 
 iloc_output: debug
-	./etapa$(ETAPA) <input >output
+	./etapa$(ETAPA) <input >output.iloc
+
+iloc: iloc_output
+	./ilocsim.py -x -t -s --data 500 --stack 1024 output.iloc
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='aux' -cvzf etapa$(ETAPA).tgz .
