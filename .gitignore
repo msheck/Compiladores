@@ -59,6 +59,6 @@ debug
 table_test
 *.png
 *.dot
-*output
+*output*
 *.tab.c
 *.tab.h

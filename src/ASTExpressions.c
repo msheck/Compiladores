@@ -10,22 +10,6 @@ Desenvolvido pelos alunos:
 
 #include "ASTExpressions.h"
 
-OpList* switch_logic_labels(OpList* code){
-    if(code != NULL) {
-        OpList* current = code;
-        char* buffer;
-        while(current != NULL) {
-            if((current->value->operation == OP_LABEL)
-            &&(strcmp(current->value->arg0,"label_true") == 0)){
-                buffer = current->next->value->arg0;
-                current->next->value->arg0 = current->next->next->next->next->value->arg0;
-                current->next->next->next->next->value->arg0 = buffer;
-            }
-            current = current->next;
-        }
-    }
-}
-
 void remove_logic_labels(OpList* code){ 
     if(code != NULL) {
         OpList* current = code;
@@ -41,6 +25,44 @@ void remove_logic_labels(OpList* code){
     }
 }
 
+OpList* rename_logic_labels(OpList* code){
+    if(code != NULL) {
+        OpList* current = code;
+        while(current->next != NULL) {
+            if((current->next->value->operation == OP_CBR)
+            &&(strcmp(current->next->value->arg2,"label_true") == 0)){
+                current->next->value->arg2 = get_label();
+                current->next->value->arg3 = get_label();
+                current->next->next->value->arg0 = current->next->value->arg2;
+                current->next->next->next->next->value->arg2 = get_label();
+                current->next->next->next->next->next->value->arg0 = current->next->value->arg3;
+                current->next->next->next->next->next->next->next->value->arg0 = current->next->next->next->next->value->arg2;
+                break;
+            }
+            current = current->next;
+        }
+    }
+    return code;
+}
+
+OpList* switch_logic_labels(OpList* code){
+    if(code != NULL) {
+        OpList* current = code;
+        char* buffer;
+        while(current != NULL) {
+            if((current->value->operation == OP_LABEL)
+            &&(strcmp(current->value->arg0,"label_true") == 0)){
+                buffer = current->next->value->arg0;
+                current->next->value->arg0 = current->next->next->next->next->value->arg0;
+                current->next->next->next->next->value->arg0 = buffer;
+                break;
+            }
+            current = current->next;
+        }
+    }
+    return code;
+}
+
 OpList* set_logic_labels(OpList* code, char* temp){
     code = opList_pushLeft(code, op_new(OP_LABEL, "label_next_command", NULL, NULL, NULL));
     code = opList_pushLeft(code, op_new(OP_LOADI, "0", NULL, temp, NULL));
@@ -53,12 +75,13 @@ OpList* set_logic_labels(OpList* code, char* temp){
 }
 
 ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr){
-    operator_node->temp = get_temp();
     switch (operator_node->data.label[0]) {
         case 33: //'!'
-            operator_node->code = switch_logic_labels(operator_node->code);
+            operator_node->temp = expr->temp;
+            expr->code = switch_logic_labels(expr->code);
             break;
         case 45: //'-'
+            operator_node->temp = get_temp();
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_RSUBI, expr->temp, "0", operator_node->temp, NULL));
             break;
         default:

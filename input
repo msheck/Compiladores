@@ -14,7 +14,7 @@ int main(int arrrg) {
 
     x = x*y+57/2;
 
-    if( (y>x!=y<x) ) then {
+    if( !(y>x) ) then {
         x=0;
     }
     else{

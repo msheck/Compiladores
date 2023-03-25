@@ -243,7 +243,7 @@ chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { Content* content = t
 list_expr:            expr                    { $$ = $1; }
                     | list_expr '^' expr      { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); };
 
-expr:                 expr_end                { $$ = $1; }
+expr:                 expr_end                { $$ = $1; $$->code = rename_logic_labels($$->code); }
 	                  | expr_tier7              { $$ = $1; };
 
 expr_end:             '(' expr ')'            { $$ = $2; }
