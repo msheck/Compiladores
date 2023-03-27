@@ -10,48 +10,15 @@ Desenvolvido pelos alunos:
 
 #include "ASTExpressions.h"
 
-void remove_logic_labels(OpList* code){ 
-    if(code != NULL) {
-        OpList* current = code;
-        while(current->next != NULL) {
-            if((current->next->value->operation == OP_CBR)
-            &&(strcmp(current->next->value->arg2,"label_true") == 0)){
-                opList_free(current->next);
-                current->next = NULL;
-                break;
-            }
-            current = current->next;
-        }
-    }
-}
-
-OpList* rename_logic_labels(OpList* code){
-    if(code != NULL) {
-        OpList* current = code;
-        while(current->next != NULL) {
-            if((current->next->value->operation == OP_CBR)
-            &&(strcmp(current->next->value->arg2,"label_true") == 0)){
-                current->next->value->arg2 = get_label();
-                current->next->value->arg3 = get_label();
-                current->next->next->value->arg0 = current->next->value->arg2;
-                current->next->next->next->next->value->arg2 = get_label();
-                current->next->next->next->next->next->value->arg0 = current->next->value->arg3;
-                current->next->next->next->next->next->next->next->value->arg0 = current->next->next->next->next->value->arg2;
-                break;
-            }
-            current = current->next;
-        }
-    }
-    return code;
-}
-
 OpList* switch_logic_labels(OpList* code){
     if(code != NULL) {
         OpList* current = code;
         char* buffer;
         while(current != NULL) {
             if((current->value->operation == OP_LABEL)
-            &&(strcmp(current->value->arg0,"label_true") == 0)){
+            &&(current->next->value->operation == OP_LOADI)
+            &&(current->next->next->next->next->value->operation == OP_LOADI)
+            &&(current->next->next->next->next->next->next == NULL)) {
                 buffer = current->next->value->arg0;
                 current->next->value->arg0 = current->next->next->next->next->value->arg0;
                 current->next->next->next->next->value->arg0 = buffer;
@@ -64,22 +31,27 @@ OpList* switch_logic_labels(OpList* code){
 }
 
 OpList* set_logic_labels(OpList* code, char* temp){
-    code = opList_pushLeft(code, op_new(OP_LABEL, "label_next_command", NULL, NULL, NULL));
+    char* label_true = get_label();
+    char* label_false = get_label();
+    char* label_next_command = get_label();
+    code = opList_pushLeft(code, op_new(OP_LABEL, label_next_command, NULL, NULL, NULL));
     code = opList_pushLeft(code, op_new(OP_LOADI, "0", NULL, temp, NULL));
-    code = opList_pushLeft(code, op_new(OP_LABEL, "label_false", NULL, NULL, NULL));
-    code = opList_pushLeft(code, op_new(OP_JUMPI, NULL, NULL, "label_next_command", NULL));
+    code = opList_pushLeft(code, op_new(OP_LABEL, label_false, NULL, NULL, NULL));
+    code = opList_pushLeft(code, op_new(OP_JUMPI, NULL, NULL, label_next_command, NULL));
     code = opList_pushLeft(code, op_new(OP_LOADI, "1", NULL, temp, NULL));
-    code = opList_pushLeft(code, op_new(OP_LABEL, "label_true", NULL, NULL, NULL));
-    code = opList_pushLeft(code, op_new(OP_CBR, temp, NULL, "label_true", "label_false"));     
+    code = opList_pushLeft(code, op_new(OP_LABEL, label_true, NULL, NULL, NULL));
+    code = opList_pushLeft(code, op_new(OP_CBR, temp, NULL, label_true, label_false));     
     return code;
 }
 
 ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr){
     switch (operator_node->data.label[0]) {
         case 33: //'!'
-            operator_node->temp = expr->temp;
-            expr->code = switch_logic_labels(expr->code);
-            break;
+            if(expr->node_type == NODE_TYPE_BOOL){
+                operator_node->temp = expr->temp;
+                expr->code = switch_logic_labels(expr->code);
+                break;
+            }
         case 45: //'-'
             operator_node->temp = get_temp();
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_RSUBI, expr->temp, "0", operator_node->temp, NULL));
@@ -112,50 +84,34 @@ ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2)
             break;
         //LOGIC EXPR
         case 123: //'>='
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_GE, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 121: //'<='
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_LE, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 62: //'>'
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_GT, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 60: //'<'
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_LT, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 94: //'!='
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_NE, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 122: //'=='
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_CMP_EQ, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 76: //"&&"
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_AND, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         case 248: //"||"
-            remove_logic_labels(expr2->code);
-            remove_logic_labels(expr1->code);
             operator_node->code = set_logic_labels(operator_node->code, operator_node->temp);
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_OR, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
