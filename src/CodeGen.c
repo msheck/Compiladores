@@ -174,18 +174,18 @@ char* generate_code(Operation* op) {
         case OP_STOREAI:
             buffer = strdup("\tstoreAI\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t=>\t"));
+            buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_STOREAO:
             buffer = strdup("\tstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t=>\t"));
+            buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -195,18 +195,18 @@ char* generate_code(Operation* op) {
         case OP_CSTOREAI:
             buffer = strdup("\tcstoreI\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t=>\t"));
+            buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CSTOREAO:
             buffer = strdup("\tcstoreAO\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t=>\t"));
+            buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -224,29 +224,29 @@ char* generate_code(Operation* op) {
             break;
         case OP_JUMPI:
             buffer = strdup("\tjumpI\t\t");
-            buffer = strcat(buffer, strdup("\t->\t"));
+            buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_JUMP:
             buffer = strdup("\tjump\t\t");
-            buffer = strcat(buffer, strdup("\t->\t"));
+            buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CBR:
             buffer = strdup("\tcbr\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, strdup("\t->\t"));
+            buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CMP_LT:
             buffer = strdup("\tcmp_LT\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -255,7 +255,7 @@ char* generate_code(Operation* op) {
         case OP_CMP_LE:
             buffer = strdup("\tcmp_LE\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -264,7 +264,7 @@ char* generate_code(Operation* op) {
         case OP_CMP_EQ:
             buffer = strdup("\tcmp_EQ\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -273,7 +273,7 @@ char* generate_code(Operation* op) {
         case OP_CMP_GE:
             buffer = strdup("\tcmp_GE\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -282,7 +282,7 @@ char* generate_code(Operation* op) {
         case OP_CMP_GT:
             buffer = strdup("\tcmp_GT\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -291,7 +291,7 @@ char* generate_code(Operation* op) {
         case OP_CMP_NE:
             buffer = strdup("\tcmp_NE\t\t");
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, ", ");
+            buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -304,14 +304,14 @@ char* generate_code(Operation* op) {
     }
     if(op->arg1 == NULL){
         buffer = strcat(buffer, op->arg0);
-        buffer = strcat(buffer, strdup("\t=>\t"));
+        buffer = strcat(buffer, strdup("\t\t=>\t"));
         buffer = strcat(buffer, op->arg2);
         buffer = strcat(buffer, "\n");
         return (buffer);
     }
     else{
         buffer = strcat(buffer, op->arg0);
-        buffer = strcat(buffer, ", ");
+        buffer = strcat(buffer, " ,  ");
         buffer = strcat(buffer, op->arg1);
         buffer = strcat(buffer, strdup("\t=>\t"));
         buffer = strcat(buffer, op->arg2);
@@ -333,7 +333,7 @@ OpList function_call(ASTree node, ContentList* args) {
 
     // RETORNO DA FUNCAO -> TEM QUE PASSAR ISSO PRA DECLARAÇAO DA FUNÇAO
     op_new(OP_I2I, "rfp", NULL, "rsp", NULL);    // Advance rsp to the start of the frame
-    op_new(OP_LOADAI, "rfp", "-1", "rsp", NULL); // Set rfp to the first value of the frame (previous rfp)
+    op_new(OP_LOADAI, "rfp" ,  "-1" ,  "rsp", NULL); // Set rfp to the first value of the frame (previous rfp)
     op_new(OP_LOADAI, "rsp", -2, "rpc", NULL);   // Set program counter to the line after the function call
     */
 }
