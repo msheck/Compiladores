@@ -192,7 +192,7 @@ funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_t
                                                                       $$ = ast_new_node($2, $1->node_type); ast_free($1);
                                                                       rsp_shift = 0; };
 
-funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, $2->code); char* label;
+funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code); char* label;
                                                                       if(strcmp($$->data.label, "main") == 0){label = main_label;}
                                                                       else{label = get_label();}
                                                                       $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, label, NULL, NULL, NULL));
@@ -216,7 +216,7 @@ list_args:            expr                          { $$ = $1;
                                                       $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rsp", "1", "rsp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rsp", NULL)); }
                     |                               { $$ = NULL; };
 
-comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, $2->code); ast_free($1);}
+comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
                     | atribuicao                    { $$ = $1; }
                     | chamada_func                  { $$ = $1; }
                     | TK_PR_RETURN expr             { ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
@@ -225,7 +225,8 @@ comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$
                     | while                         { $$ = $1; }
                     | bloc_com                      { $$ = $1; };
 
-comandos:             comando_simples ';' comandos  { if($1==NULL){ $1 = $3;} else{ast_add_child(ast_get_node($1), $3);} $$=$1; $$->code = opList_concatRight($$->code, $3->code); } // TODO: concatenar code
+comandos:             comando_simples ';' comandos  { if($1==NULL){ $$ = $3;}
+                                                      else{ast_add_child(ast_get_node($1), $3); $$=$1; $$->code = opList_concatRight($$->code, $3->code);} }
                     | comando_simples ';'           { $$ = $1; };
 
 bloc_com_dec:         '{'                           { escopo = table_nest(escopo); };
