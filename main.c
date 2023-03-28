@@ -17,7 +17,7 @@ void *operacoes = NULL;
 void exporta (void *arvore);
 void libera (void *arvore);
 int rbss_shift = 0;
-int rsp_shift = 0;
+int rfp_shift = 0;
 int rsp = 0;
 int rfp = 0;
 char* main_label;

@@ -72,7 +72,7 @@ void table_print(SymbolTable* table) {
             if(table->content[i]->scope == 0)
                 scope = strdup("rbss");
             else
-                scope = strdup("rsp ");
+                scope = strdup("rfp ");
             printf("\n| %04d [%s:%03d]: (%s) %s = %s %*c", i, scope, table->content[i]->mem_shift, type, table->keys[i], table->content[i]->lex_data.value, (int)(width-(strlen(type)+strlen(table->keys[i])+value_len+24)),'|');
             free(scope);
             if(table->content[i]->args == NULL)

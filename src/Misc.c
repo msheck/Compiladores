@@ -31,15 +31,15 @@ char* get_dataRegister(int scope){
         buffer = strdup("rbss");
     }
     else {
-        buffer = strdup("rsp");
+        buffer = strdup("rfp");
     }
     return buffer;
 }
 
 char* get_memShift(int scope, int shift){
-    if (scope != 0) {
-        shift = 0 - shift;        
-    }
+    // if (scope != 0) {
+    //     shift = 0 - shift;        
+    // }
     return int_to_string(shift);    
 }
 

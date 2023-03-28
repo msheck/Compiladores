@@ -11,7 +11,7 @@ Desenvolvido pelos alunos:
 #include "Table.h"
 #include "TablePrint.h"
 extern int rbss_shift;
-extern int rsp_shift;
+extern int rfp_shift;
 
 ContentList *content_buffer = NULL;
 int function_type_buffer = NODE_TYPE_UNDECLARED;
@@ -232,9 +232,9 @@ void table_update_type(SymbolTable* table, int type, OpList* operations){
             rbss_shift += table->content[typeless_idx->value]->total_size;
         }
         else {
-            table->content[typeless_idx->value]->mem_shift = rsp_shift;
-            shift = rsp_shift;
-            rsp_shift += table->content[typeless_idx->value]->total_size;
+            table->content[typeless_idx->value]->mem_shift = rfp_shift;
+            shift = rfp_shift;
+            rfp_shift += table->content[typeless_idx->value]->total_size;
         }
         typeless_idx = typeless_idx->next;
         while(current != NULL) {
@@ -271,8 +271,8 @@ void table_flush_buffer(SymbolTable* table){
     ContentList* current_root = current;
     while(current!=NULL){
         current->value->scope += 1;
-        current->value->mem_shift = rsp_shift;
-        rsp_shift += current->value->total_size;
+        current->value->mem_shift = rfp_shift;
+        rfp_shift += current->value->total_size;
         table_add_entry(table, current->value->lex_data.label, content_dup(current->value));
         current = current->next;
     }

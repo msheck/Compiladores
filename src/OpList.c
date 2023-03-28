@@ -79,10 +79,6 @@ void op_free(Operation* op) {
 }
 
 void _opList_print(OpList* list) {
-    if(list == NULL) {
-        printf("\nLIST EMPTY");
-        return;
-    }
     char* buffer = generate_code(list->value);
     printf("%s", buffer);
     free(buffer);
@@ -93,6 +89,12 @@ void _opList_print(OpList* list) {
 
 void opList_print(OpList* list) {
     printf("\n");
-    _opList_print(list);
+    if(list == NULL) {
+        printf("\nLIST EMPTY");
+    }
+    else{
+        _opList_print(list);
+        printf("\thalt");
+    }
     printf("\n");
 }

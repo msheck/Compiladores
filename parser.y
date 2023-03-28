@@ -18,7 +18,7 @@ extern void* escopo;
 extern void* operacoes;
 extern int function_type_buffer;
 extern int rbss_shift;
-extern int rsp_shift;
+extern int rfp_shift;
 extern char* main_label;
 extern int mainFound;
 
@@ -164,7 +164,7 @@ ident_multidim:       TK_IDENTIFICADOR '[' list_expr ']'  { Content* content = t
 
 ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, $3->data.value, NULL, NULL)); 
                                                             $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, $3->node_type)); ast_add_child($$, $3);
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, "rsp", "placeholder")); $$->code = opList_concatLeft($$->code, $3->code); };
+                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, "rfp", "placeholder")); $$->code = opList_concatLeft($$->code, $3->code); };
 
 dec_var_glob:         tipo_var var_glob ';'               { table_update_type(escopo, $1->node_type, NULL); ast_free($1); };
 
@@ -192,7 +192,7 @@ parametros:           tipo_var TK_IDENTIFICADOR                     { table_add_
 
 funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_type_buffer = $1->node_type; table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1->node_type, NULL, NULL, table_dup_buffer()));
                                                                       $$ = ast_new_node($2, $1->node_type); ast_free($1);
-                                                                      rsp_shift = 0; };
+                                                                      rfp_shift = 0; };
 
 funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code); char* label;
                                                                       if(strcmp($$->data.label, "main") == 0){label = main_label; mainFound = true; }
@@ -213,9 +213,9 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                                                       ast_check_type($1, $3); };
 
 list_args:            expr                          { $$ = $1;
-                                                      $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rsp", "1", "rsp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rsp", NULL)); }
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
                     | expr ',' list_args            { ast_add_child($1, $3); $$ = $1;
-                                                      $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rsp", "1", "rsp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rsp", NULL)); }
+                                                      $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
                     |                               { $$ = NULL; };
 
 comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
