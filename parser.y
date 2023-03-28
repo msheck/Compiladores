@@ -20,6 +20,8 @@ extern int function_type_buffer;
 extern int rbss_shift;
 extern int rsp_shift;
 extern char* main_label;
+extern int mainFound;
+
 
 #include "src/Structures.h"
 #include "src/Errors.h"
@@ -128,7 +130,7 @@ extern char* main_label;
 
 %%
 
-programa:             comm_glob               { $$ = $1; arvore = $$; operacoes = $$->code; }
+programa:             comm_glob               { $$ = $1; arvore = $$; operacoes = ($$==NULL) ? NULL : $$->code; if(!mainFound) {emit_error(ERR_NO_MAIN, 0, NULL, NULL); } }
                     |                         { $$ = NULL; };
 
 comm_glob:            dec_var_glob            { $$ = NULL; }
@@ -193,7 +195,7 @@ funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_t
                                                                       rsp_shift = 0; };
 
 funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code); char* label;
-                                                                      if(strcmp($$->data.label, "main") == 0){label = main_label;}
+                                                                      if(strcmp($$->data.label, "main") == 0){label = main_label; mainFound = true; }
                                                                       else{label = get_label();}
                                                                       $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, label, NULL, NULL, NULL));
                                                                       free(label); };

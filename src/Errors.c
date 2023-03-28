@@ -53,13 +53,16 @@ void emit_error(int code, int line_number, char* label, char* str) {
             printf("\n\033[1;4;31mERRO:\033[0;31m A operacao %s nao foi reconhecida.\033[0m",
             str);
             break;
+        case ERR_NO_MAIN:
+            printf("\n\033[1;4;31mERRO:\033[0;31m Funcao main nao encontrada.\033[0m");
+            break;
         
         default:
             printf("\n\033[1;4;31mA compilacao terminou com erro desconhecido numero %d.\033[0m",
             code);
             break;
     }
-    printf("\nCURRENT TABLE:");
-    table_print(tabela);
+    //printf("\nCURRENT TABLE:");
+    //table_print(tabela);
     exit(code);
 }
