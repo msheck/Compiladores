@@ -83,7 +83,9 @@ void _opList_print(OpList* list) {
         printf("\nLIST EMPTY");
         return;
     }
-    printf("%s", generate_code(list->value));
+    char* buffer = generate_code(list->value);
+    printf("%s", buffer);
+    free(buffer);
     if(list->next != NULL){
         _opList_print(list->next);
     }

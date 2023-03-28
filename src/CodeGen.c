@@ -29,7 +29,7 @@ char* get_label() {
 char* get_temp() {
     static int temp = 0;
     int num_digs = intDigitLength(temp);
-    char* ret = malloc(sizeof(char*)*(num_digs+2));
+    char* ret = malloc(sizeof(char*)*(num_digs+1));
     sprintf(ret, "r%d", temp++);
     return ret;
 }
@@ -83,7 +83,8 @@ char* generate_code(Operation* op) {
     switch (op->operation) {
         case OP_LABEL:
             buffer = strdup(op->arg0);
-            buffer = strcat(buffer, ":");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
+            strcat(buffer, ":");
             return buffer;
         case OP_NOP:
             return (strdup("\tnop\n"));
@@ -173,6 +174,7 @@ char* generate_code(Operation* op) {
             break;
         case OP_STOREAI:
             buffer = strdup("\tstoreAI\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
@@ -182,6 +184,7 @@ char* generate_code(Operation* op) {
             return (buffer);
         case OP_STOREAO:
             buffer = strdup("\tstoreAO\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
@@ -194,6 +197,7 @@ char* generate_code(Operation* op) {
             break;
         case OP_CSTOREAI:
             buffer = strdup("\tcstoreI\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
@@ -203,6 +207,7 @@ char* generate_code(Operation* op) {
             return (buffer);
         case OP_CSTOREAO:
             buffer = strdup("\tcstoreAO\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
@@ -224,18 +229,21 @@ char* generate_code(Operation* op) {
             break;
         case OP_JUMPI:
             buffer = strdup("\tjumpI\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_JUMP:
             buffer = strdup("\tjump\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
             buffer = strcat(buffer, "\n");
             return (buffer);
         case OP_CBR:
             buffer = strdup("\tcbr\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -245,6 +253,7 @@ char* generate_code(Operation* op) {
             return (buffer);
         case OP_CMP_LT:
             buffer = strdup("\tcmp_LT\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -254,6 +263,7 @@ char* generate_code(Operation* op) {
             return (buffer); 
         case OP_CMP_LE:
             buffer = strdup("\tcmp_LE\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -263,6 +273,7 @@ char* generate_code(Operation* op) {
             return (buffer); 
         case OP_CMP_EQ:
             buffer = strdup("\tcmp_EQ\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -272,6 +283,7 @@ char* generate_code(Operation* op) {
             return (buffer); 
         case OP_CMP_GE:
             buffer = strdup("\tcmp_GE\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -281,6 +293,7 @@ char* generate_code(Operation* op) {
             return (buffer); 
         case OP_CMP_GT:
             buffer = strdup("\tcmp_GT\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -290,6 +303,7 @@ char* generate_code(Operation* op) {
             return (buffer); 
         case OP_CMP_NE:
             buffer = strdup("\tcmp_NE\t\t");
+            buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, " ,  ");
             buffer = strcat(buffer, op->arg1);
@@ -303,6 +317,7 @@ char* generate_code(Operation* op) {
             emit_error(ERR_UNKNOWN_OPERATION, 0, NULL, buffer);
     }
     if(op->arg1 == NULL){
+        buffer = (char*) realloc(buffer, 50*sizeof(char*));
         buffer = strcat(buffer, op->arg0);
         buffer = strcat(buffer, strdup("\t\t=>\t"));
         buffer = strcat(buffer, op->arg2);
@@ -310,6 +325,7 @@ char* generate_code(Operation* op) {
         return (buffer);
     }
     else{
+        buffer = (char*) realloc(buffer, 50*sizeof(char*));
         buffer = strcat(buffer, op->arg0);
         buffer = strcat(buffer, " ,  ");
         buffer = strcat(buffer, op->arg1);

@@ -128,7 +128,7 @@ extern char* main_label;
 
 %%
 
-programa:             comm_glob               { $$ = $1; arvore = $$; operacoes = $$->code; }
+programa:             comm_glob               { $$ = $1; arvore = $$; operacoes = ($$==NULL) ? NULL : $$->code; }
                     |                         { $$ = NULL; };
 
 comm_glob:            dec_var_glob            { $$ = NULL; }

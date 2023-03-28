@@ -24,3 +24,7 @@ int main(int arrrg) {
 }
 // storeAI 2 => rbss, 0
 // storeAI 4 => rbss, 4
+
+// int main(){
+
+// }

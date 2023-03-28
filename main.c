@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 	int ret = yyparse(); 
 	//exporta(arvore);
 	opList_print(operacoes);
+	opList_free(operacoes);
 	libera(arvore);
 	arvore = NULL;
 
