@@ -313,7 +313,7 @@ expr_tier1:           '-' expr                { ast_check_not_char($2, NODE_TYPE
 // CONTROLE DE FLUXO
 
 if_then_expr:         TK_PR_IF '(' expr ')' TK_PR_THEN        { ast_check_type_node(NODE_TYPE_BOOL, $3);
-                                                                $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); free($5.label); };
+                                                                $$ = ast_new_node($1, NODE_TYPE_BOOL); ast_add_child($$, $3); free($5.label); };
 
 if_then:              if_then_expr bloc_com                   { $$ = $1; ast_add_child($$, $2); };
 
@@ -330,6 +330,14 @@ if_then_else:         if_then                                 { $$ = $1; }
                                                                 $$->code = opList_concatLeft($$->code, $$->children[0]->code); };
 
 while:                TK_PR_WHILE '(' expr ')' bloc_com       { ast_check_type_node(NODE_TYPE_BOOL, $3);
-                                                                $$ = ast_new_node($1, $3->node_type); ast_add_child($$, $3); ast_add_child($$, $5); };
+                                                                $$ = ast_new_node($1, NODE_TYPE_BOOL); ast_add_child($$, $3); ast_add_child($$, $5);
+                                                                char* while_expr = get_label(); char* while_bloc = get_label(); char* next_command = get_label();
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, next_command, NULL, NULL, NULL));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, while_expr, NULL));
+                                                                $$->code = opList_concatLeft($$->code, $$->children[1]->code);
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, while_bloc, NULL, NULL, NULL));
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_CBR, $$->children[0]->temp, NULL, while_bloc, next_command));
+                                                                $$->code = opList_concatLeft($$->code, $$->children[0]->code);
+                                                                $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, while_expr, NULL, NULL, NULL)); };
 
 %%

@@ -57,7 +57,7 @@ ASTree* resolve_unary_expr(ASTree* operator_node, ASTree *expr){
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_RSUBI, expr->temp, "0", operator_node->temp, NULL));
             break;
         default:
-            printf("\n\033[1;4;31mINVALID OPERATION!\033[0;31m Unary operator unidentified!\033[0m\n");
+            printf("\n\033[1;4;31mOPERADOR INVALIDO!\033[0;31m Operador unario nao identificado!\033[0m\n");
             exit(ERR_INVALID_EXPR);
     }
     operator_node->code = opList_concatLeft(operator_node->code, expr->code);
@@ -116,7 +116,7 @@ ASTree* resolve_binary_expr(ASTree* expr1, ASTree* operator_node, ASTree* expr2)
             operator_node->code = opList_pushLeft(operator_node->code, op_new(OP_OR, expr1->temp, expr2->temp, operator_node->temp, NULL));
             break;
         default:
-            printf("\n\033[1;4;31mINVALID CONVERTION!\033[0;31m Binary operator unidentified!\033[0m\n");
+            printf("\n\033[1;4;31mOPERADOR INVALIDO!\033[0;31m Operador binario nao identificado!\033[0m\n");
             exit(ERR_INVALID_EXPR);
     }
     operator_node->code = opList_concatLeft(operator_node->code, expr2->code);
@@ -143,11 +143,11 @@ ASTree* ast_expr_node(ASTree *expr1, lexValue operator, ASTree *expr2){
                     node_type = 4;
             }        
             else if((expr1->node_type == 2) || (expr2->node_type == 2)){
-                printf("\n\033[1;4;31mINVALID EXPRESSION ON %d!\033[0;31m Can't coerce char type with different types!\033[0m\n", operator.line_number);
+                printf("\n\033[1;4;31mEXPRESSAO INVALIDA EM %d!\033[0;31m Tipo char nao pode realizar expressoes com tipos diferentes!\033[0m\n", operator.line_number);
                 exit(ERR_INVALID_EXPR);
             }
             else{
-                printf("\n\033[1;4;31mINVALID EXPRESSION ON %d!\033[0;31m Type was not clearly defined!\033[0m\n", operator.line_number);
+                printf("\n\033[1;4;31mEXPRESSAO INVALIDA EM %d!\033[0;31m Tipo da expressao nao foi bem definido!\033[0m\n", operator.line_number);
                 exit(ERR_INVALID_EXPR);
             }
         }
