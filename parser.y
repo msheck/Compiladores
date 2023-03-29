@@ -192,14 +192,15 @@ parametros:           tipo_var TK_IDENTIFICADOR                     { table_add_
 
 funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_type_buffer = $1->node_type; table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1->node_type, NULL, NULL, table_dup_buffer()));
                                                                       $$ = ast_new_node($2, $1->node_type); ast_free($1);
-                                                                      contextList_pushLeft(context_switch_list, $2.label, contextList_createOperations(escopo))
+                                                                      //contextList_pushLeft(context_switch_list, $2.label, contextList_createOperations(escopo))
                                                                       rfp_shift = 0; };
 
 funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code); char* label;
                                                                       if(strcmp($$->data.label, "main") == 0){label = main_label; mainFound = true; }
                                                                       else{label = get_label();}
                                                                       $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, label, NULL, NULL, NULL));
-                                                                      free(label); };
+                                                                      free(label); 
+                                                                      table_print(escopo); };
 
 
 // BLOCO COMANDOS

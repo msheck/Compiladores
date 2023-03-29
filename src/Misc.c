@@ -58,7 +58,7 @@ void* getAddr_memShift(int scope, int shift){
 }
 
 OpList* patch_temps(char* func_name, ASTree* args) {
-    ContextList* current_context = context_switch_list;
+    /*ContextList* current_context = context_switch_list;
     while(current_context != NULL) {
         if(strcmp(current_context->function_name, func_name) == 0)
             break;
@@ -78,5 +78,5 @@ OpList* patch_temps(char* func_name, ASTree* args) {
         current_operation = current_operation->next;
     }
 
-    return operations;
+    return operations;*/
 }

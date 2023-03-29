@@ -1,5 +1,12 @@
+// No Content da função na tabela do escopo global, tem um ContentList com os args da func
+
 //Endereço de variáveis locais são um deslocamento =rfp=
 int z;
+
+int bar(int a, int b) {
+  a = 0;
+}
+
 int main()
 {
   int a;
