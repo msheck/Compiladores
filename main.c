@@ -22,6 +22,7 @@ int rsp = 0;
 int rfp = 0;
 char* main_label;
 int mainFound;
+ContextList* context_switch_list;
 
 int main(int argc, char **argv)
 {
@@ -30,7 +31,7 @@ int main(int argc, char **argv)
     tabela = table_new();
 	escopo = tabela;
 	int ret = yyparse(); 
-	//exporta(arvore);
+	// exporta(arvore);
 	opList_print(operacoes);
 	opList_free(operacoes);
 	libera(arvore);
