@@ -192,6 +192,7 @@ parametros:           tipo_var TK_IDENTIFICADOR                     { table_add_
 
 funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_type_buffer = $1->node_type; table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1->node_type, NULL, NULL, table_dup_buffer()));
                                                                       $$ = ast_new_node($2, $1->node_type); ast_free($1);
+                                                                      contextList_pushLeft(context_switch_list, $2.label, contextList_createOperations(escopo))
                                                                       rfp_shift = 0; };
 
 funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code); char* label;
@@ -213,9 +214,9 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                                                       ast_check_type($1, $3); };
 
 list_args:            expr                          { $$ = $1;
-                                                      $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $1->temp, NULL, "rfp", "placeholder")); }
                     | expr ',' list_args            { ast_add_child($1, $3); $$ = $1;
-                                                      $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
+                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $1->temp, NULL, "rfp", "placeholder")); }
                     |                               { $$ = NULL; };
 
 comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
@@ -238,7 +239,11 @@ bloc_com:             bloc_com_dec comandos '}'     { escopo = table_pop_nest(es
 
 chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
                                                             int function_type = content->node_type;
-                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3); };
+                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3);
+                                                            $3->code = patch_temps($1.label, $3);
+                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, "rpc", NULL, "rsp", get_memShift(1, rfp_shift))); 
+                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
+                                                            };
 
 
 // EXPRESSOES

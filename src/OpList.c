@@ -93,8 +93,9 @@ void opList_print(OpList* list) {
         printf("\nLIST EMPTY");
     }
     else{
+        printf("\ti2i\t\trfp \t\t=>\trsp\n");
         _opList_print(list);
-        printf("\thalt");
+        printf("\thalt\n");
     }
     printf("\n");
 }

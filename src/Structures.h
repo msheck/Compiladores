@@ -48,6 +48,7 @@ typedef struct content_ Content;
 typedef struct symbol_table SymbolTable;
 typedef struct iloc_operation Operation;
 typedef struct operation_list OpList;
+typedef struct context_switch_list ContextList;
 
 struct lexical_value{
     int line_number;
@@ -106,9 +107,15 @@ struct iloc_operation {
     char* arg3;        // The fourth argument for the operation. Can be a register, constant, label.
 };
 
-struct operation_list{
+struct operation_list {
     Operation* value;
     OpList* next;
+};
+
+struct context_switch_list {
+    char* function_name;
+    OpList* operations;
+    ContextList* next;
 };
 
 #endif

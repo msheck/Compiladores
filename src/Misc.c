@@ -56,3 +56,27 @@ void* getAddr_memShift(int scope, int shift){
     void* address = buffer;
     return address;
 }
+
+OpList* patch_temps(char* func_name, ASTree* args) {
+    ContextList* current_context = context_switch_list;
+    while(current_context != NULL) {
+        if(strcmp(current_context->function_name, func_name) == 0)
+            break;
+        current_context = current_context->next;
+    }
+    if (current_context == NULL) {
+        printf("\nErro: Contexto nao encontrado.");
+        exit(-1);
+    }
+
+    ASTree* current_node = args;
+    OpList* operations = current_context->operations;
+    OpList* current_operation = operations;
+    while(current_node->number_of_children > 0) {
+        current_node = current_node->children[0];
+        current_operation->value->arg0 = strdup(current_node->temp);
+        current_operation = current_operation->next;
+    }
+
+    return operations;
+}

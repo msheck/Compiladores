@@ -23,6 +23,7 @@ int main()
 // int main(int arrrg) {
 //     foo(1);
 //     int x <= 2, y <= 4;
+//     foo(x);
 
 //     x = x*y+57/2;
 
