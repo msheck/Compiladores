@@ -16,7 +16,9 @@ Desenvolvido pelos alunos:
 
 OpList* opList_new();
 
-OpList*  opList_pushLeft(OpList* list, Operation* value);
+OpList* opList_pushLeft(OpList* list, Operation* value);
+
+OpList* opList_pushRight(OpList* list, Operation* value);
 
 OpList* opList_concatLeft(OpList* list, OpList* source);
 

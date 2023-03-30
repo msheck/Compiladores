@@ -12,6 +12,7 @@ Desenvolvido pelos alunos:
 #define _MISC_H_
 
 #include "Structures.h"
+#include "OpList.h"
 
 int intDigitLength(int source);
 
@@ -24,5 +25,7 @@ char* get_memShift(int scope, int shift);
 void* getAddr_dataRegister(int scope);
 
 void* getAddr_memShift(int scope, int shift);
+
+OpList* generate_args(ContentList* args, ASTree* args_tree);
 
 #endif

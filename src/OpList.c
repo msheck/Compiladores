@@ -14,6 +14,15 @@ OpList* opList_new() {
     return NULL;
 }
 
+OpList* opList_goToEnd(OpList* list) {
+    if(list != NULL) {
+        if(list->next != NULL)
+            return opList_goToEnd(list->next);
+        else
+            return list;
+    }
+}
+
 OpList*  opList_pushLeft(OpList* list, Operation* value) {
     OpList* new_node;
     if(list == NULL) {
@@ -28,13 +37,20 @@ OpList*  opList_pushLeft(OpList* list, Operation* value) {
     return new_node;
 }
 
-OpList* opList_goToEnd(OpList* list) {
-    if(list != NULL) {
-        if(list->next != NULL)
-            return opList_goToEnd(list->next);
-        else
-            return list;
+OpList* opList_pushRight(OpList* list, Operation* value) {
+    OpList* new_node;
+    OpList* last_node = opList_goToEnd(list);
+    if(list == NULL) {
+        list = malloc(sizeof(OpList*)+sizeof(NULL));
+        list->value = value;
+        list->next = NULL;
+        return list;
     }
+    new_node = malloc(sizeof(OpList*)+sizeof(NULL));
+    new_node->value = value;
+    new_node->next = NULL;
+    last_node->next = new_node;
+    return list;
 }
 
 OpList* opList_concatLeft(OpList* list, OpList* source) {

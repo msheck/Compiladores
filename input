@@ -1,24 +1,18 @@
 //Endereço de variáveis locais são um deslocamento =rfp=
+
+int foo(int x, int y, int z, float aa) {
+    int a <= 15;
+    // TODO: SUBIR STACK POINTER
+    a = a;
+    a = x;
+    // TODO: RETORNO
+}
+
 int z;
 int main()
 {
-  int a;
-  int b;
-  z = 923;
-  b = 456;
-  a = z + b;
-  return 0;
+  foo(1, 2, 3, 4.5);
 }
-
-// TODO:
-// Toda declaração de variável não inicializada dá segfault
-
-// int x, y, z;
-// int foo(int x) {
-//     int a <= 15;
-//     a = a;
-//     a = x;
-// }
 
 // int main(int arrrg) {
 //     foo(1);
