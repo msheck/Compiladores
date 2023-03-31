@@ -109,6 +109,8 @@ void opList_print(OpList* list) {
         printf("\nLIST EMPTY");
     }
     else{
+        printf("\ti2i\trfp\t=>\trsp\n");
+        printf("\taddI\trsp, 2\t=>\trsp\n");
         _opList_print(list);
         printf("L0:\thalt\n");
     }

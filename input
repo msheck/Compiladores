@@ -1,21 +1,24 @@
 //Endereço de variáveis locais são um deslocamento =rfp=
 
-int foo(int x, int y, int z, int aa) {
-    int a <= 15;
+int foo(int x) {
+    /*int a <= 15;
     a = x;
-    return a;
+    return a;*/
     // TODO: RETORNO
 }
 
-int bar(int a) {
+/*int bar(int a) {
   a = 3;
   return a;
-}
+}*/
 
-int z;
 int main()
 {
-  foo(1, 2, 3, 4);
+  int a;
+  int b;
+  a = 600;
+  b = 42069;
+  foo(1);
 }
 
 // int main(int arrrg) {
@@ -43,3 +46,22 @@ int main()
 //     };    
 // }
 
+/*
+STACK:
+RFP: 1024
+RSP: 1030
+1024:     <- rfp_init 
+1025: 
+1026: 600
+1027: ---
+1028: ---
+1029: ---
+1030: 42069
+1031: ---
+1032: ---
+1033: ---
+1034:     <-rfp_new
+1035: 
+1036: 
+1037: 
+*/
