@@ -110,7 +110,7 @@ void opList_print(OpList* list) {
     }
     else{
         _opList_print(list);
-        printf("\thalt");
+        printf("\thalt\n");
     }
     printf("\n");
 }

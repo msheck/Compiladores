@@ -98,7 +98,7 @@ extern int mainFound;
 %type<astree> funcao_dec
 %type<astree> funcao
 %type<astree> atribuicao
-%type<astree> list_args
+%type<astree> args
 %type<astree> comando_simples
 %type<astree> comandos
 %type<astree> bloc_com
@@ -208,48 +208,49 @@ funcao:               funcao_dec bloc_com                           { $$ = $1; a
 
 // BLOCO COMANDOS
 
-atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(escopo, $1.label, $3);
-                                                      Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
-                                                      $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
-                                                      ast_check_type($$->children[0], $$->children[1]);
-                                                      $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, get_dataRegister(content->scope), get_memShift(content->scope, content->mem_shift)));
-                                                      $$->code = opList_concatLeft($$->code, $3->code); }
-                    | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
-                                                      ast_check_type($1, $3); };
+atribuicao:           TK_IDENTIFICADOR '=' expr       { //table_update_data_value(escopo, $1.label, $3);
+                                                        Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
+                                                        $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
+                                                        ast_check_type($$->children[0], $$->children[1]);
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, get_dataRegister(content->scope), get_memShift(content->scope, content->mem_shift)));
+                                                        $$->code = opList_concatLeft($$->code, $3->code); }
+                    | ident_multidim '=' expr         { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
+                                                        ast_check_type($1, $3); };
 
-list_args:            expr                          { $$ = $1; }
-                    | expr ',' list_args            { ast_add_child($1, $3); $$ = $1; }
-                    |                               { $$ = NULL; };
+comando_simples:      tipo_var var_loc                { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
+                    | atribuicao                      { $$ = $1; }
+                    | chamada_func                    { $$ = $1; }
+                    | TK_PR_RETURN expr               { ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
+                                                        $$ = ast_new_node($1, $2->node_type); ast_add_child($$, $2); }
+                    | if_then_else                    { $$ = $1; }
+                    | while                           { $$ = $1; }
+                    | bloc_com                        { $$ = $1; };
 
-comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
-                    | atribuicao                    { $$ = $1; }
-                    | chamada_func                  { $$ = $1; }
-                    | TK_PR_RETURN expr             { ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
-                                                      $$ = ast_new_node($1, $2->node_type); ast_add_child($$, $2); }
-                    | if_then_else                  { $$ = $1; }
-                    | while                         { $$ = $1; }
-                    | bloc_com                      { $$ = $1; };
+comandos:             comando_simples ';' comandos    { if($1==NULL){ $$ = $3;}
+                                                        else{ast_add_child(ast_get_node($1), $3); $$=$1; $$->code = opList_concatRight($$->code, $3->code);} }
+                    | comando_simples ';'             { $$ = $1; };
 
-comandos:             comando_simples ';' comandos  { if($1==NULL){ $$ = $3;}
-                                                      else{ast_add_child(ast_get_node($1), $3); $$=$1; $$->code = opList_concatRight($$->code, $3->code);} }
-                    | comando_simples ';'           { $$ = $1; };
+bloc_com_dec:         '{'                             { escopo = table_nest(escopo); };
 
-bloc_com_dec:         '{'                           { escopo = table_nest(escopo); };
+bloc_com:             bloc_com_dec comandos '}'       { escopo = table_pop_nest(escopo); $$ = $2; }
+                    | bloc_com_dec '}'                { escopo = table_pop_nest(escopo); $$ = NULL; };
 
-bloc_com:             bloc_com_dec comandos '}'     { escopo = table_pop_nest(escopo); $$ = $2; }
-                    | bloc_com_dec '}'              { escopo = table_pop_nest(escopo); $$ = NULL; };
+args:                 expr                            { $$ = $1; $$->code = opList_pushLeft($$->code, op_new(OP_LOADI, $1->data.value, NULL, $$->temp, NULL)); }
+                    | expr ',' args                   { ast_add_child($1, $3); $$ = $1; $$->code = opList_pushLeft($$->code, op_new(OP_LOADI, $1->data.value, NULL, $$->temp, NULL)); }
+                    |                                 { $$ = NULL; };
 
-chamada_func:         TK_IDENTIFICADOR '(' list_args ')'  { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
-                                                            int function_type = content->node_type;
-                                                            char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3);
-                                                            char* reg = get_temp();
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rsp", "1")); 
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
-                                                            $$->code = opList_concatLeft($$->code, generate_args(content->args, $3));
-                                                            $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
-                                                            free(reg);
-                                                            };
+chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
+                                                        int function_type = content->node_type;
+                                                        char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, function_type); ast_add_child($$, $3);
+                                                        char* reg = get_temp();
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rfp", "1")); 
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
+                                                        $$->code = opList_concatLeft($$->code, generate_args(content->args, $3));
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rsp", NULL, "rfp", NULL));
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
+                                                        free(reg);
+                                                      };
 
 
 // EXPRESSOES
