@@ -57,11 +57,12 @@ void* getAddr_memShift(int scope, int shift){
     return address;
 }
 
-OpList* generate_args(ContentList* args, ASTree* args_tree) {
+OpList* generate_args(Content* content, ASTree* args_tree) {
     OpList* ret = opList_new();
+    ContentList* args = content->args;
     ASTree* current_node = args_tree;
     ContentList* current_content = args;
-    int shift = 2;
+    int shift = 2+content->total_size;
     while(current_content!=NULL) {
         ret = opList_pushRight(ret, current_node->code->value);
         ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", int_to_string(shift)));

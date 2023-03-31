@@ -1,17 +1,21 @@
 //Endereço de variáveis locais são um deslocamento =rfp=
 
-int foo(int x, int y, int z, float aa) {
+int foo(int x, int y, int z, int aa) {
     int a <= 15;
-    // TODO: SUBIR STACK POINTER
-    a = a;
     a = x;
+    return a;
     // TODO: RETORNO
+}
+
+int bar(int a) {
+  a = 3;
+  return a;
 }
 
 int z;
 int main()
 {
-  foo(1, 2, 3, 4.5);
+  foo(1, 2, 3, 4);
 }
 
 // int main(int arrrg) {

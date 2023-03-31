@@ -18,7 +18,7 @@ extern int rsp;
 
 // Returns a char* containing an unique label. NEEDS FREE!!!
 char* get_label() {
-    static int label = 0;
+    static int label = 1;
     int num_digs = intDigitLength(label);
     char* ret = malloc(sizeof(char*)*(num_digs+1));
     sprintf(ret, "L%d", label++);
