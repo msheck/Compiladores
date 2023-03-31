@@ -217,10 +217,8 @@ atribuicao:           TK_IDENTIFICADOR '=' expr     { //table_update_data_value(
                     | ident_multidim '=' expr       { $$ = ast_new_node($2, $3->node_type); ast_add_child($$, $1); ast_add_child($$, $3); 
                                                       ast_check_type($1, $3); };
 
-list_args:            expr                          { $$ = $1;
-                                                      $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
-                    | expr ',' list_args            { ast_add_child($1, $3); $$ = $1;
-                                                      $$->code = $1->code; $$->code = opList_pushLeft($$->code, op_new(OP_SUB, "rfp", "1", "rfp", NULL)); $$->code = opList_pushLeft($$->code, op_new(OP_STORE, $1->temp, NULL, "rfp", NULL)); }
+list_args:            expr                          { $$ = $1; }
+                    | expr ',' list_args            { ast_add_child($1, $3); $$ = $1; }
                     |                               { $$ = NULL; };
 
 comando_simples:      tipo_var var_loc              { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1);}
