@@ -1,14 +1,19 @@
 int a;
-int f()
-{
-  return 25;
-}
 int g()
 {
   return 75;
 }
+int f(int x)
+{
+  int y;
+  int z;
+  y = 999999;
+  z = 777777;
+  return 25*x;
+}
 
 int main() {
-    a = f()+g();
+    a = f(8);
+    a = a + g();
     return 0;
 }

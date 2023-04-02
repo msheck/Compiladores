@@ -10,6 +10,8 @@ Desenvolvido pelos alunos:
 
 #include "Misc.h"
 
+extern int rfp_shift;
+
 int intDigitLength(int source){
     int num_digs = 0;
     while(source != 0){
@@ -66,7 +68,7 @@ OpList* generate_args(Content* content, ASTree* args_tree) {
     char* buffer_shift;
     while(current_content!=NULL) {
         buffer_shift = int_to_string(shift);
-        ret = opList_pushRight(ret, current_node->code->value);
+        ret = opList_concatRight(ret, current_node->code);
         ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", buffer_shift));
         shift += current_content->value->total_size;
         current_content = current_content->next;
@@ -75,5 +77,7 @@ OpList* generate_args(Content* content, ASTree* args_tree) {
     }
     buffer_shift = int_to_string(shift);
     ret = opList_pushRight(ret, op_new(OP_ADDI, "rsp", buffer_shift, "rsp", NULL));
+    free(buffer_shift);
+    // rfp_shift = shift;
     return ret;
 }

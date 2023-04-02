@@ -215,10 +215,12 @@ funcao:               funcao_dec bloc_com                           { $$ = $1; a
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOAD, "rsp", NULL, "rfp", NULL));
                                                                         char* temp = get_temp();
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOADAI, "rsp", "1", temp, NULL));
+                                                                        $$->code = opList_pushRight($$->code, op_new(OP_ADDI, "rsp", "2", "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_JUMP, NULL, NULL, temp, NULL));
                                                                         free(temp);
                                                                       }
                                                                       else {
+                                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", "2", "rsp", NULL));
                                                                         $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rfp", NULL, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_JUMPI, NULL, NULL, "L0", NULL));
                                                                       }
@@ -268,8 +270,8 @@ args:                 expr                            { $$ = $1; }
 
 chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
                                                         char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, content->node_type); ast_add_child($$, $3);
-                                                        char* reg = get_temp(); char* return_size = int_to_string(content->total_size+2); $$->temp = get_temp();
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOADAI, "rsp", "2", $$->temp, NULL)); 
+                                                        char* reg = get_temp(); char* return_size = int_to_string(content->total_size); $$->temp = get_temp();
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOAD, "rsp", NULL, $$->temp, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rfp", "1")); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
