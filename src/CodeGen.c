@@ -335,21 +335,3 @@ char* generate_code(Operation* op) {
         return (buffer);
     }
 }
-
-OpList function_call(ASTree node, ContentList* args) {
-    /*op_new(OP_SUBI, "rsp", 1, "rsp", NULL);
-    op_new(OP_STORE, "rfp", NULL, "rsp", NULL);
-    op_new(OP_SUBI, "rsp", 1, "rsp", NULL);
-    Content* current = args;
-    while(current != NULL) {
-        op_new(OP_STORE, "rsp", )
-        args->value
-        current = args->next;
-    }
-
-    // RETORNO DA FUNCAO -> TEM QUE PASSAR ISSO PRA DECLARAÇAO DA FUNÇAO
-    op_new(OP_I2I, "rfp", NULL, "rsp", NULL);    // Advance rsp to the start of the frame
-    op_new(OP_LOADAI, "rfp" ,  "-1" ,  "rsp", NULL); // Set rfp to the first value of the frame (previous rfp)
-    op_new(OP_LOADAI, "rsp", -2, "rpc", NULL);   // Set program counter to the line after the function call
-    */
-}

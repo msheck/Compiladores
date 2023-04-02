@@ -63,14 +63,17 @@ OpList* generate_args(Content* content, ASTree* args_tree) {
     ASTree* current_node = args_tree;
     ContentList* current_content = args;
     int shift = 2+content->total_size;
+    char* buffer_shift;
     while(current_content!=NULL) {
+        buffer_shift = int_to_string(shift);
         ret = opList_pushRight(ret, current_node->code->value);
-        ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", int_to_string(shift)));
+        ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", buffer_shift));
         shift += current_content->value->total_size;
         current_content = current_content->next;
         if(current_node->number_of_children > 0)
             current_node = current_node->children[0];
     }
-    ret = opList_pushRight(ret, op_new(OP_ADDI, "rsp", int_to_string(shift), "rsp", NULL));
+    buffer_shift = int_to_string(shift);
+    ret = opList_pushRight(ret, op_new(OP_ADDI, "rsp", buffer_shift, "rsp", NULL));
     return ret;
 }

@@ -79,6 +79,4 @@ Operation* op_new(int operation, char* arg0, char* arg1, char* arg2, char* arg3)
 
 char* generate_code(Operation* op);
 
-OpList function_call(ASTree node, ContentList* args);
-
 #endif

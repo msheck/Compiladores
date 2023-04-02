@@ -7,6 +7,8 @@
 #	-Vinicius Meirelles Pereira
 
 ETAPA = 5
+DATA = 512
+STACK = 1024
 SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c src/Misc.c
 
 .PHONY: zip unzip compile_test test clean flex etapa$(ETAPA)
@@ -52,10 +54,10 @@ iloc_output: debug
 	./etapa$(ETAPA) <input >output.iloc
 
 iloc: iloc_output
-	./ilocsim.py -x -t -s --data 500 --stack 1024 output.iloc
+	./ilocsim.py -t -s --data $(DATA) --stack $(STACK) output.iloc
 
 zip: clean
-	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='aux' -cvzf etapa$(ETAPA).tgz .
+	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='_auxFiles' -cvzf etapa$(ETAPA).tgz .
 
 unzip:
 	mkdir entrega | tar xf etapa$(ETAPA).tgz --directory entrega

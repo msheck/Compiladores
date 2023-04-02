@@ -62,7 +62,5 @@ void emit_error(int code, int line_number, char* label, char* str) {
             code);
             break;
     }
-    //printf("\nCURRENT TABLE:");
-    //table_print(tabela);
     exit(code);
 }
