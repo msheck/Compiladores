@@ -172,20 +172,20 @@ ident_init:           TK_IDENTIFICADOR TK_OC_LE lits      { char* temp = get_tem
 
 dec_var_glob:         tipo_var var_glob ';'               { table_update_type(escopo, $1->node_type, NULL); ast_free($1); };
 
-var_glob:             TK_IDENTIFICADOR                    { char* temp = get_temp(); table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, temp, NULL, NULL)); free(temp);
+var_glob:             TK_IDENTIFICADOR                    { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                             free($1.label); $$ = NULL; 
                                                           }
                     | dec_ident_multidim                  { $$ = NULL; ast_free($1); }
-                    | var_glob ',' TK_IDENTIFICADOR       { char* temp = get_temp(); table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, temp, NULL, NULL)); free(temp);
+                    | var_glob ',' TK_IDENTIFICADOR       { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                             free($3.label); $$ = NULL; 
                                                           }
                     | var_glob ',' dec_ident_multidim     { $$ = NULL; };
 
-var_loc:              TK_IDENTIFICADOR                    { char* temp = get_temp(); table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, temp, NULL, NULL)); free(temp);
+var_loc:              TK_IDENTIFICADOR                    { table_add_entry(escopo, $1.label, content_new($1, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                             free($1.label); $$ = NULL; 
                                                           }
                     | ident_init                          { $$ = $1; }
-                    | var_loc ',' TK_IDENTIFICADOR        { char* temp = get_temp(); table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, temp, NULL, NULL)); free(temp);
+                    | var_loc ',' TK_IDENTIFICADOR        { table_add_entry(escopo, $3.label, content_new($3, NAT_VAR, NODE_TYPE_UNDECLARED, NULL, NULL, NULL));
                                                             free($3.label); 
                                                           }
                     | var_loc ',' ident_init              { ast_add_child($3, $1); $$ = $3;
@@ -194,8 +194,8 @@ var_loc:              TK_IDENTIFICADOR                    { char* temp = get_tem
 
 // FUNCOES
 
-parametros:           tipo_var TK_IDENTIFICADOR                     { char* temp = get_temp(); table_add_to_buffer(content_new($2, NAT_VAR, $1->node_type, temp, NULL, NULL)); ast_free($1); free($2.label); free(temp); }
-                    | tipo_var TK_IDENTIFICADOR ',' parametros      { char* temp = get_temp(); table_add_to_buffer(content_new($2, NAT_VAR, $1->node_type, temp, NULL, NULL)); ast_free($1); free($2.label); free(temp); }
+parametros:           tipo_var TK_IDENTIFICADOR                     { table_add_to_buffer(content_new($2, NAT_VAR, $1->node_type, NULL, NULL, NULL)); ast_free($1); free($2.label); }
+                    | tipo_var TK_IDENTIFICADOR ',' parametros      { table_add_to_buffer(content_new($2, NAT_VAR, $1->node_type, NULL, NULL, NULL)); ast_free($1); free($2.label); }
                     | ;
 
 funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_type_buffer = $1->node_type; char* label; 
@@ -245,7 +245,7 @@ atribuicao:           TK_IDENTIFICADOR '=' expr       { Content* content = table
 comando_simples:      tipo_var var_loc                { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1); }
                     | atribuicao                      { $$ = $1; }
                     | chamada_func                    { $$ = $1; }
-                    | TK_PR_RETURN expr               { ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
+                    | TK_PR_RETURN expr               { //ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
                                                         $$ = ast_new_node($1, $2->node_type); ast_add_child($$, $2);
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $2->temp, NULL, "rfp", "2"));
                                                         $$->code = opList_concatLeft($$->code, $2->code); 
@@ -275,8 +275,9 @@ chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rfp", "1")); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
-                                                        $$->code = opList_concatLeft($$->code, generate_args(content, $3));
+                                                        $$->code = opList_concatLeft($$->code, generate_args(content, $3, reg));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rsp", NULL, "rfp", NULL));
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rfp", NULL, reg, NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", return_size, "rsp", NULL));
                                                         free(reg); free(return_size);
