@@ -55,7 +55,7 @@ OpList* opList_pushRight(OpList* list, Operation* value) {
 
 OpList* opList_concatLeft(OpList* list, OpList* source) {
     if(list != NULL){
-        if(source != NULL){
+        if(source->value != NULL){
             OpList* rightmost_source = opList_goToEnd(source);
             rightmost_source->next = list;
         }

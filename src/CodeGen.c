@@ -178,7 +178,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -188,7 +188,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -201,7 +201,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -211,7 +211,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t=>\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -247,7 +247,7 @@ char* generate_code(Operation* op) {
             buffer = strcat(buffer, op->arg0);
             buffer = strcat(buffer, strdup("\t\t->\t"));
             buffer = strcat(buffer, op->arg2);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg3);
             buffer = strcat(buffer, "\n");
             return (buffer);
@@ -255,7 +255,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_LT\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -265,7 +265,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_LE\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -275,7 +275,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_EQ\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -285,7 +285,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_GE\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -295,7 +295,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_GT\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -305,7 +305,7 @@ char* generate_code(Operation* op) {
             buffer = strdup("\tcmp_NE\t\t");
             buffer = (char*) realloc(buffer, 50*sizeof(char*));
             buffer = strcat(buffer, op->arg0);
-            buffer = strcat(buffer, " ,  ");
+            buffer = strcat(buffer, "  ,  ");
             buffer = strcat(buffer, op->arg1);
             buffer = strcat(buffer, strdup("\t->\t"));
             buffer = strcat(buffer, op->arg2);
@@ -327,7 +327,7 @@ char* generate_code(Operation* op) {
     else{
         buffer = (char*) realloc(buffer, 50*sizeof(char*));
         buffer = strcat(buffer, op->arg0);
-        buffer = strcat(buffer, " ,  ");
+        buffer = strcat(buffer, "  ,  ");
         buffer = strcat(buffer, op->arg1);
         buffer = strcat(buffer, strdup("\t=>\t"));
         buffer = strcat(buffer, op->arg2);

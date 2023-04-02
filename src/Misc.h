@@ -26,6 +26,6 @@ void* getAddr_dataRegister(int scope);
 
 void* getAddr_memShift(int scope, int shift);
 
-OpList* generate_args(Content* content, ASTree* args_tree, char* reg);
+OpList* generate_args(Content* content, ASTree* args_tree);
 
 #endif

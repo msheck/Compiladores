@@ -213,11 +213,11 @@ funcao:               funcao_dec bloc_com                           { $$ = $1; a
                                                                       if(strcmp($1->data.label, "main") != 0) {
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_I2I, "rfp", NULL, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOAD, "rsp", NULL, "rfp", NULL));
-                                                                        char* temp = get_temp();
+                                                                        char* temp = get_temp(); char* return_size = int_to_string(2+content->total_size);
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOADAI, "rsp", "1", temp, NULL));
-                                                                        $$->code = opList_pushRight($$->code, op_new(OP_ADDI, "rsp", "2", "rsp", NULL));
+                                                                        $$->code = opList_pushRight($$->code, op_new(OP_ADDI, "rsp", return_size, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_JUMP, NULL, NULL, temp, NULL));
-                                                                        free(temp);
+                                                                        free(temp); free(return_size);
                                                                       }
                                                                       else {
                                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", "2", "rsp", NULL));
@@ -270,16 +270,15 @@ args:                 expr                            { $$ = $1; }
 
 chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
                                                         char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, content->node_type); ast_add_child($$, $3);
-                                                        char* reg = get_temp(); char* return_size = int_to_string(content->total_size); $$->temp = get_temp();
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOAD, "rsp", NULL, $$->temp, NULL)); 
+                                                        char* reg = get_temp(); $$->temp = get_temp(); char* return_size = int_to_string(0-content->total_size);
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOADAI, "rsp", return_size, $$->temp, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rfp", "1")); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
-                                                        $$->code = opList_concatLeft($$->code, generate_args(content, $3, reg));
+                                                        $$->code = opList_concatLeft($$->code, generate_args(content, $3));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rsp", NULL, "rfp", NULL));
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rfp", NULL, reg, NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", return_size, "rsp", NULL));
+                                                        if($3 != NULL) $$->code = opList_concatLeft($$->code, $3->code);
                                                         free(reg); free(return_size);
                                                       };
 

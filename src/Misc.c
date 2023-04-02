@@ -59,15 +59,7 @@ void* getAddr_memShift(int scope, int shift){
     return address;
 }
 
-Operation* reference_previous_rfp(Operation* operation, char* reg) {
-    if(operation->operation == OP_LOADAI && strcmp(operation->arg0, "rfp") == 0) {
-        free(operation->arg0);
-        operation->arg0 = strdup(reg);
-    }
-    return operation;
-}
-
-OpList* generate_args(Content* content, ASTree* args_tree, char* reg) {
+OpList* generate_args(Content* content, ASTree* args_tree) {
     OpList* ret = opList_new();
     ContentList* args = content->args;
     ASTree* current_node = args_tree;
@@ -76,7 +68,6 @@ OpList* generate_args(Content* content, ASTree* args_tree, char* reg) {
     char* buffer_shift;
     while(current_content!=NULL) {
         buffer_shift = int_to_string(shift);
-        ret = opList_pushRight(ret, reference_previous_rfp(current_node->code->value, reg));
         ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", buffer_shift));
         shift += current_content->value->total_size;
         current_content = current_content->next;
@@ -86,6 +77,6 @@ OpList* generate_args(Content* content, ASTree* args_tree, char* reg) {
     buffer_shift = int_to_string(shift);
     ret = opList_pushRight(ret, op_new(OP_ADDI, "rsp", buffer_shift, "rsp", NULL));
     free(buffer_shift);
-    // rfp_shift = shift;
+    rfp_shift = shift;
     return ret;
 }
