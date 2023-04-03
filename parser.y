@@ -216,7 +216,6 @@ funcao:               funcao_dec bloc_com                           { $$ = $1; a
                                                                       $$->code = opList_pushRight($$->code, op_new(OP_LABEL, return_label, NULL, NULL, NULL));
                                                                       char* temp = get_temp(); char* return_size = int_to_string(2+content->total_size);
                                                                       if(strcmp($1->data.label, "main") != 0) {
-                                                                        $$->code = opList_pushRight($$->code, op_new(OP_LABEL, get_label(), NULL, NULL, NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_I2I, "rfp", NULL, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOAD, "rsp", NULL, "rfp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOADAI, "rsp", "1", temp, NULL));
