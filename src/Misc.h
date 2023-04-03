@@ -28,4 +28,6 @@ void* getAddr_memShift(int scope, int shift);
 
 OpList* generate_args(Content* content, ASTree* args_tree);
 
+OpList* allocate_vars(OpList* code, SymbolTable* table);
+
 #endif

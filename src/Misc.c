@@ -10,8 +10,6 @@ Desenvolvido pelos alunos:
 
 #include "Misc.h"
 
-extern int rfp_shift;
-
 int intDigitLength(int source){
     int num_digs = 0;
     while(source != 0){
@@ -69,7 +67,6 @@ OpList* generate_args(Content* content, ASTree* args_tree) {
     while(current_content!=NULL) {
         buffer_shift = int_to_string(shift);
         ret = opList_pushRight(ret, op_new(OP_STOREAI, current_node->temp, NULL, "rfp", buffer_shift));
-        shift += current_content->value->total_size;
         current_content = current_content->next;
         if(current_node->number_of_children > 0)
             current_node = current_node->children[0];
@@ -77,6 +74,22 @@ OpList* generate_args(Content* content, ASTree* args_tree) {
     buffer_shift = int_to_string(shift);
     ret = opList_pushRight(ret, op_new(OP_ADDI, "rsp", buffer_shift, "rsp", NULL));
     free(buffer_shift);
-    rfp_shift = shift;
     return ret;
+}
+
+OpList* allocate_vars(OpList* code, SymbolTable* table) {
+    if(table->content == NULL)
+        return code;
+
+    char* buffer;
+    for(int i=0; i < table->size; i++) {
+        if(table->content[i] != NULL) {
+            if(table->content[i]->nature == NAT_VAR) {
+                buffer = int_to_string(table->content[i]->total_size);
+                code = opList_pushLeft(code, op_new(OP_ADDI, "rsp", buffer, "rsp", NULL));
+            }
+        }
+    }
+    free(buffer);
+    return code;
 }

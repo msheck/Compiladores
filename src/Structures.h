@@ -99,7 +99,7 @@ struct symbol_table{
 };
 
 struct iloc_operation {
-    int operation;      // Operation code, defined on CodeGen.h.
+    int operation;     // Operation code, defined on CodeGen.h.
     char* arg0;        // The first argument for the operation. Can be a register, constant, label.
     char* arg1;        // The second argument for the operation. Can be a register, constant, label.
     char* arg2;        // The third argument for the operation. Can be a register, constant, label.

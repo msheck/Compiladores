@@ -54,7 +54,7 @@ iloc_output: debug
 	./etapa$(ETAPA) <input >output.iloc
 
 iloc: iloc_output
-	./ilocsim.py -t -s --data $(DATA) --stack $(STACK) output.iloc
+	./ilocsim.py -x -t -s --data $(DATA) --stack $(STACK) output.iloc
 
 zip: clean
 	tar --exclude-vcs-ignores --exclude='.git*' --exclude='.vscode*' --exclude='input' --exclude='_auxFiles' -cvzf etapa$(ETAPA).tgz .

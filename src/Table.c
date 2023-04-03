@@ -193,7 +193,7 @@ SymbolTable* table_nest(SymbolTable* root) {
     SymbolTable* new_table = table_new();
     new_table->return_type = function_type_buffer; // This is set by the parser
     new_table->scope_level = root->scope_level + 1;
-    function_type_buffer = NODE_TYPE_UNDECLARED;
+    //function_type_buffer = NODE_TYPE_UNDECLARED;
     SymbolTable* current = root;
     while(current->next != NULL) {
         current = current->next;

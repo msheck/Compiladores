@@ -32,6 +32,8 @@ extern int mainFound;
 #include "src/OpList.h"
 #include "src/CodeGen.h"
 
+char* return_label;
+
 %}
 
 %code requires { #include "src/AbstractSyntaxTree.h" }
@@ -203,6 +205,7 @@ funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_t
                                                                       if(strcmp($2.label, "main") == 0){label = main_label; mainFound = true;}
                                                                       else{label = get_label();}
                                                                       $2.value = label;
+                                                                      return_label = get_label();
                                                                       table_add_entry(escopo, $2.label, content_new($2, NAT_FUN, $1->node_type, NULL, NULL, table_dup_buffer()));
                                                                       $$ = ast_new_node($2, $1->node_type); ast_free($1); 
                                                                     };
@@ -210,20 +213,22 @@ funcao_dec:           tipo_var TK_IDENTIFICADOR '(' parametros ')'  { function_t
 funcao:               funcao_dec bloc_com                           { $$ = $1; ast_add_child($$, $2); $$->code = opList_concatLeft($$->code, ($2==NULL) ? NULL : $2->code);
                                                                       Content* content = table_get_content(escopo, $$->data.label, $$->data.line_number);
                                                                       $$->code = opList_pushLeft($$->code, op_new(OP_LABEL, content->lex_data.value, NULL, NULL, NULL));
+                                                                      $$->code = opList_pushRight($$->code, op_new(OP_LABEL, return_label, NULL, NULL, NULL));
+                                                                      char* temp = get_temp(); char* return_size = int_to_string(2+content->total_size);
                                                                       if(strcmp($1->data.label, "main") != 0) {
+                                                                        $$->code = opList_pushRight($$->code, op_new(OP_LABEL, get_label(), NULL, NULL, NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_I2I, "rfp", NULL, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOAD, "rsp", NULL, "rfp", NULL));
-                                                                        char* temp = get_temp(); char* return_size = int_to_string(2+content->total_size);
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_LOADAI, "rsp", "1", temp, NULL));
-                                                                        $$->code = opList_pushRight($$->code, op_new(OP_ADDI, "rsp", return_size, "rsp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_JUMP, NULL, NULL, temp, NULL));
-                                                                        free(temp); free(return_size);
                                                                       }
                                                                       else {
-                                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", "2", "rsp", NULL));
+                                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", return_size, "rsp", NULL));
                                                                         $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rfp", NULL, "rsp", NULL));
+                                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOADI, "1024", NULL, "rfp", NULL));
                                                                         $$->code = opList_pushRight($$->code, op_new(OP_JUMPI, NULL, NULL, "L0", NULL));
                                                                       }
+                                                                      free(temp); free(return_size);
                                                                     };
 
 
@@ -232,9 +237,6 @@ funcao:               funcao_dec bloc_com                           { $$ = $1; a
 atribuicao:           TK_IDENTIFICADOR '=' expr       { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_VAR, $1.line_number);
                                                         $$ = ast_new_node($2, $3->node_type); ast_add_child($$, ast_new_node($1, table_get_type(escopo, content->lex_data.label, content->lex_data.line_number))); ast_add_child($$, $3);
                                                         ast_check_type($$->children[0], $$->children[1]);
-                                                        char* size = int_to_string(content->total_size);
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rsp", size, "rsp", NULL));
-                                                        free(size);
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $3->temp, NULL, get_dataRegister(content->scope), get_memShift(content->scope, content->mem_shift)));
                                                         $$->code = opList_concatLeft($$->code, $3->code); 
                                                       }
@@ -245,8 +247,9 @@ atribuicao:           TK_IDENTIFICADOR '=' expr       { Content* content = table
 comando_simples:      tipo_var var_loc                { ast_check_type($1, $2); $$ = $2; table_update_type(escopo, $1->node_type, ($2==NULL) ? NULL : $2->code); ast_free($1); }
                     | atribuicao                      { $$ = $1; }
                     | chamada_func                    { $$ = $1; }
-                    | TK_PR_RETURN expr               { //ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
+                    | TK_PR_RETURN expr               { ast_check_type_node(((SymbolTable*)escopo)->return_type, $2);
                                                         $$ = ast_new_node($1, $2->node_type); ast_add_child($$, $2);
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, return_label, NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, $2->temp, NULL, "rfp", "2"));
                                                         $$->code = opList_concatLeft($$->code, $2->code); 
                                                       }
@@ -261,7 +264,7 @@ comandos:             comando_simples ';' comandos    { if($1==NULL){ $$ = $3;}
 
 bloc_com_dec:         '{'                             { escopo = table_nest(escopo); };
 
-bloc_com:             bloc_com_dec comandos '}'       { escopo = table_pop_nest(escopo); $$ = $2; }
+bloc_com:             bloc_com_dec comandos '}'       { $$ = $2; $$->code = allocate_vars($$->code, escopo); escopo = table_pop_nest(escopo); }
                     | bloc_com_dec '}'                { escopo = table_pop_nest(escopo); $$ = NULL; };
 
 args:                 expr                            { $$ = $1; }
@@ -270,8 +273,8 @@ args:                 expr                            { $$ = $1; }
 
 chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table_get_content(escopo, $1.label, $1.line_number); table_check_use(content, NAT_FUN, $1.line_number);
                                                         char str[] = "call "; strcat(str, $1.label); free($1.label); $1.label=strdup(str); $$ = ast_new_node($1, content->node_type); ast_add_child($$, $3);
-                                                        char* reg = get_temp(); $$->temp = get_temp(); char* return_size = int_to_string(0-content->total_size);
-                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOADAI, "rsp", return_size, $$->temp, NULL)); 
+                                                        char* reg = get_temp(); $$->temp = get_temp();
+                                                        $$->code = opList_pushLeft($$->code, op_new(OP_LOADAI, "rsp", "2", $$->temp, NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_JUMPI, NULL, NULL, content->lex_data.value, NULL)); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STOREAI, reg, NULL, "rfp", "1")); 
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_ADDI, "rpc", "3", reg, NULL)); 
@@ -279,7 +282,7 @@ chamada_func:         TK_IDENTIFICADOR '(' args ')'   { Content* content = table
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_I2I, "rsp", NULL, "rfp", NULL));
                                                         $$->code = opList_pushLeft($$->code, op_new(OP_STORE, "rfp", NULL, "rsp", NULL));
                                                         if($3 != NULL) $$->code = opList_concatLeft($$->code, $3->code);
-                                                        free(reg); free(return_size);
+                                                        free(reg);
                                                       };
 
 
