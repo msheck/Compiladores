@@ -57,6 +57,16 @@ A análise semântica armazena as declarações da gramática em uma tabela, e g
 
 Nessa etapa separamos os arquivos de acordo com suas funcionalidades e o agrupados na pasta _src/..._ para uma organização mais intuitiva.
 
+
+## Etapa 5 - Geração de Código
+
+Utilizando as estruturas de árvore sintática e tabela de simbolos, geramos operações que serão executados no simulador _**ilocsim.py**_.
+É realizada apenas uma passagem pela árvore para gerar o código. 
+
+Os dados globais são guardados na memória apontada pelo registrador _rbss_, inicializado em 512 pela configuração do _**Makefile**_.
+A função _main_ é necessária para a compilação do código, se ela não for encontrada, será retornado um erro. A área de dados da main é definida pelo seu começo apontado pelo registrador _rfp_ e o final apontado pelo registrador _rsp_. O _rfp_ da main é inicializado em 1024 pela configuração do _**Makefile**_.
+Cada função gera um novo registro de ativação na pilha. Seu conteúdo consiste, nesta ordem, do endereço anterior de _rfp_, valor de retorno de _rpc_, o valor de retorno da função, e em seguida todas as variáveis locais à função.
+
 ---
 
 ## Makefile commands

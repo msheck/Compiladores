@@ -81,15 +81,17 @@ OpList* allocate_vars(OpList* code, SymbolTable* table) {
     if(table->content == NULL)
         return code;
 
+    int total_size = 0;
     char* buffer;
     for(int i=0; i < table->size; i++) {
         if(table->content[i] != NULL) {
             if(table->content[i]->nature == NAT_VAR) {
-                buffer = int_to_string(table->content[i]->total_size);
-                code = opList_pushLeft(code, op_new(OP_ADDI, "rsp", buffer, "rsp", NULL));
+                total_size += table->content[i]->total_size;
             }
         }
     }
+    buffer = int_to_string(total_size);
+    code = opList_pushLeft(code, op_new(OP_ADDI, "rsp", buffer, "rsp", NULL));
     free(buffer);
     return code;
 }
