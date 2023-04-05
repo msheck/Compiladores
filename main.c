@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	int ret = yyparse(); 
 	exporta(arvore);
 	generateAsm(operacoes);
-	opList_print(operacoes);
+	//opList_print(operacoes);
 	opList_free(operacoes);
 	libera(arvore);
 	arvore = NULL;
