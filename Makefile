@@ -10,7 +10,7 @@ ETAPA = 5
 
 DATA = 512
 STACK = 1024
-SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c src/Misc.c
+SOURCES := lex.yy.c parser.tab.c src/AbstractSyntaxTree.c src/Errors.c src/CodeGen.c src/OpList.c src/ASTExpressions.c src/IntList.c src/Content.c src/ContentList.c src/Table.c src/TablePrint.c src/Misc.c src/Assembler.c
 
 .PHONY: zip unzip compile_test test clean flex etapa$(ETAPA)
 

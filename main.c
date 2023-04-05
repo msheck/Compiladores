@@ -5,6 +5,7 @@
 #include "src/Content.h"
 #include "src/Table.h"
 #include "src/TablePrint.h"
+#include "src/Assembler.h"
 
 extern int yyparse(void);
 extern int yylex_destroy(void);
@@ -31,6 +32,7 @@ int main(int argc, char **argv)
 	escopo = tabela;
 	int ret = yyparse(); 
 	exporta(arvore);
+	generateAsm(operacoes);
 	opList_print(operacoes);
 	opList_free(operacoes);
 	libera(arvore);
